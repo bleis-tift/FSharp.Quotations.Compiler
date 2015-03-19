@@ -20,22 +20,26 @@ module internal MethodCallEmitter =
 
   let doNothing (_: ILGenerator) = ()
 
+  let emitOneOpCode opcode (gen: ILGenerator) = gen.Emit(opcode)
+  let emitTwoOpCodes (opcode1, opcode2) (gen: ILGenerator) = gen.Emit(opcode1); gen.Emit(opcode2)
+
   let private altEmitterTable1 =
     let dict = Dictionary<MethodInfo, (ILGenerator -> unit)>(identityEqualityComparer)
     dict.Add(getMethod <@ +(1) @>, doNothing)
-    dict.Add(getMethod <@ -(1) @>, fun gen -> gen.Emit(OpCodes.Neg))
-    dict.Add(getMethod <@ 1 - 1 @>, fun gen -> gen.Emit(OpCodes.Sub))
-    dict.Add(getMethod <@ 1 / 1 @>, fun gen -> gen.Emit(OpCodes.Div))
-    dict.Add(getMethod <@ 1 % 1 @>, fun gen -> gen.Emit(OpCodes.Rem))
+    dict.Add(getMethod <@ -(1) @>, emitOneOpCode OpCodes.Neg)
+    dict.Add(getMethod <@ 1 - 1 @>, emitOneOpCode OpCodes.Sub)
+    dict.Add(getMethod <@ 1 / 1 @>, emitOneOpCode OpCodes.Div)
+    dict.Add(getMethod <@ 1 % 1 @>, emitOneOpCode OpCodes.Rem)
+    dict.Add(getMethod <@ 1 &&& 1 @>, emitOneOpCode OpCodes.And)
     dict :> IReadOnlyDictionary<_, _>
 
   open Microsoft.FSharp.Core.Operators.Checked
 
   let private altEmitterTable2 =
     let dict = Dictionary<MethodInfo, (ILGenerator -> unit)>(identityEqualityComparer)
-    dict.Add(getMethod <@ -(1) @>, fun gen -> gen.Emit(OpCodes.Ldc_I4_M1); gen.Emit(OpCodes.Mul_Ovf))
-    dict.Add(getMethod <@ 1 - 1 @>, fun gen -> gen.Emit(OpCodes.Sub_Ovf))
-    dict.Add(getMethod <@ 1 * 1 @>, fun gen -> gen.Emit(OpCodes.Mul_Ovf))
+    dict.Add(getMethod <@ -(1) @>, emitTwoOpCodes (OpCodes.Ldc_I4_M1, OpCodes.Mul_Ovf))
+    dict.Add(getMethod <@ 1 - 1 @>, emitOneOpCode OpCodes.Sub_Ovf)
+    dict.Add(getMethod <@ 1 * 1 @>, emitOneOpCode OpCodes.Mul_Ovf)
     dict :> IReadOnlyDictionary<_, _>
 
   let emit (mi: MethodInfo) isTailCall (gen: ILGenerator) =
