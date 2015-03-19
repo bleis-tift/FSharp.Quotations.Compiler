@@ -16,3 +16,5 @@ module internal MethodCallEmitter =
   let emit (mi: MethodInfo) (gen: ILGenerator) =
     if mi = posInt then ()
     elif mi = negInt then gen.Emit(OpCodes.Neg)
+    else
+      gen.EmitCall(OpCodes.Call, mi, null)
