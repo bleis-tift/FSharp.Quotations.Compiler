@@ -70,6 +70,7 @@
     <Content Include="app.config" />
     <Compile Include="TestUtil.fs" />
     <Compile Include="LiteralTest.fs" />
+    <Compile Include="ArithmeticOpTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FsUnit.NUnit">

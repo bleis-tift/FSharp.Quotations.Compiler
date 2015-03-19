@@ -7,6 +7,9 @@ open System.Reflection.Emit
 open System.Collections.Generic
 
 module ExprCompiler =
+  type StackInfo =
+    | CompileTarget of Expr
+    | Compiling of (ILGenerator -> unit)
 
   let inline emitLoadInteger< ^TInteger when ^TInteger : (static member op_Explicit: ^TInteger -> int) > (value: obj) (gen: ILGenerator) =
     match int (unbox< ^TInteger > value) with
@@ -30,18 +33,25 @@ module ExprCompiler =
 
     let gen = m.GetILGenerator()
 
-    let stack = Stack<Expr>()
-    stack.Push(expr)
+    let stack = Stack<StackInfo>()
+    stack.Push(CompileTarget expr)
 
     while stack.Count <> 0 do
       match stack.Pop() with
-      | Value (value, typ) ->
-          if typ = typeof<int> then
-            emitLoadInteger<int> value gen
-          else
-            failwithf "unsupported value type: %A" typ
-      | expr ->
-          failwithf "unsupported expr: %A" expr
+      | Compiling f -> f gen
+      | CompileTarget target ->
+          match target with
+          | Call (None, mi, argsExprs) ->
+              stack.Push(Compiling (fun gen ->
+                MethodCallEmitter.emit mi gen))
+              argsExprs |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))
+          | Value (value, typ) ->
+              if typ = typeof<int> then
+                emitLoadInteger<int> value gen
+              else
+                failwithf "unsupported value type: %A" typ
+          | expr ->
+              failwithf "unsupported expr: %A" expr
 
     gen.Emit(OpCodes.Ret)
     let f : Func<'T> = unbox (m.CreateDelegate(typeof<Func<'T>>))
