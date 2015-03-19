@@ -43,7 +43,7 @@ module ExprCompiler =
           match target with
           | Call (None, mi, argsExprs) ->
               stack.Push(Compiling (fun gen ->
-                MethodCallEmitter.emit mi gen))
+                MethodCallEmitter.emit mi (stack.Count = 0) gen))
               argsExprs |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))
           | Value (value, typ) ->
               if typ = typeof<int> then
