@@ -26,3 +26,8 @@ module ArithmeticOpTest =
   let ``int * int`` () =
     <@ 2 * 3 @> |> check 6
     <@ Int32.MinValue * -1 @> |> check Int32.MinValue
+
+  [<Test>]
+  let ``int / int`` () =
+    <@ 5 / 2 @> |> check 2
+    <@ Int32.MinValue / -1 @> |> checkExn<int, OverflowException>

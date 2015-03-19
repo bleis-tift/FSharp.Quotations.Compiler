@@ -27,7 +27,7 @@ module TestUtil =
     expr |> ExprCompiler.compile
     |> should equal expected
 
-  let checkExn<'TExn when 'TExn :> exn> (expr: Expr<_>) =
+  let checkExn<'T, 'TExn when 'TExn :> exn> (expr: Expr<'T>) =
     try
       ExprCompiler.compile expr |> ignore
       Assert.Fail("exception is not thrown.")
