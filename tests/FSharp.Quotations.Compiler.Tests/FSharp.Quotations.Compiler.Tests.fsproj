@@ -69,6 +69,7 @@
     <Content Include="packages.config" />
     <Content Include="app.config" />
     <Compile Include="TestUtil.fs" />
+    <Compile Include="LiteralTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FsUnit.NUnit">
