@@ -18,6 +18,7 @@ module internal MethodCallEmitter =
 
   open Microsoft.FSharp.Core.Operators.Checked
 
+  let private negOvfInt = getMethod <@ -(1) @>
   let private subOvfIntIntInt = getMethod <@ 1 - 1 @>
   let private mulOvfIntIntInt = getMethod <@ 1 * 1 @>
 
@@ -29,6 +30,7 @@ module internal MethodCallEmitter =
     elif mi = modIntIntInt then gen.Emit(OpCodes.Rem)
     elif mi = subOvfIntIntInt then gen.Emit(OpCodes.Sub_Ovf)
     elif mi = mulOvfIntIntInt then gen.Emit(OpCodes.Mul_Ovf)
+    elif mi = negOvfInt then gen.Emit(OpCodes.Ldc_I4_M1); gen.Emit(OpCodes.Mul_Ovf) // -n -> n * -1
     else
       if isTailCall then
         gen.Emit(OpCodes.Tailcall)

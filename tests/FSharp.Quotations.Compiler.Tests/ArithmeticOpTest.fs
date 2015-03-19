@@ -41,6 +41,11 @@ module ArithmeticOpTest =
     open Microsoft.FSharp.Core.Operators.Checked
 
     [<Test>]
+    let ``- int`` () =
+      <@ -(1) @> |> check -1
+      <@ - Int32.MinValue @> |> checkExn<_, OverflowException>
+
+    [<Test>]
     let ``int + int`` () =
       <@ 1 + 2 @> |> check 3
       <@ Int32.MaxValue + 1 @> |> checkExn<_, OverflowException>
