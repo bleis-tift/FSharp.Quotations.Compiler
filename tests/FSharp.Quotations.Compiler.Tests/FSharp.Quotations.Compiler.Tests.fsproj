@@ -65,7 +65,6 @@
   -->
   <Import Project="..\..\.paket\paket.targets" />
   <ItemGroup>
-    <Compile Include="Tests.fs" />
     <None Include="paket.references" />
     <Content Include="packages.config" />
     <Content Include="app.config" />
