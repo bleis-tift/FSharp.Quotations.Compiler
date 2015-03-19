@@ -4,34 +4,47 @@ open System.Reflection
 open System.Reflection.Emit
 open Microsoft.FSharp.Quotations.Patterns
 
+open System.Collections.Generic
+open System.Runtime.CompilerServices
+
 module internal MethodCallEmitter =
 
   let private getMethod = function
   | Call (_, mi, _) -> mi
   | expr -> failwithf "expr is not Method call: %A" expr
 
-  let private posInt = getMethod <@ +(1) @>
-  let private negInt = getMethod <@ -(1) @>
-  let private subIntIntInt = getMethod <@ 1 - 1 @>
-  let private divIntIntInt = getMethod <@ 1 / 1 @>
-  let private modIntIntInt = getMethod <@ 1 % 1 @>
+  let private identityEqualityComparer =
+    { new IEqualityComparer<MethodInfo> with
+        member __.Equals(x, y) = (x = y)
+        member __.GetHashCode(x) = RuntimeHelpers.GetHashCode(x) }
+
+  let doNothing (_: ILGenerator) = ()
+
+  let private altEmitterTable1 =
+    let dict = Dictionary<MethodInfo, (ILGenerator -> unit)>(identityEqualityComparer)
+    dict.Add(getMethod <@ +(1) @>, doNothing)
+    dict.Add(getMethod <@ -(1) @>, fun gen -> gen.Emit(OpCodes.Neg))
+    dict.Add(getMethod <@ 1 - 1 @>, fun gen -> gen.Emit(OpCodes.Sub))
+    dict.Add(getMethod <@ 1 / 1 @>, fun gen -> gen.Emit(OpCodes.Div))
+    dict.Add(getMethod <@ 1 % 1 @>, fun gen -> gen.Emit(OpCodes.Rem))
+    dict :> IReadOnlyDictionary<_, _>
 
   open Microsoft.FSharp.Core.Operators.Checked
 
-  let private negOvfInt = getMethod <@ -(1) @>
-  let private subOvfIntIntInt = getMethod <@ 1 - 1 @>
-  let private mulOvfIntIntInt = getMethod <@ 1 * 1 @>
+  let private altEmitterTable2 =
+    let dict = Dictionary<MethodInfo, (ILGenerator -> unit)>(identityEqualityComparer)
+    dict.Add(getMethod <@ -(1) @>, fun gen -> gen.Emit(OpCodes.Ldc_I4_M1); gen.Emit(OpCodes.Mul_Ovf))
+    dict.Add(getMethod <@ 1 - 1 @>, fun gen -> gen.Emit(OpCodes.Sub_Ovf))
+    dict.Add(getMethod <@ 1 * 1 @>, fun gen -> gen.Emit(OpCodes.Mul_Ovf))
+    dict :> IReadOnlyDictionary<_, _>
 
   let emit (mi: MethodInfo) isTailCall (gen: ILGenerator) =
-    if mi = posInt then ()
-    elif mi = negInt then gen.Emit(OpCodes.Neg)
-    elif mi = subIntIntInt then gen.Emit(OpCodes.Sub)
-    elif mi = divIntIntInt then gen.Emit(OpCodes.Div)
-    elif mi = modIntIntInt then gen.Emit(OpCodes.Rem)
-    elif mi = subOvfIntIntInt then gen.Emit(OpCodes.Sub_Ovf)
-    elif mi = mulOvfIntIntInt then gen.Emit(OpCodes.Mul_Ovf)
-    elif mi = negOvfInt then gen.Emit(OpCodes.Ldc_I4_M1); gen.Emit(OpCodes.Mul_Ovf) // -n -> n * -1
-    else
-      if isTailCall then
-        gen.Emit(OpCodes.Tailcall)
-      gen.EmitCall(OpCodes.Call, mi, null)
+    match altEmitterTable1.TryGetValue(mi) with
+    | true, emitter -> emitter gen
+    | _ ->
+        match altEmitterTable2.TryGetValue(mi) with
+        | true, emitter -> emitter gen
+        | _ ->
+            if isTailCall then
+              gen.Emit(OpCodes.Tailcall)
+            gen.EmitCall(OpCodes.Call, mi, null)
