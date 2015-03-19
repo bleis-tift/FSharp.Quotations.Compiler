@@ -1,0 +1,23 @@
+type project
+owners
+    bleis-tift
+authors 
+    bleis-tift
+projectUrl
+    http://github.com/bleis-tift/FSharp.Quotations.Compiler
+iconUrl
+    https://raw.githubusercontent.com/bleis-tift/FSharp.Quotations.Compiler/master/docs/files/img/logo.png
+licenseUrl
+    http://github.com/bleis-tift/FSharp.Quotations.Compiler/blob/master/LICENSE.txt
+requireLicenseAcceptance
+    false
+copyright
+    Copyright 2015
+tags
+    fsharp F# quotations compiler
+summary
+    A compiler for F# expression tree
+description
+    A compiler for F# expression tree. This library is based on System.Reflection.Emit technology.
+
+
