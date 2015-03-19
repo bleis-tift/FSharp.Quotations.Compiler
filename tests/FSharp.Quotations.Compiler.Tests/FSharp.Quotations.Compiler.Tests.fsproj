@@ -68,6 +68,7 @@
     <None Include="paket.references" />
     <Content Include="packages.config" />
     <Content Include="app.config" />
+    <Compile Include="TestUtil.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FsUnit.NUnit">
