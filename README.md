@@ -1,31 +1,15 @@
-[![Issue Stats](http://issuestats.com/github/fsprojects/ProjectScaffold/badge/issue)](http://issuestats.com/github/fsprojects/ProjectScaffold)
-[![Issue Stats](http://issuestats.com/github/fsprojects/ProjectScaffold/badge/pr)](http://issuestats.com/github/fsprojects/ProjectScaffold)
+[![Issue Stats](http://issuestats.com/github/bleis-tift/FSharp.Quotations.Compiler/badge/issue)](http://issuestats.com/github/bleis-tift/FSharp.Quotations.Compiler)
+[![Issue Stats](http://issuestats.com/github/bleis-tift/FSharp.Quotations.Compiler/badge/pr)](http://issuestats.com/github/bleis-tift/FSharp.Quotations.Compiler)
 
-# ProjectScaffold
+# FSharp.Quotations.Compiler
 
-This project can be used to scaffold a prototypical .NET solution including file system layout and tooling. This includes a build process that: 
-
-* updates all AssemblyInfo files
-* compiles the application and runs all test projects
-* generates [SourceLinks](https://github.com/ctaggart/SourceLink)
-* generates API docs based on XML document tags
-* generates [documentation based on Markdown files](http://fsprojects.github.io/ProjectScaffold/writing-docs.html)
-* generates [NuGet](http://www.nuget.org) packages
-* and allows a simple [one step release process](http://fsprojects.github.io/ProjectScaffold/release-process.html).
-
-In order to start the scaffolding process run 
-
-    $ build.cmd // on windows    
-    $ build.sh  // on mono
+This library is a compiler for F# expression tree.
+This is based on System.Reflection.Emit technology.
     
-Read the [Getting started tutorial](http://fsprojects.github.io/ProjectScaffold/index.html#Getting-started) to learn more.
+Read the [Getting started tutorial](http://bleis-tift.github.io/FSharp.Quotations.Compiler/index.html#Getting-started) to learn more.
 
-Documentation: http://fsprojects.github.io/ProjectScaffold
+Documentation: http://bleis-tift.github.io/FSharp.Quotations.Compiler
 
 ## Maintainer(s)
 
-- [@forki](https://github.com/forki)
-- [@pblasucci](https://github.com/pblasucci)
-- [@sergey-tihon](https://github.com/sergey-tihon)
-
-The default maintainer account for projects under "fsprojects" is [@fsgit](https://github.com/fsgit) - F# Community Project Incubation Space (repo management)
+- [@bleis-tift](https://github.com/bleis-tift)
