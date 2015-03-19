@@ -44,3 +44,8 @@ module ArithmeticOpTest =
     let ``int + int`` () =
       <@ 1 + 2 @> |> check 3
       <@ Int32.MaxValue + 1 @> |> checkExn<_, OverflowException>
+
+    [<Test>]
+    let ``int - int`` () =
+      <@ 3 - 1 @> |> check 2
+      <@ Int32.MinValue - 1 @> |> checkExn<_, OverflowException>
