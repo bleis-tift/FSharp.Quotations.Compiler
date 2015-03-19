@@ -19,6 +19,7 @@ module internal MethodCallEmitter =
   open Microsoft.FSharp.Core.Operators.Checked
 
   let private subOvfIntIntInt = getMethod <@ 1 - 1 @>
+  let private mulOvfIntIntInt = getMethod <@ 1 * 1 @>
 
   let emit (mi: MethodInfo) isTailCall (gen: ILGenerator) =
     if mi = posInt then ()
@@ -27,6 +28,7 @@ module internal MethodCallEmitter =
     elif mi = divIntIntInt then gen.Emit(OpCodes.Div)
     elif mi = modIntIntInt then gen.Emit(OpCodes.Rem)
     elif mi = subOvfIntIntInt then gen.Emit(OpCodes.Sub_Ovf)
+    elif mi = mulOvfIntIntInt then gen.Emit(OpCodes.Mul_Ovf)
     else
       if isTailCall then
         gen.Emit(OpCodes.Tailcall)
