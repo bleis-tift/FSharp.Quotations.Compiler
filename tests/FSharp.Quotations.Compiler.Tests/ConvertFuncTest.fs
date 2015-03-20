@@ -103,3 +103,14 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``string int`` () = <@ string 42 @> |> check "42"
+
+  module Checked =
+    open Microsoft.FSharp.Core.Operators.Checked
+
+    [<Test>]
+    let ``byte int`` () =
+      <@ byte 1 @> |> check 1uy
+      // Byte.MaxValue = 255uy
+      <@ byte 256 @> |> checkExn<_, OverflowException>
+      // Byte.MinValue = 0uy
+      <@ byte -1 @> |> checkExn<_, OverflowException>

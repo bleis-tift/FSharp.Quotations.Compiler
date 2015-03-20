@@ -63,6 +63,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ -(1) @>, emitTwoOpCodes (OpCodes.Ldc_I4_M1, OpCodes.Mul_Ovf))
     dict.Add(getMethod <@ 1 - 1 @>, emitOneOpCode OpCodes.Sub_Ovf)
     dict.Add(getMethod <@ 1 * 1 @>, emitOneOpCode OpCodes.Mul_Ovf)
+    dict.Add(getMethod <@ byte 1 @>, emitOneOpCode OpCodes.Conv_Ovf_U1)
     dict :> IReadOnlyDictionary<_, _>
 
   // shadowing the functions of the Microsoft.FSharp.Core.Operators.Checked module
