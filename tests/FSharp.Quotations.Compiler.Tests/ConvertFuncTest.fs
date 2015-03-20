@@ -62,3 +62,13 @@ module ConvertFuncTest =
     // Int16.MinValue = -32768s
     <@ int16 -32769 @> |> check 32767s
     <@ int16 -32770 @> |> check 32766s
+
+  [<Test>]
+  let ``uint16 int`` () =
+    <@ uint16 1 @> |> check 1us
+    // UInt16.MaxValue = 65535us
+    <@ uint16 65536 @> |> check 0us
+    <@ uint16 65537 @> |> check 1us
+    // UInt16.MinValue = 0us
+    <@ uint16 -1 @> |> check 65535us
+    <@ uint16 -2 @> |> check 65534us
