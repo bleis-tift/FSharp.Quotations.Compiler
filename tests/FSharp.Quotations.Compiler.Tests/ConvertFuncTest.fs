@@ -141,3 +141,11 @@ module ConvertFuncTest =
       <@ int16 32768 @> |> checkExn<_, OverflowException>
       // Int16.MinValue = -32768s
       <@ int16 -32769 @> |> checkExn<_, OverflowException>
+
+    [<Test>]
+    let ``uint16 int`` () =
+      <@ uint16 1 @> |> check 1us
+      // UInt16.MaxValue = 65535us
+      <@ uint16 65536 @> |> checkExn<_, OverflowException>
+      // UInt16.MinValue = 0us
+      <@ uint16 -1 @> |> checkExn<_, OverflowException>
