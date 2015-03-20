@@ -63,3 +63,7 @@ module ArithmeticOpTest =
     let ``int * int`` () =
       <@ 2 * 3 @> |> check 6
       <@ Int32.MinValue * -1 @> |> checkExn<_, OverflowException>
+
+    [<Test>]
+    let ``string + string`` () =
+      <@ "aaa" + "bbb" @> |> check "aaabbb"
