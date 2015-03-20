@@ -77,6 +77,10 @@ module internal MethodCallEmitter =
                                        |>> emitPropGet (getProperty <@ System.Globalization.CultureInfo.InvariantCulture @>)
                                        |>> emitOpCodeWithType OpCodes.Unbox_Any typeof<System.IFormatProvider>
                                        |>> emitCall (getMethod <@ System.Double.Parse("", System.Globalization.NumberStyles.None, Unchecked.defaultof<System.IFormatProvider>) @>))
+    dict.Add(getMethod <@ float32 "" @>, emitOpCodeWithInt OpCodes.Ldc_I4 (int System.Globalization.NumberStyles.Float)
+                                         |>> emitPropGet (getProperty <@ System.Globalization.CultureInfo.InvariantCulture @>)
+                                         |>> emitOpCodeWithType OpCodes.Unbox_Any typeof<System.IFormatProvider>
+                                         |>> emitCall (getMethod <@ System.Single.Parse("", System.Globalization.NumberStyles.None, Unchecked.defaultof<System.IFormatProvider>) @>))
     dict :> IReadOnlyDictionary<_, _>
 
   open Microsoft.FSharp.Core.Operators.Checked

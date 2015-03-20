@@ -160,6 +160,20 @@ module ConvertFuncTest =
     <@ float "str" @> |> checkExn<_, FormatException>
     <@ float (null: string) @> |> checkExn<_, ArgumentNullException>
 
+  [<Test>]
+  let ``float32 string`` () =
+    <@ float32 "1" @> |> check 1.0f
+    <@ float32 "NaN" @> |> check nanf
+    <@ float32 "Infinity" @> |> check infinityf
+    <@ float32 "-Infinity" @> |> check -infinityf
+    // Single.MaxValue < 3.40282347e+39
+    <@ float32 "3.40282347e+39" @> |> checkExn<_, OverflowException>
+    // Single.MinValue > -3.40282347e+39
+    <@ float32 "-3.40282347e+39" @> |> checkExn<_, OverflowException>
+
+    <@ float32 "str" @> |> checkExn<_, FormatException>
+    <@ float32 (null: string) @> |> checkExn<_, ArgumentNullException>
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
