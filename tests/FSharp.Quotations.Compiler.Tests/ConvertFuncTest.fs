@@ -114,3 +114,11 @@ module ConvertFuncTest =
       <@ byte 256 @> |> checkExn<_, OverflowException>
       // Byte.MinValue = 0uy
       <@ byte -1 @> |> checkExn<_, OverflowException>
+
+    [<Test>]
+    let ``sbyte int`` () =
+      <@ sbyte 1 @> |> check 1y
+      // SByte.MaxValue = 127y
+      <@ sbyte 128 @> |> checkExn<_, OverflowException>
+      // SByte.MinValue = -128y
+      <@ sbyte -129 @> |> checkExn<_, OverflowException>
