@@ -167,3 +167,6 @@ module ConvertFuncTest =
       <@ uint64 1 @> |> check 1UL
       // UInt64.MinValue = 0UL
       <@ uint64 -1 @> |> checkExn<_, OverflowException>
+
+    [<Test>]
+    let ``nativeint int`` () = <@ nativeint 0 @> |> check 0n
