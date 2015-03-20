@@ -34,8 +34,26 @@ module ExprCompiler =
     while stack.Count <> 0 do
       match stack.Pop() with
       | Compiling f -> f gen
+      | CompilingIfThenElse (falseLabel, ifEndLabel, cond, truePart, falsePart) ->
+          match cond, truePart, falsePart with
+          | NotYet cond, _, _ ->
+              stack.Push(CompilingIfThenElse (falseLabel, ifEndLabel, Done, truePart, falsePart))
+              stack.Push(CompileTarget cond)
+          | Done, NotYet truePart, _ ->
+              gen.Emit(OpCodes.Brfalse, falseLabel)
+              stack.Push(CompilingIfThenElse (falseLabel, ifEndLabel, Done, Done, falsePart))
+              stack.Push(CompileTarget truePart)
+          | Done, Done, NotYet falsePart ->
+              gen.Emit(OpCodes.Br, ifEndLabel)
+              gen.MarkLabel(falseLabel)
+              stack.Push(CompilingIfThenElse (falseLabel, ifEndLabel, Done, Done, Done))
+              stack.Push(CompileTarget falsePart)
+          | Done, Done, Done ->
+              gen.MarkLabel(ifEndLabel)
       | CompileTarget target ->
           match target with
+          | IfThenElse (cond, truePart, falsePart) ->
+              stack.Push(CompilingIfThenElse (gen.DefineLabel(), gen.DefineLabel(), NotYet cond, NotYet truePart, NotYet falsePart))
           | Call (None, mi, argsExprs) ->
               MethodCallEmitter.emit (mi, argsExprs) stack
           | Value (value, typ) ->
