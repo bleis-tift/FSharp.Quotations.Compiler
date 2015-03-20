@@ -73,6 +73,7 @@
     <Compile Include="ArithmeticOpTest.fs" />
     <Compile Include="BitOpTest.fs" />
     <Compile Include="CmpOpTest.fs" />
+    <Compile Include="ConvertFuncTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FsUnit.NUnit">
