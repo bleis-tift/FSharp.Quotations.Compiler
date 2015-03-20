@@ -9,3 +9,6 @@ module BitOpTest =
 
   [<Test>]
   let ``int ||| int`` () = <@ 42 ||| 0 @> |> check 42
+
+  [<Test>]
+  let ``int ^^^ int`` () = <@ 1 ^^^ 1 @> |> check 0
