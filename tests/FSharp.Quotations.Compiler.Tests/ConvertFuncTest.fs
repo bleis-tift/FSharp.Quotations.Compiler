@@ -100,3 +100,6 @@ module ConvertFuncTest =
   let ``unativeint int`` () =
     <@ unativeint 0 @> |> check 0un
     <@ unativeint 1 @> |> check (unativeint 1)
+
+  [<Test>]
+  let ``string int`` () = <@ string 42 @> |> check "42"
