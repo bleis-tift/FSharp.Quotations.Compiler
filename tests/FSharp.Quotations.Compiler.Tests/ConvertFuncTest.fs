@@ -118,6 +118,17 @@ module ConvertFuncTest =
     <@ byte "str" @> |> checkExn<_, FormatException>
     <@ byte (null: string) @> |> checkExn<_, ArgumentNullException>
 
+  [<Test>]
+  let ``sbyte string`` () =
+    <@ sbyte "1" @> |> check 1y
+    // SByte.MaxValue = 127y
+    <@ sbyte "128" @> |> checkExn<_, OverflowException>
+    // SByte.MinValue = -128y
+    <@ sbyte "-129" @> |> checkExn<_, OverflowException>
+
+    <@ sbyte "str" @> |> checkExn<_, FormatException>
+    <@ sbyte (null: string) @> |> checkExn<_, ArgumentNullException>
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
