@@ -36,3 +36,10 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``decimal int`` () = <@ decimal 1 @> |> check 1M
+
+  [<Test>]
+  let ``enum int`` () =
+    <@ enum 0 @> |> check StringSplitOptions.None
+    <@ enum 1 @> |> check StringSplitOptions.RemoveEmptyEntries
+    <@ enum 2 @> |> check (2 |> unbox<StringSplitOptions>)
+    <@ enum -1 @> |> check (-1 |> unbox<StringSplitOptions>)
