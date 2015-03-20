@@ -129,6 +129,12 @@ module ConvertFuncTest =
     <@ sbyte "str" @> |> checkExn<_, FormatException>
     <@ sbyte (null: string) @> |> checkExn<_, ArgumentNullException>
 
+  [<Test>]
+  let ``char string`` () =
+    <@ char "a" @> |> check 'a'
+    <@ char "aa" @> |> checkExn<_, FormatException>
+    <@ char (null: string) @> |> checkExn<_, ArgumentNullException>
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
