@@ -33,3 +33,6 @@ module ConvertFuncTest =
     // Char.MinValue = '\000'
     <@ char -1 @> |> check (Char.MaxValue)
     <@ char -2 @> |> check (char ((int Char.MaxValue) - 1))
+
+  [<Test>]
+  let ``decimal int`` () = <@ decimal 1 @> |> check 1M

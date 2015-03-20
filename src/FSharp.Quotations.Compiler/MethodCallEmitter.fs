@@ -23,6 +23,8 @@ module internal MethodCallEmitter =
   let emitOneOpCode opcode (gen: ILGenerator) = gen.Emit(opcode)
   let emitTwoOpCodes (opcode1, opcode2) (gen: ILGenerator) = gen.Emit(opcode1); gen.Emit(opcode2)
 
+  let emitCall mi (gen: ILGenerator) = gen.EmitCall(OpCodes.Call, mi, null)
+
   let private altEmitterTable1 =
     let dict = Dictionary<MethodInfo, (ILGenerator -> unit)>(identityEqualityComparer)
     dict.Add(getMethod <@ +(1) @>, doNothing)
@@ -39,6 +41,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ byte 1 @>, doNothing)
     dict.Add(getMethod <@ sbyte 1 @>, doNothing)
     dict.Add(getMethod <@ char 1 @>, doNothing)
+    dict.Add(getMethod <@ decimal 1 @>, emitCall (getMethod <@ System.Convert.ToDecimal(1) @>))
     dict :> IReadOnlyDictionary<_, _>
 
   open Microsoft.FSharp.Core.Operators.Checked
