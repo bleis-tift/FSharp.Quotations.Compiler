@@ -71,3 +71,37 @@ module CmpOpTest =
     <@ true >= false @> |> check true
     <@ true >= true @> |> check true
     <@ false >= true @> |> check false
+
+  [<Test>]
+  let ``string = string`` () =
+    <@ "aaa" = "aaa" @> |> check true
+    <@ "bbb" = "aaa" @> |> check false
+
+  [<Test>]
+  let ``string <> string`` () =
+    <@ "aaa" <> "aaa" @> |> check false
+    <@ "bbb" <> "aaa" @> |> check true
+
+  [<Test>]
+  let ``string < string`` () =
+    <@ "aaa" < "bbb" @> |> check true
+    <@ "aaa" < "aaa" @> |> check false
+    <@ "bbb" < "aaa" @> |> check false
+
+  [<Test>]
+  let ``string <= string`` () =
+    <@ "aaa" <= "bbb" @> |> check true
+    <@ "aaa" <= "aaa" @> |> check true
+    <@ "bbb" <= "aaa" @> |> check false
+
+  [<Test>]
+  let ``string > string`` () =
+    <@ "aaa" > "bbb" @> |> check false
+    <@ "aaa" > "aaa" @> |> check false
+    <@ "bbb" > "aaa" @> |> check true
+
+  [<Test>]
+  let ``string >= string`` () =
+    <@ "aaa" >= "bbb" @> |> check false
+    <@ "aaa" >= "aaa" @> |> check true
+    <@ "bbb" >= "aaa" @> |> check true
