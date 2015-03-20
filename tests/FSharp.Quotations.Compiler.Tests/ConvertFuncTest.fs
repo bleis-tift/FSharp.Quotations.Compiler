@@ -158,3 +158,6 @@ module ConvertFuncTest =
       <@ uint32 1 @> |> check 1u
       // UInt32.MinValue = 0u
       <@ uint32 -1 @> |> checkExn<_, OverflowException>
+
+    [<Test>]
+    let ``int64 int`` () = <@ int64 1 @> |> check 1L
