@@ -49,3 +49,6 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``float32 int`` () = <@ float32 1 @> |> check 1.0f
+
+  [<Test>]
+  let ``int int`` () = <@ int 1 @> |> check 1
