@@ -43,3 +43,6 @@ module ConvertFuncTest =
     <@ enum 1 @> |> check StringSplitOptions.RemoveEmptyEntries
     <@ enum 2 @> |> check (2 |> unbox<StringSplitOptions>)
     <@ enum -1 @> |> check (-1 |> unbox<StringSplitOptions>)
+
+  [<Test>]
+  let ``float int`` () = <@ float 1 @> |> check 1.0

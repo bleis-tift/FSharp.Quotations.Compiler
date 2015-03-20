@@ -42,6 +42,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ sbyte 1 @>, doNothing)
     dict.Add(getMethod <@ char 1 @>, doNothing)
     dict.Add(getMethod <@ decimal 1 @>, emitCall (getMethod <@ System.Convert.ToDecimal(1) @>))
+    dict.Add(getMethod <@ float 1 @>, emitOneOpCode OpCodes.Conv_R8)
     dict :> IReadOnlyDictionary<_, _>
 
   open Microsoft.FSharp.Core.Operators.Checked
