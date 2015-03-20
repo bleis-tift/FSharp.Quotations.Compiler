@@ -52,6 +52,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ uint32 1 @>, doNothing)
     dict.Add(getMethod <@ int64 1 @>, emitOneOpCode OpCodes.Conv_I8)
     dict.Add(getMethod <@ uint64 1 @>, emitOneOpCode OpCodes.Conv_I8)
+    dict.Add(getMethod <@ nativeint 1 @>, emitOneOpCode OpCodes.Conv_I)
     dict :> IReadOnlyDictionary<_, _>
 
   open Microsoft.FSharp.Core.Operators.Checked

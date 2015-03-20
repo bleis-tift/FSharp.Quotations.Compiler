@@ -92,3 +92,6 @@ module ConvertFuncTest =
     // UInt64.MinValue = 0UL
     <@ uint64 -1 @> |> check UInt64.MaxValue
     <@ uint64 -2 @> |> check (UInt64.MaxValue - 1UL)
+
+  [<Test>]
+  let ``nativeint int`` () = <@ nativeint 0 @> |> check 0n
