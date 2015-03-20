@@ -5,6 +5,8 @@ open System.Reflection.Emit
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 
+open System
+open System.Globalization
 open System.Collections.Generic
 open System.Runtime.CompilerServices
 
@@ -29,12 +31,18 @@ module internal MethodCallEmitter =
   let emitTwoOpCodes (opcode1, opcode2) (gen: ILGenerator) = gen.Emit(opcode1); gen.Emit(opcode2)
 
   let emitOpCodeWithInt opcode (value: int) (gen: ILGenerator) = gen.Emit(opcode, value)
-  let emitOpCodeWithType opcode (value: System.Type) (gen: ILGenerator) = gen.Emit(opcode, value)
+  let emitOpCodeWithType opcode (value: Type) (gen: ILGenerator) = gen.Emit(opcode, value)
 
   let emitCall mi (gen: ILGenerator) = gen.EmitCall(OpCodes.Call, mi, null)
   let emitPropGet (pi: PropertyInfo) (gen: ILGenerator) = emitCall pi.GetMethod gen
 
   let private (|>>) emit1 emit2 = (fun (gen: ILGenerator) -> emit1 gen; emit2 gen)
+
+  let emitStrToFloat (mi: MethodInfo) =
+    emitOpCodeWithInt OpCodes.Ldc_I4 (int NumberStyles.Float)
+    |>> emitPropGet (getProperty <@ CultureInfo.InvariantCulture @>)
+    |>> emitOpCodeWithType OpCodes.Unbox_Any typeof<IFormatProvider>
+    |>> emitCall mi
 
   let private altEmitterTable1 =
     let dict = Dictionary<MethodInfo, (ILGenerator -> unit)>(identityEqualityComparer)
@@ -52,7 +60,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ byte 1 @>, doNothing)
     dict.Add(getMethod <@ sbyte 1 @>, doNothing)
     dict.Add(getMethod <@ char 1 @>, doNothing)
-    dict.Add(getMethod <@ decimal 1 @>, emitCall (getMethod <@ System.Convert.ToDecimal(1) @>))
+    dict.Add(getMethod <@ decimal 1 @>, emitCall (getMethod <@ Convert.ToDecimal(1) @>))
     dict.Add(getMethod <@ float 1 @>, emitOneOpCode OpCodes.Conv_R8)
     dict.Add(getMethod <@ float32 1 @>, emitOneOpCode OpCodes.Conv_R4)
     dict.Add(getMethod <@ int 1 @>, doNothing)
@@ -68,19 +76,10 @@ module internal MethodCallEmitter =
                                       |>> emitOneOpCode OpCodes.Conv_Ovf_U1)
     dict.Add(getMethod <@ sbyte "" @>, emitCall (getMethod <@ LanguagePrimitives.ParseInt32("") @>)
                                        |>> emitOneOpCode OpCodes.Conv_Ovf_I1)
-    dict.Add(getMethod <@ char "" @>, emitCall (getMethod <@ System.Char.Parse("") @>))
-    dict.Add(getMethod <@ decimal "" @>, emitOpCodeWithInt OpCodes.Ldc_I4 (int System.Globalization.NumberStyles.Float)
-                                         |>> emitPropGet (getProperty <@ System.Globalization.CultureInfo.InvariantCulture @>)
-                                         |>> emitOpCodeWithType OpCodes.Unbox_Any typeof<System.IFormatProvider>
-                                         |>> emitCall (getMethod <@ System.Decimal.Parse("", System.Globalization.NumberStyles.None, Unchecked.defaultof<System.IFormatProvider>) @>))
-    dict.Add(getMethod <@ float "" @>, emitOpCodeWithInt OpCodes.Ldc_I4 (int System.Globalization.NumberStyles.Float)
-                                       |>> emitPropGet (getProperty <@ System.Globalization.CultureInfo.InvariantCulture @>)
-                                       |>> emitOpCodeWithType OpCodes.Unbox_Any typeof<System.IFormatProvider>
-                                       |>> emitCall (getMethod <@ System.Double.Parse("", System.Globalization.NumberStyles.None, Unchecked.defaultof<System.IFormatProvider>) @>))
-    dict.Add(getMethod <@ float32 "" @>, emitOpCodeWithInt OpCodes.Ldc_I4 (int System.Globalization.NumberStyles.Float)
-                                         |>> emitPropGet (getProperty <@ System.Globalization.CultureInfo.InvariantCulture @>)
-                                         |>> emitOpCodeWithType OpCodes.Unbox_Any typeof<System.IFormatProvider>
-                                         |>> emitCall (getMethod <@ System.Single.Parse("", System.Globalization.NumberStyles.None, Unchecked.defaultof<System.IFormatProvider>) @>))
+    dict.Add(getMethod <@ char "" @>, emitCall (getMethod <@ Char.Parse("") @>))
+    dict.Add(getMethod <@ decimal "" @>, emitStrToFloat (getMethod <@ Decimal.Parse("", NumberStyles.None, Unchecked.defaultof<IFormatProvider>) @>))
+    dict.Add(getMethod <@ float "" @>, emitStrToFloat (getMethod <@ Double.Parse("", NumberStyles.None, Unchecked.defaultof<IFormatProvider>) @>))
+    dict.Add(getMethod <@ float32 "" @>, emitStrToFloat (getMethod <@ Single.Parse("", NumberStyles.None, Unchecked.defaultof<IFormatProvider>) @>))
     dict :> IReadOnlyDictionary<_, _>
 
   open Microsoft.FSharp.Core.Operators.Checked
@@ -114,7 +113,7 @@ module internal MethodCallEmitter =
         match altEmitterTable2.TryGetValue(mi) with
         | true, emitter -> emitter gen
         | _ ->
-            let isReturnVoid = mi.ReturnType = typeof<System.Void>
+            let isReturnVoid = mi.ReturnType = typeof<Void>
             if isTailCall && not isReturnVoid then
               gen.Emit(OpCodes.Tailcall)
             gen.EmitCall(OpCodes.Call, mi, null)
