@@ -8,3 +8,10 @@ module BoolOpTest =
   [<TestCase(false, false, false)>]
   let ``bool || bool`` (x, y, expected) =
     <@ x || y @> |> check expected
+
+  [<TestCase(true, true, true)>]
+  [<TestCase(true, false, false)>]
+  [<TestCase(false, true, false)>]
+  [<TestCase(false, false, false)>]
+  let ``bool && bool`` (x, y, expected) =
+    <@ x && y @> |> check expected
