@@ -85,3 +85,10 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``int64 int`` () = <@ int64 1 @> |> check 1L
+
+  [<Test>]
+  let ``uint64 int`` () =
+    <@ uint64 1 @> |> check 1UL
+    // UInt64.MinValue = 0UL
+    <@ uint64 -1 @> |> check UInt64.MaxValue
+    <@ uint64 -2 @> |> check (UInt64.MaxValue - 1UL)
