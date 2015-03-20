@@ -130,3 +130,6 @@ module ConvertFuncTest =
       <@ char 65536 @> |> checkExn<_, OverflowException>
       // Char.MinValue = '\000'
       <@ char -1 @> |> checkExn<_, OverflowException>
+
+    [<Test>]
+    let ``int int`` () = <@ int 1 @> |> check 1
