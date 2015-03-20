@@ -2,6 +2,7 @@
 
 open System.Reflection
 open System.Reflection.Emit
+open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 
 open System.Collections.Generic
@@ -55,7 +56,10 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ 1 * 1 @>, emitOneOpCode OpCodes.Mul_Ovf)
     dict :> IReadOnlyDictionary<_, _>
 
-  let emit (mi: MethodInfo) isTailCall (gen: ILGenerator) =
+  // shadowing the functions of the Microsoft.FSharp.Core.Operators.Checked module
+  open Microsoft.FSharp.Core.Operators
+
+  let private emitImpl (mi: MethodInfo) isTailCall (gen: ILGenerator) =
     match altEmitterTable1.TryGetValue(mi) with
     | true, emitter -> emitter gen
     | _ ->
@@ -65,3 +69,8 @@ module internal MethodCallEmitter =
             if isTailCall then
               gen.Emit(OpCodes.Tailcall)
             gen.EmitCall(OpCodes.Call, mi, null)
+
+  let emit (mi: MethodInfo, argsExprs: Expr list) (stack: CompileStack) =
+    stack.Push(Compiling (fun gen ->
+      emitImpl mi (stack.Count = 0) gen))
+    argsExprs |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))

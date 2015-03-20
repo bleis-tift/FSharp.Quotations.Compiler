@@ -4,13 +4,8 @@ open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 open System
 open System.Reflection.Emit
-open System.Collections.Generic
 
 module ExprCompiler =
-  type StackInfo =
-    | CompileTarget of Expr
-    | Compiling of (ILGenerator -> unit)
-
   let inline emitLoadInteger< ^TInteger when ^TInteger : (static member op_Explicit: ^TInteger -> int) > (value: obj) (gen: ILGenerator) =
     match int (unbox< ^TInteger > value) with
     | -1 -> gen.Emit(OpCodes.Ldc_I4_M1)
@@ -33,7 +28,7 @@ module ExprCompiler =
 
     let gen = m.GetILGenerator()
 
-    let stack = Stack<StackInfo>()
+    let stack = CompileStack()
     stack.Push(CompileTarget expr)
 
     while stack.Count <> 0 do
@@ -42,9 +37,7 @@ module ExprCompiler =
       | CompileTarget target ->
           match target with
           | Call (None, mi, argsExprs) ->
-              stack.Push(Compiling (fun gen ->
-                MethodCallEmitter.emit mi (stack.Count = 0) gen))
-              argsExprs |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))
+              MethodCallEmitter.emit (mi, argsExprs) stack
           | Value (value, typ) ->
               if typ = typeof<int> then
                 emitLoadInteger<int> value gen

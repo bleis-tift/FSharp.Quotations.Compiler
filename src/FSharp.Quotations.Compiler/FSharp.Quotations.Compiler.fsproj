@@ -60,6 +60,7 @@
   <ItemGroup>
     <None Include="paket.references" />
     <None Include="paket.template" />
+    <Compile Include="CompileStack.fs" />
     <Compile Include="MethodCallEmitter.fs" />
     <Compile Include="ExprCompiler.fs" />
   </ItemGroup>
