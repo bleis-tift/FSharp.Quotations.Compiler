@@ -152,3 +152,9 @@ module ConvertFuncTest =
 
     [<Test>]
     let ``int32 int`` () = <@ int32 1 @> |> check 1
+
+    [<Test>]
+    let ``uint32 int`` () =
+      <@ uint32 1 @> |> check 1u
+      // UInt32.MinValue = 0u
+      <@ uint32 -1 @> |> checkExn<_, OverflowException>
