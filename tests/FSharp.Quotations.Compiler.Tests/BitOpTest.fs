@@ -26,3 +26,6 @@ module BitOpTest =
     <@ 42 <<< 1 @> |> check 84
     <@ Int32.MaxValue <<< 1 @> |> check -2
     <@ Int32.MinValue <<< 1 @> |> check 0
+
+  [<Test>]
+  let ``~~~ int`` () = <@ ~~~1 @> |> check -2
