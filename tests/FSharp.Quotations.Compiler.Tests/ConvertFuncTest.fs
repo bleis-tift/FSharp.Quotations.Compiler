@@ -122,3 +122,11 @@ module ConvertFuncTest =
       <@ sbyte 128 @> |> checkExn<_, OverflowException>
       // SByte.MinValue = -128y
       <@ sbyte -129 @> |> checkExn<_, OverflowException>
+
+    [<Test>]
+    let ``char int`` () =
+      <@ char 97 @> |> check 'a'
+      // Char.MaxValue = char 65535
+      <@ char 65536 @> |> checkExn<_, OverflowException>
+      // Char.MinValue = '\000'
+      <@ char -1 @> |> checkExn<_, OverflowException>
