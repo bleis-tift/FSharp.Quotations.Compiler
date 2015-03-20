@@ -107,6 +107,17 @@ module ConvertFuncTest =
   [<Test>]
   let ``string bool`` () = <@ string true @> |> check "True"
 
+  [<Test>]
+  let ``byte string`` () =
+    <@ byte "1" @> |> check 1uy
+    // Byte.MaxValue = 255uy
+    <@ byte "256" @> |> checkExn<_, OverflowException>
+    // Byte.MinValue = 0uy
+    <@ byte "-1" @> |> checkExn<_, OverflowException>
+
+    <@ byte "str" @> |> checkExn<_, FormatException>
+    <@ byte (null: string) @> |> checkExn<_, ArgumentNullException>
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
