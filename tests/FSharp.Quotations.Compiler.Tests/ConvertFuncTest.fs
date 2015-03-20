@@ -104,6 +104,9 @@ module ConvertFuncTest =
   [<Test>]
   let ``string int`` () = <@ string 42 @> |> check "42"
 
+  [<Test>]
+  let ``string bool`` () = <@ string true @> |> check "True"
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
