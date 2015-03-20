@@ -251,6 +251,11 @@ module ConvertFuncTest =
     <@ uint64 "str" @> |> checkExn<_, FormatException>
     <@ uint64 (null: string) @> |> checkExn<_, ArgumentNullException>
 
+  [<Test>]
+  let ``string string`` () =
+    <@ string "str" @> |> check "str"
+    <@ string (null: string) @> |> check ""
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
