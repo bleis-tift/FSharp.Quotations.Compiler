@@ -14,6 +14,10 @@ module internal MethodCallEmitter =
   | Call (_, mi, _) -> mi
   | expr -> failwithf "expr is not Method call: %A" expr
 
+  let private getProperty = function
+  | PropertyGet (_, pi, _) -> pi
+  | expr -> failwithf "expr is not property get: %A" expr
+
   let private identityEqualityComparer =
     { new IEqualityComparer<MethodInfo> with
         member __.Equals(x, y) = (x = y)
@@ -24,7 +28,11 @@ module internal MethodCallEmitter =
   let emitOneOpCode opcode (gen: ILGenerator) = gen.Emit(opcode)
   let emitTwoOpCodes (opcode1, opcode2) (gen: ILGenerator) = gen.Emit(opcode1); gen.Emit(opcode2)
 
+  let emitOpCodeWithInt opcode (value: int) (gen: ILGenerator) = gen.Emit(opcode, value)
+  let emitOpCodeWithType opcode (value: System.Type) (gen: ILGenerator) = gen.Emit(opcode, value)
+
   let emitCall mi (gen: ILGenerator) = gen.EmitCall(OpCodes.Call, mi, null)
+  let emitPropGet (pi: PropertyInfo) (gen: ILGenerator) = emitCall pi.GetMethod gen
 
   let private (|>>) emit1 emit2 = (fun (gen: ILGenerator) -> emit1 gen; emit2 gen)
 
@@ -61,6 +69,10 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ sbyte "" @>, emitCall (getMethod <@ LanguagePrimitives.ParseInt32("") @>)
                                        |>> emitOneOpCode OpCodes.Conv_Ovf_I1)
     dict.Add(getMethod <@ char "" @>, emitCall (getMethod <@ System.Char.Parse("") @>))
+    dict.Add(getMethod <@ decimal "" @>, emitOpCodeWithInt OpCodes.Ldc_I4 (int System.Globalization.NumberStyles.Float)
+                                         |>> emitPropGet (getProperty <@ System.Globalization.CultureInfo.InvariantCulture @>)
+                                         |>> emitOpCodeWithType OpCodes.Unbox_Any typeof<System.IFormatProvider>
+                                         |>> emitCall (getMethod <@ System.Decimal.Parse("", System.Globalization.NumberStyles.None, Unchecked.defaultof<System.IFormatProvider>) @>))
     dict :> IReadOnlyDictionary<_, _>
 
   open Microsoft.FSharp.Core.Operators.Checked

@@ -135,6 +135,17 @@ module ConvertFuncTest =
     <@ char "aa" @> |> checkExn<_, FormatException>
     <@ char (null: string) @> |> checkExn<_, ArgumentNullException>
 
+  [<Test>]
+  let ``decimal string`` () =
+    <@ decimal "1" @> |> check 1M
+    // Decimal.MaxValue = 79228162514264337593543950335M
+    <@ decimal "79228162514264337593543950336" @> |> checkExn<_, OverflowException>
+    // Decimal.MinValue = -79228162514264337593543950335M
+    <@ decimal "-79228162514264337593543950336" @> |> checkExn<_, OverflowException>
+
+    <@ decimal "str" @> |> checkExn<_, FormatException>
+    <@ decimal (null: string) @> |> checkExn<_, ArgumentNullException>
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
