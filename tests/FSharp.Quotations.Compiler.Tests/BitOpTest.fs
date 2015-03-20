@@ -12,3 +12,11 @@ module BitOpTest =
 
   [<Test>]
   let ``int ^^^ int`` () = <@ 1 ^^^ 1 @> |> check 0
+
+  [<Test>]
+  let ``int >>> int`` () =
+    <@ 42 >>> 1 @> |> check 21
+    <@ 42 >>> 31 @> |> check 0
+    <@ -1 >>> 1 @> |> check -1
+    <@ -1 >>> 31 @> |> check -1
+    <@ -1 >>> 32 @> |> check -1

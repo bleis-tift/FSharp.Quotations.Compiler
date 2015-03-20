@@ -33,6 +33,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ 1 &&& 1 @>, emitOneOpCode OpCodes.And)
     dict.Add(getMethod <@ 1 ||| 1 @>, emitOneOpCode OpCodes.Or)
     dict.Add(getMethod <@ 1 ^^^ 1 @>, emitOneOpCode OpCodes.Xor)
+    dict.Add(getMethod <@ 1 >>> 1 @>, emitOneOpCode OpCodes.Shr)
     dict :> IReadOnlyDictionary<_, _>
 
   open Microsoft.FSharp.Core.Operators.Checked
