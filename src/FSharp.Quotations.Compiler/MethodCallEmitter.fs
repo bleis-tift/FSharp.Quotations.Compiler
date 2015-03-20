@@ -87,9 +87,12 @@ module internal MethodCallEmitter =
         match altEmitterTable2.TryGetValue(mi) with
         | true, emitter -> emitter gen
         | _ ->
-            if isTailCall then
+            let isReturnVoid = mi.ReturnType = typeof<System.Void>
+            if isTailCall && not isReturnVoid then
               gen.Emit(OpCodes.Tailcall)
             gen.EmitCall(OpCodes.Call, mi, null)
+            if isReturnVoid then
+              gen.Emit(OpCodes.Ldnull)
 
   let emit (mi: MethodInfo, argsExprs: Expr list) (stack: CompileStack) =
     stack.Push(Compiling (fun gen ->

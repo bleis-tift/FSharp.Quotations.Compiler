@@ -21,6 +21,9 @@ module CoreFuncTest =
   let ``id int`` () = <@ id 1 @> |> check 1
 
   [<Test>]
+  let ``ignore int`` () = <@ ignore 1 @> |> check ()
+
+  [<Test>]
   let ``max int int`` () = <@ max 10 20 @> |> check 20
 
   [<Test>]
