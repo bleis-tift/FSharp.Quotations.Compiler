@@ -95,3 +95,8 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``nativeint int`` () = <@ nativeint 0 @> |> check 0n
+
+  [<Test>]
+  let ``unativeint int`` () =
+    <@ unativeint 0 @> |> check 0un
+    <@ unativeint 1 @> |> check (unativeint 1)
