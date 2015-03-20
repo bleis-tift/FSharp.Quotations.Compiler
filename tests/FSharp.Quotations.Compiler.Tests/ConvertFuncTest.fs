@@ -218,6 +218,17 @@ module ConvertFuncTest =
     <@ int32 "str" @> |> checkExn<_, FormatException>
     <@ int32 (null: string) @> |> checkExn<_, ArgumentNullException>
 
+  [<Test>]
+  let ``uint32 string`` () =
+    <@ uint32 "1" @> |> check 1u
+    // UInt32.MaxValue = 4294967295u
+    <@ uint32 "4294967296" @> |> checkExn<_, OverflowException>
+    // UInt32.MinValue = 0u
+    <@ uint32 "-1" @> |> checkExn<_, OverflowException>
+
+    <@ uint32 "str" @> |> checkExn<_, FormatException>
+    <@ uint32 (null: string) @> |> checkExn<_, ArgumentNullException>
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
