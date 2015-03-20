@@ -6,3 +6,6 @@ open System
 module BitOpTest =
   [<Test>]
   let ``int &&& int`` () = <@ 42 &&& 63 @> |> check 42
+
+  [<Test>]
+  let ``int ||| int`` () = <@ 42 ||| 0 @> |> check 42
