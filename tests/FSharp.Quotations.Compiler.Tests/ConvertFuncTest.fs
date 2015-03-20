@@ -72,3 +72,6 @@ module ConvertFuncTest =
     // UInt16.MinValue = 0us
     <@ uint16 -1 @> |> check 65535us
     <@ uint16 -2 @> |> check 65534us
+
+  [<Test>]
+  let ``int32 int`` () = <@ int32 1 @> |> check 1
