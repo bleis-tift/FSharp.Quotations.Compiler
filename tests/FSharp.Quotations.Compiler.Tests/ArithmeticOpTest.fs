@@ -37,6 +37,10 @@ module ArithmeticOpTest =
     <@ 5 % 2 @> |> check 1
     <@ Int32.MinValue % -1 @> |> checkExn<int, OverflowException>
 
+  [<Test>]
+  let ``string + string`` () =
+    <@ "aaa" + "bbb" @> |> check "aaabbb"
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
