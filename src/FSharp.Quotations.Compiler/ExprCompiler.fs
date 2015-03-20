@@ -56,11 +56,15 @@ module ExprCompiler =
               stack.Push(CompilingIfThenElse (gen.DefineLabel(), gen.DefineLabel(), NotYet cond, NotYet truePart, NotYet falsePart))
           | Call (None, mi, argsExprs) ->
               MethodCallEmitter.emit (mi, argsExprs) stack
+          | Value (null, _) ->
+              gen.Emit(OpCodes.Ldnull)
           | Value (value, typ) ->
               if typ = typeof<int> then
                 emitLoadInteger<int> value gen
               elif typ = typeof<bool> then
                 emitLoadInteger<int> (if unbox<bool> value then 1 else 0) gen
+              elif typ = typeof<string> then
+                gen.Emit(OpCodes.Ldstr, unbox<string> value)
               else
                 failwithf "unsupported value type: %A" typ
           | expr ->

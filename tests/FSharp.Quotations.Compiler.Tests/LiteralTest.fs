@@ -8,3 +8,7 @@ module LiteralTest =
   [<TestCase(true)>]
   [<TestCase(false)>]
   let bool (b: bool) = <@ b @> |> check b
+
+  [<TestCase("test string")>]
+  [<TestCase(null: string)>]
+  let string (str: string) = <@ str @> |> check str
