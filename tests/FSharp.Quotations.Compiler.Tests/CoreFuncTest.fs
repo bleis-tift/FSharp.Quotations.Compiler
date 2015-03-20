@@ -32,6 +32,33 @@ module CoreFuncTest =
   [<Test>]
   let ``sign int`` () = <@ sign -10 @> |> check -1
 
+  [<Test>]
+  let ``box bool`` () = <@ box true @> |> check (box true)
+
+  [<Test>]
+  let ``compare bool bool`` () = <@ compare true true @> |> check 0
+
+  [<Test>]
+  let ``hash bool`` () = <@ hash true @> |> check 1
+
+  [<Test>]
+  let ``limitedHash int bool`` () = <@ limitedHash 1 true @> |> check 1
+
+  [<Test>]
+  let ``id bool`` () = <@ id true @> |> check true
+
+  [<Test>]
+  let ``ignore bool`` () = <@ ignore true @> |> check ()
+
+  [<Test>]
+  let ``not bool`` () = <@ not true @> |> check false
+
+  [<Test>]
+  let ``max bool bool`` () = <@ max false true @> |> check true
+
+  [<Test>]
+  let ``min bool bool`` () = <@ min false true @> |> check false
+
   module Unchecked =
     open Microsoft.FSharp.Core.Operators.Unchecked
 
