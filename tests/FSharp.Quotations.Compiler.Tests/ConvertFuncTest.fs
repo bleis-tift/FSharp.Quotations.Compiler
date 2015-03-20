@@ -23,3 +23,13 @@ module ConvertFuncTest =
     // SByte.MinValue = -128y
     <@ sbyte -129 @> |> check 127y
     <@ sbyte -130 @> |> check 126y
+
+  [<Test>]
+  let ``char int`` () =
+    <@ char 97 @> |> check 'a'
+    // Char.MaxValue = char 65535
+    <@ char 65536 @> |> check '\000'
+    <@ char 65537 @> |> check '\001'
+    // Char.MinValue = '\000'
+    <@ char -1 @> |> check (Char.MaxValue)
+    <@ char -2 @> |> check (char ((int Char.MaxValue) - 1))
