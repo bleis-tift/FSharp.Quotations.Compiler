@@ -146,6 +146,20 @@ module ConvertFuncTest =
     <@ decimal "str" @> |> checkExn<_, FormatException>
     <@ decimal (null: string) @> |> checkExn<_, ArgumentNullException>
 
+  [<Test>]
+  let ``float string`` () =
+    <@ float "1" @> |> check 1.0
+    <@ float "NaN" @> |> check nan
+    <@ float "Infinity" @> |> check infinity
+    <@ float "-Infinity" @> |> check -infinity
+    // Double.MaxValue < 1.797693135e+308
+    <@ float "1.797693135e+308" @> |> checkExn<_, OverflowException>
+    // Double.MinValue > -1.797693135e+308
+    <@ float "-1.797693135e+308" @> |> checkExn<_, OverflowException>
+
+    <@ float "str" @> |> checkExn<_, FormatException>
+    <@ float (null: string) @> |> checkExn<_, ArgumentNullException>
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
