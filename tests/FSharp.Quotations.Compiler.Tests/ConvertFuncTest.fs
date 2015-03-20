@@ -240,6 +240,17 @@ module ConvertFuncTest =
     <@ int64 "str" @> |> checkExn<_, FormatException>
     <@ int64 (null: string) @> |> checkExn<_, ArgumentNullException>
 
+  [<Test>]
+  let ``uint64 string`` () =
+    <@ uint64 "1" @> |> check 1UL
+    // UInt64.MaxValue = 18446744073709551615UL
+    <@ uint64 "18446744073709551616" @> |> checkExn<_, OverflowException>
+    // UInt64.MinValue = -18446744073709551616UL
+    <@ uint64 "-18446744073709551617" @> |> checkExn<_, OverflowException>
+
+    <@ uint64 "str" @> |> checkExn<_, FormatException>
+    <@ uint64 (null: string) @> |> checkExn<_, ArgumentNullException>
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
