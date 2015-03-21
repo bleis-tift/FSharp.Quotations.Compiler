@@ -21,3 +21,8 @@ module StringFuncTest =
   let ``String.IndexOf`` () =
     <@ "str".IndexOf("r") @> |> check 2
     <@ (null:string).IndexOf("r") @> |> checkExnType typeof<NullReferenceException>
+
+  [<Test>]
+  let ``String.map`` () =
+    <@ String.map (fun ch -> char (int ch + 1)) "abc" @>
+    |> check (String.map (fun ch -> char (int ch + 1)) "abc")

@@ -27,23 +27,27 @@ module ExprCompiler =
   type ICompiledType<'T> =
     abstract member ExecuteCompiledCode: unit -> 'T
 
+  let fsharpFuncType argType retType =
+    typedefof<FSharpFunc<_, _>>.MakeGenericType([|argType; retType|])
+
   let compile (expr: Expr<'T>) : 'T =
     let asm =
       AppDomain.CurrentDomain.DefineDynamicAssembly(
         AssemblyName("CompiledAssembly"),
         AssemblyBuilderAccess.Run)
-    let module_ = asm.DefineDynamicModule("CompiledModule")
-    let typ = module_.DefineType("CompiledType", TypeAttributes.Public, typeof<obj>, [| typeof<ICompiledType<'T>> |])
+    let parentMod = asm.DefineDynamicModule("CompiledModule")
+    let typ = parentMod.DefineType("CompiledType", TypeAttributes.Public, typeof<obj>, [| typeof<ICompiledType<'T>> |])
     let m = typ.DefineMethod("ExecuteCompiledCode", MethodAttributes.Public ||| MethodAttributes.Virtual, typeof<'T>, [||])
     typ.DefineMethodOverride(m, typeof<ICompiledType<'T>>.GetMethod("ExecuteCompiledCode"))
 
-    let gen = m.GetILGenerator()
+    let mutable gen = m.GetILGenerator()
 
     let stack = CompileStack()
     stack.Push(CompileTarget expr)
 
     while stack.Count <> 0 do
       match stack.Pop() with
+      | RestoreGen g -> gen <- g
       | Compiling f -> f gen
       | CompilingIfThenElse (falseLabel, ifEndLabel, cond, truePart, falsePart) ->
           match cond, truePart, falsePart with
@@ -65,6 +69,29 @@ module ExprCompiler =
           match target with
           | IfThenElse (cond, truePart, falsePart) ->
               stack.Push(CompilingIfThenElse (gen.DefineLabel(), gen.DefineLabel(), NotYet cond, NotYet truePart, NotYet falsePart))
+          | Lambda (var, body) ->
+              let baseType = fsharpFuncType var.Type body.Type
+              let baseCtor =
+                baseType.GetConstructor(BindingFlags.NonPublic ||| BindingFlags.Instance, null, [||], null)
+              // TODO : unique name
+              let lambda =
+                parentMod.DefineType("lambda0", TypeAttributes.Public, baseType)
+
+              let ctor = lambda.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, [||])
+              let ctorGen = ctor.GetILGenerator()
+              ctorGen.Emit(OpCodes.Ldarg_0)
+              ctorGen.Emit(OpCodes.Call, baseCtor)
+              ctorGen.Emit(OpCodes.Ret)
+
+              let invoke =
+                lambda.DefineMethod("Invoke", MethodAttributes.Public ||| MethodAttributes.Virtual, var.Type, [| body.Type |])
+              lambda.DefineMethodOverride(invoke, baseType.GetMethod("Invoke"))
+              let invokeGen = invoke.GetILGenerator()
+              stack.Push(Compiling (fun gen -> gen.Emit(OpCodes.Newobj, ctor)))
+              stack.Push(RestoreGen gen)
+              gen <- invokeGen
+              stack.Push(Compiling (fun gen -> gen.Emit(OpCodes.Ret); lambda.CreateType() |> ignore))
+              stack.Push(CompileTarget body)
           | Call (None, mi, argsExprs) ->
               MethodCallEmitter.emit (mi, argsExprs) stack
           | Call (Some recv, mi, argsExprs) ->
@@ -84,6 +111,9 @@ module ExprCompiler =
                 gen.Emit(OpCodes.Ldstr, unbox<string> value)
               else
                 failwithf "unsupported value type: %A" typ
+          | Var _ ->
+              // TODO : impl
+              gen.Emit(OpCodes.Ldarg_1)
           | expr ->
               failwithf "unsupported expr: %A" expr
 

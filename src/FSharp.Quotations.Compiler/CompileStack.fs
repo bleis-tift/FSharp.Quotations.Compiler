@@ -12,5 +12,6 @@ type CompileStackInfo =
   | CompileTarget of Expr
   | Compiling of (ILGenerator -> unit)
   | CompilingIfThenElse of falseLabel:Label * ifEndLabel:Label * cond:CompilingState * truePart:CompilingState * falsePart:CompilingState
+  | RestoreGen of ILGenerator
 
 type CompileStack = Stack<CompileStackInfo>
