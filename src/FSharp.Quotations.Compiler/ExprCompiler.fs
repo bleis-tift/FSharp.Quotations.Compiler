@@ -56,6 +56,8 @@ module ExprCompiler =
               stack.Push(CompilingIfThenElse (gen.DefineLabel(), gen.DefineLabel(), NotYet cond, NotYet truePart, NotYet falsePart))
           | Call (None, mi, argsExprs) ->
               MethodCallEmitter.emit (mi, argsExprs) stack
+          | PropertyGet (Some recv, pi, argsExprs) ->
+              MethodCallEmitter.emit (pi.GetMethod, recv::argsExprs) stack
           | Value (null, _) ->
               gen.Emit(OpCodes.Ldnull)
           | Value (value, typ) ->
