@@ -275,6 +275,9 @@ module ConvertFuncTest =
     [<Test>]
     let ``int32 int`` () = testInt32From<int> [1]
 
+    [<Test>]
+    let ``int32 string`` () = testInt32From<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
+
     let inline testUInt32From< ^T when ^T : (static member op_Explicit: ^T -> uint32) > data =
       test { Data = data; ExprFun = (fun (x: ^T) -> <@ uint32 x @>); Fun = uint32 }
 
