@@ -3,6 +3,7 @@
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 open System
+open System.Reflection
 open System.Reflection.Emit
 
 module ExprCompiler =
@@ -23,8 +24,18 @@ module ExprCompiler =
     | i ->
         gen.Emit(OpCodes.Ldc_I4, i)
 
+  type ICompiledType<'T> =
+    abstract member ExecuteCompiledCode: unit -> 'T
+
   let compile (expr: Expr<'T>) : 'T =
-    let m = DynamicMethod("compiledMethod", typeof<'T>, [||])
+    let asm =
+      AppDomain.CurrentDomain.DefineDynamicAssembly(
+        AssemblyName("CompiledAssembly"),
+        AssemblyBuilderAccess.Run)
+    let module_ = asm.DefineDynamicModule("CompiledModule")
+    let typ = module_.DefineType("CompiledType", TypeAttributes.Public, typeof<obj>, [| typeof<ICompiledType<'T>> |])
+    let m = typ.DefineMethod("ExecuteCompiledCode", MethodAttributes.Public ||| MethodAttributes.Virtual, typeof<'T>, [||])
+    typ.DefineMethodOverride(m, typeof<ICompiledType<'T>>.GetMethod("ExecuteCompiledCode"))
 
     let gen = m.GetILGenerator()
 
@@ -77,5 +88,6 @@ module ExprCompiler =
               failwithf "unsupported expr: %A" expr
 
     gen.Emit(OpCodes.Ret)
-    let f : Func<'T> = unbox (m.CreateDelegate(typeof<Func<'T>>))
-    f.Invoke()
+
+    let x = Activator.CreateInstance(typ.CreateType()) :?> ICompiledType<'T>
+    x.ExecuteCompiledCode()
