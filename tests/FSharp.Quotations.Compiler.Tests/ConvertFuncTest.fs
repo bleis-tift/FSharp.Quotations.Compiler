@@ -255,6 +255,9 @@ module ConvertFuncTest =
       let max, min = int Int16.MaxValue, int Int16.MinValue
       testInt16From<int> [1; max + 1; min - 1]
 
+    [<Test>]
+    let ``int16 string`` () = testInt16From<string> ["1"; "32768"; "-32769"; "str"; null]
+
     let inline testUInt16From< ^T when ^T : (static member op_Explicit: ^T -> uint16) > data =
       test { Data = data; ExprFun = (fun (x: ^T) -> <@ uint16 x @>); Fun = uint16 }
 
