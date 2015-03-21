@@ -114,6 +114,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ sbyte "" @>, emitCall (getMethod <@ LanguagePrimitives.ParseInt32("") @>)
                                        |>> emitOpCode OpCodes.Conv_Ovf_I1)
     dict.Add(getMethod <@ char "" @>, emitCall (getMethod <@ Char.Parse("") @>))
+    dict.Add(getMethod <@ int "" @>, emitCall (getMethod <@ LanguagePrimitives.ParseInt32("") @>))
     dict :> IReadOnlyDictionary<_, _>
 
   // shadowing the functions of the Microsoft.FSharp.Core.Operators.Checked module

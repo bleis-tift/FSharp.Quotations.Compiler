@@ -244,6 +244,9 @@ module ConvertFuncTest =
     [<Test>]
     let ``int int`` () = testIntFrom<int> [1]
 
+    [<Test>]
+    let ``int string`` () = testIntFrom<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
+
     let inline testInt16From< ^T when ^T : (static member op_Explicit: ^T -> int16) > data =
       test { Data = data; ExprFun = (fun (x: ^T) -> <@ int16 x @>); Fun = int16 }
 
