@@ -295,6 +295,10 @@ module ConvertFuncTest =
     [<Test>]
     let ``int64 int`` () = testInt64From<int> [1]
 
+    [<Test>]
+    let ``int64 string`` () =
+      testInt64From<string> ["1"; "9223372036854775808"; "-9223372036854775809"; "str"; null]
+
     let inline testUInt64From< ^T when ^T : (static member op_Explicit: ^T -> uint64) > data =
       test { Data = data; ExprFun = (fun (x: ^T) -> <@ uint64 x @>); Fun = uint64 }
 
