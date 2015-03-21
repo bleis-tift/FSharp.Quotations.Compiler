@@ -224,6 +224,9 @@ module ConvertFuncTest =
       let max, min = int SByte.MaxValue, int SByte.MinValue
       testSByteFrom<int> [1; max + 1; min - 1]
 
+    [<Test>]
+    let ``sbyte string`` () = testSByteFrom<string> ["1"; "128"; "-129"; "str"; null]
+
     let inline testCharFrom< ^T when ^T : (static member op_Explicit: ^T -> char) > data =
       test { Data = data; ExprFun = (fun (x: ^T) -> <@ char x @>); Fun = char }
 
