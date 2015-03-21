@@ -308,6 +308,10 @@ module ConvertFuncTest =
       testUInt64From<int> [1; min - 1]
 
     [<Test>]
+    let ``uint64 string`` () =
+      testUInt64From<string> ["1"; "18446744073709551616"; "-18446744073709551617"; "str"; null]
+
+    [<Test>]
     let ``nativeint int`` () = <@ nativeint 0 @> |> check 0n
 
     [<Test>]
