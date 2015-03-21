@@ -5,6 +5,9 @@ open System
 [<TestModule>]
 module StringFuncTest =
   [<Test>]
+  let ``String.Empty`` () = <@ String.Empty @> |> check ""
+
+  [<Test>]
   let ``String.length`` () =
     <@ String.length "str" @> |> check 3
     <@ String.length null @> |> check 0
