@@ -286,6 +286,9 @@ module ConvertFuncTest =
       let min = int UInt32.MinValue
       testUInt32From<int> [1; min - 1]
 
+    [<Test>]
+    let ``uint32 string`` () = testUInt32From<string> ["1"; "4294967296"; "-1"; "str"; null]
+
     let inline testInt64From< ^T when ^T : (static member op_Explicit: ^T -> int64) > data =
       test { Data = data; ExprFun = (fun (x: ^T) -> <@ int64 x @>); Fun = int64 }
 
