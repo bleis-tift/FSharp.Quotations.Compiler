@@ -76,6 +76,7 @@
     <Compile Include="ConvertFuncTest.fs" />
     <Compile Include="CoreFuncTest.fs" />
     <Compile Include="BoolOpTest.fs" />
+    <Compile Include="StringOpTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FsUnit.NUnit">
