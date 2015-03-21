@@ -4,94 +4,177 @@ open System
 
 [<TestModule>]
 module ConvertFuncTest =
+  type TestInfo<'TInput, 'TExpected> = {
+    Data: 'TInput list
+    ExprFun: 'TInput -> Microsoft.FSharp.Quotations.Expr<'TExpected>
+    Fun: 'TInput -> 'TExpected
+  }
+
+  type Expected<'T> =
+    | ReturnVal of 'T
+    | ThrownExn of Type
+
+  let test { Data = data; ExprFun = f1; Fun = f2 } =
+    if data.IsEmpty then
+      failwith "test data is empty."
+    for tc in data do
+      let expected =
+        try ReturnVal (f2 tc)
+        with e -> ThrownExn (e.GetType())
+      match expected with
+      | ReturnVal e -> f1 tc |> check e
+      | ThrownExn t -> f1 tc |> checkExnType t
+
+  let inline testByteFrom< ^T when ^T : (static member op_Explicit: ^T -> byte) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ byte x @>); Fun = byte }
+
   [<Test>]
   let ``byte int`` () =
-    <@ byte 1 @> |> check 1uy
-    // Byte.MaxValue = 255uy
-    <@ byte 256 @> |> check 0uy
-    <@ byte 257 @> |> check 1uy
-    // Byte.MinValue = 0uy
-    <@ byte -1 @> |> check 255uy
-    <@ byte -2 @> |> check 254uy
+    let max, min = int Byte.MaxValue, int Byte.MinValue
+    testByteFrom<int> [1; max + 1; min - 1]
+
+  [<Test>]
+  let ``byte string`` () = testByteFrom<string> ["1"; "256"; "-1"; "str"; null]
+
+  let inline testSByteFrom< ^T when ^T : (static member op_Explicit: ^T -> sbyte) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ sbyte x @>); Fun = sbyte }
 
   [<Test>]
   let ``sbyte int`` () =
-    <@ sbyte 1 @> |> check 1y
-    // SByte.MaxValue = 127y
-    <@ sbyte 128 @> |> check -128y
-    <@ sbyte 129 @> |> check -127y
-    // SByte.MinValue = -128y
-    <@ sbyte -129 @> |> check 127y
-    <@ sbyte -130 @> |> check 126y
+    let max, min = int SByte.MaxValue, int SByte.MinValue
+    testSByteFrom<int> [1; max + 1; min - 1]
+
+  [<Test>]
+  let ``sbyte string`` () = testSByteFrom<string> ["1"; "128"; "-129"; "str"; null]
+
+  let inline testCharFrom< ^T when ^T : (static member op_Explicit: ^T -> char) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ char x @>); Fun = char }
 
   [<Test>]
   let ``char int`` () =
-    <@ char 97 @> |> check 'a'
-    // Char.MaxValue = char 65535
-    <@ char 65536 @> |> check '\000'
-    <@ char 65537 @> |> check '\001'
-    // Char.MinValue = '\000'
-    <@ char -1 @> |> check (Char.MaxValue)
-    <@ char -2 @> |> check (char ((int Char.MaxValue) - 1))
+    let max, min = int Char.MaxValue, int Char.MinValue
+    testCharFrom<int> [97; max + 1; min - 1]
 
   [<Test>]
-  let ``decimal int`` () = <@ decimal 1 @> |> check 1M
+  let ``char string`` () = testCharFrom<string> ["a"; "aa"; null]
+
+  let inline testDecimalFrom< ^T when ^T : (static member op_Explicit: ^T -> decimal) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ decimal x @>); Fun = decimal }
 
   [<Test>]
-  let ``enum int`` () =
-    <@ enum 0 @> |> check StringSplitOptions.None
-    <@ enum 1 @> |> check StringSplitOptions.RemoveEmptyEntries
-    <@ enum 2 @> |> check (2 |> unbox<StringSplitOptions>)
-    <@ enum -1 @> |> check (-1 |> unbox<StringSplitOptions>)
+  let ``decimal int`` () = testDecimalFrom<int> [1]
 
   [<Test>]
-  let ``float int`` () = <@ float 1 @> |> check 1.0
+  let ``decimal string`` () =
+    testDecimalFrom<string> [
+      "1"
+      "79228162514264337593543950336" 
+      "-79228162514264337593543950336" 
+      "str"; null
+    ]
+
+  let inline testFloatFrom< ^T when ^T : (static member op_Explicit: ^T -> float) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ float x @>); Fun = float }
 
   [<Test>]
-  let ``float32 int`` () = <@ float32 1 @> |> check 1.0f
+  let ``float int`` () = testFloatFrom<int> [1]
 
   [<Test>]
-  let ``int int`` () = <@ int 1 @> |> check 1
+  let ``float string`` () =
+    testFloatFrom<string> [
+      "1"; "NaN"; "Infinity"; "-Infinity";
+      "1.797693135e+308"
+      "-1.797693135e+308" 
+      "str"; null
+    ]
+
+  let inline testFloat32From< ^T when ^T : (static member op_Explicit: ^T -> float) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ float x @>); Fun = float }
+
+  [<Test>]
+  let ``float32 int`` () = testFloat32From<int> [1]
+
+  [<Test>]
+  let ``float32 string`` () =
+    testFloat32From<string> [
+      "1"; "NaN"; "Infinity"; "-Infinity";
+      "3.40282347e+39"
+      "-3.40282347e+39" 
+      "str"; null
+    ]
+
+  let inline testIntFrom< ^T when ^T : (static member op_Explicit: ^T -> int) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ int x @>); Fun = int }
+
+  [<Test>]
+  let ``int int`` () = testIntFrom<int> [1]
+
+  [<Test>]
+  let ``int string`` () = testIntFrom<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
+
+  let inline testInt16From< ^T when ^T : (static member op_Explicit: ^T -> int16) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ int16 x @>); Fun = int16 }
 
   [<Test>]
   let ``int16 int`` () =
-    <@ int16 1 @> |> check 1s
-    // Int16.MaxValue = 32767s
-    <@ int16 32768 @> |> check -32768s
-    <@ int16 32769 @> |> check -32767s
-    // Int16.MinValue = -32768s
-    <@ int16 -32769 @> |> check 32767s
-    <@ int16 -32770 @> |> check 32766s
+    let max, min = int Int16.MaxValue, int Int16.MinValue
+    testInt16From<int> [1; max + 1; min - 1]
+
+  [<Test>]
+  let ``int16 string`` () = testInt16From<string> ["1"; "32768"; "-32769"; "str"; null]
+
+  let inline testUInt16From< ^T when ^T : (static member op_Explicit: ^T -> uint16) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ uint16 x @>); Fun = uint16 }
 
   [<Test>]
   let ``uint16 int`` () =
-    <@ uint16 1 @> |> check 1us
-    // UInt16.MaxValue = 65535us
-    <@ uint16 65536 @> |> check 0us
-    <@ uint16 65537 @> |> check 1us
-    // UInt16.MinValue = 0us
-    <@ uint16 -1 @> |> check 65535us
-    <@ uint16 -2 @> |> check 65534us
+    let max, min = int UInt16.MaxValue, int UInt16.MinValue
+    testUInt16From<int> [1; max + 1; min - 1]
 
   [<Test>]
-  let ``int32 int`` () = <@ int32 1 @> |> check 1
+  let ``uint16 string`` () = testUInt16From<string> ["1"; "65536"; "-1"; "str"; null]
+
+  let inline testInt32From< ^T when ^T : (static member op_Explicit: ^T -> int32) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ int32 x @>); Fun = int32 }
+
+  [<Test>]
+  let ``int32 int`` () = testInt32From<int> [1]
+
+  [<Test>]
+  let ``int32 string`` () = testInt32From<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
+
+  let inline testUInt32From< ^T when ^T : (static member op_Explicit: ^T -> uint32) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ uint32 x @>); Fun = uint32 }
 
   [<Test>]
   let ``uint32 int`` () =
-    <@ uint32 1 @> |> check 1u
-    // UInt32.MinValue = 0u
-    <@ uint32 -1 @> |> check UInt32.MaxValue
-    <@ uint32 -2 @> |> check (UInt32.MaxValue - 1u)
+    let min = int UInt32.MinValue
+    testUInt32From<int> [1; min - 1]
 
   [<Test>]
-  let ``int64 int`` () = <@ int64 1 @> |> check 1L
+  let ``uint32 string`` () = testUInt32From<string> ["1"; "4294967296"; "-1"; "str"; null]
+
+  let inline testInt64From< ^T when ^T : (static member op_Explicit: ^T -> int64) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ int64 x @>); Fun = int64 }
+
+  [<Test>]
+  let ``int64 int`` () = testInt64From<int> [1]
+
+  [<Test>]
+  let ``int64 string`` () =
+    testInt64From<string> ["1"; "9223372036854775808"; "-9223372036854775809"; "str"; null]
+
+  let inline testUInt64From< ^T when ^T : (static member op_Explicit: ^T -> uint64) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ uint64 x @>); Fun = uint64 }
 
   [<Test>]
   let ``uint64 int`` () =
-    <@ uint64 1 @> |> check 1UL
-    // UInt64.MinValue = 0UL
-    <@ uint64 -1 @> |> check UInt64.MaxValue
-    <@ uint64 -2 @> |> check (UInt64.MaxValue - 1UL)
+    let min = int UInt64.MinValue
+    testUInt64From<int> [1; min - 1]
+
+  [<Test>]
+  let ``uint64 string`` () =
+    testUInt64From<string> ["1"; "18446744073709551616"; "-18446744073709551617"; "str"; null]
 
   [<Test>]
   let ``nativeint int`` () = <@ nativeint 0 @> |> check 0n
@@ -102,154 +185,17 @@ module ConvertFuncTest =
     <@ unativeint -1 @> |> check (unativeint -1)
 
   [<Test>]
+  let ``enum int`` () =
+    <@ enum 0 @> |> check StringSplitOptions.None
+    <@ enum 1 @> |> check StringSplitOptions.RemoveEmptyEntries
+    <@ enum 2 @> |> check (2 |> unbox<StringSplitOptions>)
+    <@ enum -1 @> |> check (-1 |> unbox<StringSplitOptions>)
+
+  [<Test>]
   let ``string int`` () = <@ string 42 @> |> check "42"
 
   [<Test>]
   let ``string bool`` () = <@ string true @> |> check "True"
-
-  [<Test>]
-  let ``byte string`` () =
-    <@ byte "1" @> |> check 1uy
-    // Byte.MaxValue = 255uy
-    <@ byte "256" @> |> checkExn<_, OverflowException>
-    // Byte.MinValue = 0uy
-    <@ byte "-1" @> |> checkExn<_, OverflowException>
-
-    <@ byte "str" @> |> checkExn<_, FormatException>
-    <@ byte (null: string) @> |> checkExn<_, ArgumentNullException>
-
-  [<Test>]
-  let ``sbyte string`` () =
-    <@ sbyte "1" @> |> check 1y
-    // SByte.MaxValue = 127y
-    <@ sbyte "128" @> |> checkExn<_, OverflowException>
-    // SByte.MinValue = -128y
-    <@ sbyte "-129" @> |> checkExn<_, OverflowException>
-
-    <@ sbyte "str" @> |> checkExn<_, FormatException>
-    <@ sbyte (null: string) @> |> checkExn<_, ArgumentNullException>
-
-  [<Test>]
-  let ``char string`` () =
-    <@ char "a" @> |> check 'a'
-    <@ char "aa" @> |> checkExn<_, FormatException>
-    <@ char (null: string) @> |> checkExn<_, ArgumentNullException>
-
-  [<Test>]
-  let ``decimal string`` () =
-    <@ decimal "1" @> |> check 1M
-    // Decimal.MaxValue = 79228162514264337593543950335M
-    <@ decimal "79228162514264337593543950336" @> |> checkExn<_, OverflowException>
-    // Decimal.MinValue = -79228162514264337593543950335M
-    <@ decimal "-79228162514264337593543950336" @> |> checkExn<_, OverflowException>
-
-    <@ decimal "str" @> |> checkExn<_, FormatException>
-    <@ decimal (null: string) @> |> checkExn<_, ArgumentNullException>
-
-  [<Test>]
-  let ``float string`` () =
-    <@ float "1" @> |> check 1.0
-    <@ float "NaN" @> |> check nan
-    <@ float "Infinity" @> |> check infinity
-    <@ float "-Infinity" @> |> check -infinity
-    // Double.MaxValue < 1.797693135e+308
-    <@ float "1.797693135e+308" @> |> checkExn<_, OverflowException>
-    // Double.MinValue > -1.797693135e+308
-    <@ float "-1.797693135e+308" @> |> checkExn<_, OverflowException>
-
-    <@ float "str" @> |> checkExn<_, FormatException>
-    <@ float (null: string) @> |> checkExn<_, ArgumentNullException>
-
-  [<Test>]
-  let ``float32 string`` () =
-    <@ float32 "1" @> |> check 1.0f
-    <@ float32 "NaN" @> |> check nanf
-    <@ float32 "Infinity" @> |> check infinityf
-    <@ float32 "-Infinity" @> |> check -infinityf
-    // Single.MaxValue < 3.40282347e+39
-    <@ float32 "3.40282347e+39" @> |> checkExn<_, OverflowException>
-    // Single.MinValue > -3.40282347e+39
-    <@ float32 "-3.40282347e+39" @> |> checkExn<_, OverflowException>
-
-    <@ float32 "str" @> |> checkExn<_, FormatException>
-    <@ float32 (null: string) @> |> checkExn<_, ArgumentNullException>
-
-  [<Test>]
-  let ``int string`` () =
-    <@ int "1" @> |> check 1
-    // Int32.MaxValue = 2147483647
-    <@ int "2147483648" @> |> checkExn<_, OverflowException>
-    // Int32.MinValue = -2147483648
-    <@ int "-2147483649" @> |> checkExn<_, OverflowException>
-
-    <@ int "str" @> |> checkExn<_, FormatException>
-    <@ int (null: string) @> |> checkExn<_, ArgumentNullException>
-
-  [<Test>]
-  let ``int16 string`` () =
-    <@ int16 "1" @> |> check 1s
-    // Int16.MaxValue = 32767s
-    <@ int16 "32768" @> |> checkExn<_, OverflowException>
-    // Int16.MinValue = -32768s
-    <@ int16 "-32769" @> |> checkExn<_, OverflowException>
-
-    <@ int16 "str" @> |> checkExn<_, FormatException>
-    <@ int16 (null: string) @> |> checkExn<_, ArgumentNullException>
-
-  [<Test>]
-  let ``uint16 string`` () =
-    <@ uint16 "1" @> |> check 1us
-    // UInt16.MaxValue = 65535us
-    <@ uint16 "65536" @> |> checkExn<_, OverflowException>
-    // UInt16.MinValue = 0us
-    <@ uint16 "-1" @> |> checkExn<_, OverflowException>
-
-    <@ uint16 "str" @> |> checkExn<_, FormatException>
-    <@ uint16 (null: string) @> |> checkExn<_, ArgumentNullException>
-
-  [<Test>]
-  let ``int32 string`` () =
-    <@ int32 "1" @> |> check 1
-    // Int32.MaxValue = 2147483647
-    <@ int32 "2147483648" @> |> checkExn<_, OverflowException>
-    // Int32.MinValue = -2147483648
-    <@ int32 "-2147483649" @> |> checkExn<_, OverflowException>
-
-    <@ int32 "str" @> |> checkExn<_, FormatException>
-    <@ int32 (null: string) @> |> checkExn<_, ArgumentNullException>
-
-  [<Test>]
-  let ``uint32 string`` () =
-    <@ uint32 "1" @> |> check 1u
-    // UInt32.MaxValue = 4294967295u
-    <@ uint32 "4294967296" @> |> checkExn<_, OverflowException>
-    // UInt32.MinValue = 0u
-    <@ uint32 "-1" @> |> checkExn<_, OverflowException>
-
-    <@ uint32 "str" @> |> checkExn<_, FormatException>
-    <@ uint32 (null: string) @> |> checkExn<_, ArgumentNullException>
-
-  [<Test>]
-  let ``int64 string`` () =
-    <@ int64 "1" @> |> check 1L
-    // Int64.MaxValue = 9223372036854775807L
-    <@ int64 "9223372036854775808" @> |> checkExn<_, OverflowException>
-    // Int64.MinValue = -9223372036854775808L
-    <@ int64 "-9223372036854775809" @> |> checkExn<_, OverflowException>
-
-    <@ int64 "str" @> |> checkExn<_, FormatException>
-    <@ int64 (null: string) @> |> checkExn<_, ArgumentNullException>
-
-  [<Test>]
-  let ``uint64 string`` () =
-    <@ uint64 "1" @> |> check 1UL
-    // UInt64.MaxValue = 18446744073709551615UL
-    <@ uint64 "18446744073709551616" @> |> checkExn<_, OverflowException>
-    // UInt64.MinValue = -18446744073709551616UL
-    <@ uint64 "-18446744073709551617" @> |> checkExn<_, OverflowException>
-
-    <@ uint64 "str" @> |> checkExn<_, FormatException>
-    <@ uint64 (null: string) @> |> checkExn<_, ArgumentNullException>
 
   [<Test>]
   let ``string string`` () =
@@ -259,66 +205,79 @@ module ConvertFuncTest =
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
+    let inline testByteFrom< ^T when ^T : (static member op_Explicit: ^T -> byte) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ byte x @>); Fun = byte }
+
     [<Test>]
     let ``byte int`` () =
-      <@ byte 1 @> |> check 1uy
-      // Byte.MaxValue = 255uy
-      <@ byte 256 @> |> checkExn<_, OverflowException>
-      // Byte.MinValue = 0uy
-      <@ byte -1 @> |> checkExn<_, OverflowException>
+      let max, min = int Byte.MaxValue, int Byte.MinValue
+      testByteFrom<int> [1; max + 1; min - 1]
+
+    let inline testSByteFrom< ^T when ^T : (static member op_Explicit: ^T -> sbyte) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ sbyte x @>); Fun = sbyte }
 
     [<Test>]
     let ``sbyte int`` () =
-      <@ sbyte 1 @> |> check 1y
-      // SByte.MaxValue = 127y
-      <@ sbyte 128 @> |> checkExn<_, OverflowException>
-      // SByte.MinValue = -128y
-      <@ sbyte -129 @> |> checkExn<_, OverflowException>
+      let max, min = int SByte.MaxValue, int SByte.MinValue
+      testSByteFrom<int> [1; max + 1; min - 1]
+
+    let inline testCharFrom< ^T when ^T : (static member op_Explicit: ^T -> char) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ char x @>); Fun = char }
 
     [<Test>]
     let ``char int`` () =
-      <@ char 97 @> |> check 'a'
-      // Char.MaxValue = char 65535
-      <@ char 65536 @> |> checkExn<_, OverflowException>
-      // Char.MinValue = '\000'
-      <@ char -1 @> |> checkExn<_, OverflowException>
+      let max, min = int Char.MaxValue, int Char.MinValue
+      testCharFrom<int> [97; max + 1; min - 1]
+
+    let inline testIntFrom< ^T when ^T : (static member op_Explicit: ^T -> int) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ int x @>); Fun = int }
 
     [<Test>]
-    let ``int int`` () = <@ int 1 @> |> check 1
+    let ``int int`` () = testIntFrom<int> [1]
+
+    let inline testInt16From< ^T when ^T : (static member op_Explicit: ^T -> int16) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ int16 x @>); Fun = int16 }
 
     [<Test>]
     let ``int16 int`` () =
-      <@ int16 1 @> |> check 1s
-      // Int16.MaxValue = 32767s
-      <@ int16 32768 @> |> checkExn<_, OverflowException>
-      // Int16.MinValue = -32768s
-      <@ int16 -32769 @> |> checkExn<_, OverflowException>
+      let max, min = int Int16.MaxValue, int Int16.MinValue
+      testInt16From<int> [1; max + 1; min - 1]
+
+    let inline testUInt16From< ^T when ^T : (static member op_Explicit: ^T -> uint16) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ uint16 x @>); Fun = uint16 }
 
     [<Test>]
     let ``uint16 int`` () =
-      <@ uint16 1 @> |> check 1us
-      // UInt16.MaxValue = 65535us
-      <@ uint16 65536 @> |> checkExn<_, OverflowException>
-      // UInt16.MinValue = 0us
-      <@ uint16 -1 @> |> checkExn<_, OverflowException>
+      let max, min = int UInt16.MaxValue, int UInt16.MinValue
+      testUInt16From<int> [1; max + 1; min - 1]
+
+    let inline testInt32From< ^T when ^T : (static member op_Explicit: ^T -> int32) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ int32 x @>); Fun = int32 }
 
     [<Test>]
-    let ``int32 int`` () = <@ int32 1 @> |> check 1
+    let ``int32 int`` () = testInt32From<int> [1]
+
+    let inline testUInt32From< ^T when ^T : (static member op_Explicit: ^T -> uint32) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ uint32 x @>); Fun = uint32 }
 
     [<Test>]
     let ``uint32 int`` () =
-      <@ uint32 1 @> |> check 1u
-      // UInt32.MinValue = 0u
-      <@ uint32 -1 @> |> checkExn<_, OverflowException>
+      let min = int UInt32.MinValue
+      testUInt32From<int> [1; min - 1]
+
+    let inline testInt64From< ^T when ^T : (static member op_Explicit: ^T -> int64) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ int64 x @>); Fun = int64 }
 
     [<Test>]
-    let ``int64 int`` () = <@ int64 1 @> |> check 1L
+    let ``int64 int`` () = testInt64From<int> [1]
+
+    let inline testUInt64From< ^T when ^T : (static member op_Explicit: ^T -> uint64) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ uint64 x @>); Fun = uint64 }
 
     [<Test>]
     let ``uint64 int`` () =
-      <@ uint64 1 @> |> check 1UL
-      // UInt64.MinValue = 0UL
-      <@ uint64 -1 @> |> checkExn<_, OverflowException>
+      let min = int UInt64.MinValue
+      testUInt64From<int> [1; min - 1]
 
     [<Test>]
     let ``nativeint int`` () = <@ nativeint 0 @> |> check 0n

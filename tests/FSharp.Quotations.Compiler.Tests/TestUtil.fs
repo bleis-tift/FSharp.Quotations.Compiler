@@ -33,3 +33,10 @@ module TestUtil =
       ExprCompiler.compile expr |> ignore
       Assert.Fail("exception is not thrown.")
     with :? 'TExn -> ()
+
+  let checkExnType (expectedType: Type) (expr: Expr<_>) =
+    try
+      ExprCompiler.compile expr |> ignore
+      Assert.Fail("exception is not thrown.")
+    with e ->
+      e.GetType() |> should equal expectedType
