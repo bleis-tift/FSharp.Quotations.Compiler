@@ -13,3 +13,8 @@ module StringFuncTest =
   let ``String.Length`` () =
     <@ "str".Length @> |> check 3
     <@ (null:string).Length @> |> checkExnType typeof<NullReferenceException>
+
+  [<Test>]
+  let ``String.IndexOf`` () =
+    <@ "str".IndexOf("r") @> |> check 2
+    <@ (null:string).IndexOf("r") @> |> checkExnType typeof<NullReferenceException>
