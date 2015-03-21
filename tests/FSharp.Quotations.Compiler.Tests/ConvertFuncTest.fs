@@ -235,6 +235,9 @@ module ConvertFuncTest =
       let max, min = int Char.MaxValue, int Char.MinValue
       testCharFrom<int> [97; max + 1; min - 1]
 
+    [<Test>]
+    let ``char string`` () = testCharFrom<string> ["a"; "aa"; null]
+
     let inline testIntFrom< ^T when ^T : (static member op_Explicit: ^T -> int) > data =
       test { Data = data; ExprFun = (fun (x: ^T) -> <@ int x @>); Fun = int }
 
