@@ -10,8 +10,8 @@ type CompilingState =
 
 type CompileStackInfo =
   | CompileTarget of Expr
-  | Compiling of (ILGenerator -> unit)
+  | Compiling of (ILGeneratorWrapper -> unit)
   | CompilingIfThenElse of falseLabel:Label * ifEndLabel:Label * cond:CompilingState * truePart:CompilingState * falsePart:CompilingState
-  | RestoreGen of ILGenerator
+  | RestoreGen of ILGeneratorWrapper
 
 type CompileStack = Stack<CompileStackInfo>

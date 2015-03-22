@@ -60,6 +60,12 @@
   <ItemGroup>
     <None Include="paket.references" />
     <None Include="paket.template" />
+    <Compile Include="Stringizer.fs" />
+    <Compile Include="ModuleBuilderWrapper.fs" />
+    <Compile Include="TypeBuilderWrapper.fs" />
+    <Compile Include="GeneratorProviders.fs" />
+    <Compile Include="ILOpCode.fs" />
+    <Compile Include="ILGeneratorWrapper.fs" />
     <Compile Include="CompileStack.fs" />
     <Compile Include="MethodCallEmitter.fs" />
     <Compile Include="ExprCompiler.fs" />
