@@ -8,6 +8,12 @@ open System.Reflection.Emit
 
 module ExprCompiler =
 
+  type VariableInfo =
+    | Arg of int
+    | Local of LocalBuilder
+
+  type VariableEnv = (string * VariableInfo) list
+
   let inline emitLoadInteger< ^TInteger when ^TInteger : (static member op_Explicit: ^TInteger -> int) > (value: obj) (gen: ILGeneratorWrapper) =
     match int (unbox< ^TInteger > value) with
     | -1 -> gen.Emit(Ldc_I4_M1)
@@ -46,6 +52,9 @@ module ExprCompiler =
     stack.Push(CompileTarget expr)
 
     let mutable lambdaCount = 0
+
+    let varEnv: VariableEnv ref = ref []
+    let args = ref 0
 
     while stack.Count <> 0 do
       match stack.Pop() with
@@ -89,6 +98,18 @@ module ExprCompiler =
               stack.Push(CompileTarget handler)
               stack.Push(Compiling (fun gen -> gen.Emit(Stloc res); gen.BeginFinallyBlock()))
               stack.Push(CompileTarget body)
+          | Let (var, expr, body) ->
+              stack.Push(Compiling (fun _ ->
+                varEnv := (!varEnv).Tail
+              ))
+              let local = ref Unchecked.defaultof<LocalBuilder>
+              stack.Push(Compiling (fun gen -> gen.Emit(Stloc !local)))
+              stack.Push(CompileTarget body)
+              stack.Push(Compiling (fun gen ->
+                local := gen.DeclareLocal(var.Type)
+                varEnv := (var.Name, Local !local)::(!varEnv)
+              ))
+              stack.Push(CompileTarget expr)
           | Lambda (var, body) ->
               let baseType = fsharpFuncType var.Type body.Type
               let baseCtor =
@@ -107,11 +128,19 @@ module ExprCompiler =
               let invoke =
                 lambda.DefineOverrideMethod(baseType, "Invoke", MethodAttributes.Public, body.Type, [ var.Type ])
               let invokeGen = invoke.GetILGenerator()
+              stack.Push(Compiling (fun _ ->
+                varEnv := (!varEnv).Tail
+                decr args
+              ))
               stack.Push(Compiling (fun gen -> gen.Emit(Newobj ctor.RawBuilder)))
               stack.Push(RestoreGen gen)
               gen <- invokeGen
               stack.Push(Compiling (fun gen -> gen.Emit(Ret); lambda.CreateType() |> ignore))
               stack.Push(CompileTarget body)
+              stack.Push(Compiling (fun _gen ->
+                varEnv := (var.Name, Arg (!args + 1))::(!varEnv)
+                incr args
+              ))
           | Call (None, mi, argsExprs) ->
               MethodCallEmitter.emit (mi, argsExprs) stack
           | Call (Some recv, mi, argsExprs) ->
@@ -132,9 +161,14 @@ module ExprCompiler =
               else
                 gen.Close()
                 failwithf "unsupported value type: %A" typ
-          | Var _ ->
-              // TODO : impl
-              gen.Emit(Ldarg_1)
+          | Var v ->
+              match List.pick (fun (n, info) -> if n = v.Name then Some info else None) !varEnv with
+              | Arg 0 -> gen.Emit(Ldarg_0)
+              | Arg 1 -> gen.Emit(Ldarg_1)
+              | Arg 2 -> gen.Emit(Ldarg_2)
+              | Arg 3 -> gen.Emit(Ldarg_3)
+              | Arg idx -> gen.Emit(Ldarg idx)
+              | Local local -> gen.Emit(Ldloc local)
           | expr ->
               gen.Close()
               failwithf "unsupported expr: %A" expr

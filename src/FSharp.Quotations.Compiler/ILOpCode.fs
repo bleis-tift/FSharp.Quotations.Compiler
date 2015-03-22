@@ -41,6 +41,9 @@ type ILOpCode =
   | Ldloc of LocalBuilder
   | Ldarg_0
   | Ldarg_1
+  | Ldarg_2
+  | Ldarg_3
+  | Ldarg of int
   | Ldsfld of FieldInfo
   | Ldnull
   | Ldstr of string
@@ -96,6 +99,9 @@ module ILOpCode =
   | Ldloc _ -> OpCodes.Ldloc
   | Ldarg_0 -> OpCodes.Ldarg_0
   | Ldarg_1 -> OpCodes.Ldarg_1
+  | Ldarg_2 -> OpCodes.Ldarg_2
+  | Ldarg_3 -> OpCodes.Ldarg_3
+  | Ldarg _ -> OpCodes.Ldarg
   | Ldsfld _ -> OpCodes.Ldsfld
   | Ldnull -> OpCodes.Ldnull
   | Ldstr _ -> OpCodes.Ldstr
