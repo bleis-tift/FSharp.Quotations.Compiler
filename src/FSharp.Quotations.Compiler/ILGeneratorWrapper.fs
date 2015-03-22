@@ -43,6 +43,11 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
     this.WriteLine("begin catch " + typ.ToReadableText())
     pushIndent ()
     gen.BeginCatchBlock(typ)
+  member this.BeginFinallyBlock() =
+    popIndent ()
+    this.WriteLine("begin finally")
+    pushIndent ()
+    gen.BeginFinallyBlock()
   member this.EndExceptionBlock() =
     popIndent ()
     this.WriteLine("end")

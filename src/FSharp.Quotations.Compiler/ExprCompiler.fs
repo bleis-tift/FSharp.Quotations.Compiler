@@ -76,6 +76,13 @@ module ExprCompiler =
               stack.Push(CompileTarget exnHandler)
               stack.Push(Compiling (fun gen -> gen.Emit(Stloc res); gen.BeginCatchBlock(e.Type)))
               stack.Push(CompileTarget body)
+          | TryFinally (body, handler) ->
+              let res = gen.DeclareLocal(body.Type)
+              gen.BeginExceptionBlock() |> ignore
+              stack.Push(Compiling (fun gen -> gen.EndExceptionBlock(); gen.Emit(Ldloc res)))
+              stack.Push(CompileTarget handler)
+              stack.Push(Compiling (fun gen -> gen.Emit(Stloc res); gen.BeginFinallyBlock()))
+              stack.Push(CompileTarget body)
           | Lambda (var, body) ->
               let baseType = fsharpFuncType var.Type body.Type
               let baseCtor =
