@@ -100,9 +100,10 @@ module ExprCompiler =
               ctorGen.Emit(Ldarg_0)
               ctorGen.Emit(Call (Ctor baseCtor))
               ctorGen.Emit(Ret)
+              ctorGen.Close()
 
               let invoke =
-                lambda.DefineOverrideMethod(baseType, "Invoke", MethodAttributes.Public, var.Type, [ body.Type ])
+                lambda.DefineOverrideMethod(baseType, "Invoke", MethodAttributes.Public, body.Type, [ var.Type ])
               let invokeGen = invoke.GetILGenerator()
               stack.Push(Compiling (fun gen -> gen.Emit(Newobj ctor.RawBuilder)))
               stack.Push(RestoreGen gen)
