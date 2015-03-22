@@ -130,11 +130,13 @@ module ExprCompiler =
               elif typ = typeof<string> then
                 gen.Emit(Ldstr (unbox<string> value))
               else
+                gen.Close()
                 failwithf "unsupported value type: %A" typ
           | Var _ ->
               // TODO : impl
               gen.Emit(Ldarg_1)
           | expr ->
+              gen.Close()
               failwithf "unsupported expr: %A" expr
 
     gen.Emit(Ret)

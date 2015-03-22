@@ -79,6 +79,7 @@
     <Compile Include="StringOpTest.fs" />
     <Compile Include="StringFuncTest.fs" />
     <Compile Include="ControlFlowExprTest.fs" />
+    <Compile Include="LetTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FsUnit.NUnit">
