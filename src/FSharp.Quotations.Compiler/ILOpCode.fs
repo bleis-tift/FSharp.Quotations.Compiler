@@ -59,6 +59,7 @@ type ILOpCode =
   | Tailcall
   | Call of CallTarget
   | Newobj of ConstructorInfo
+  | Pop
   | Ret
 
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
@@ -113,4 +114,5 @@ module ILOpCode =
   | Tailcall -> OpCodes.Tailcall
   | Call _ -> OpCodes.Call
   | Newobj _ -> OpCodes.Newobj
+  | Pop -> OpCodes.Pop
   | Ret -> OpCodes.Ret

@@ -67,6 +67,10 @@ module ExprCompiler =
               gen.MarkLabel(ifEndLabel)
       | CompileTarget target ->
           match target with
+          | Sequential (e1, e2) ->
+              stack.Push(CompileTarget e2)
+              stack.Push(Compiling (fun gen -> gen.Emit(Pop)))
+              stack.Push(CompileTarget e1)
           | IfThenElse (cond, truePart, falsePart) ->
               stack.Push(CompilingIfThenElse (gen.DefineLabel(), gen.DefineLabel(), NotYet cond, NotYet truePart, NotYet falsePart))
           | TryWith (body, _, _, e, exnHandler) ->
