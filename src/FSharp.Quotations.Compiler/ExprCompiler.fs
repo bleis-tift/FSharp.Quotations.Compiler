@@ -45,6 +45,8 @@ module ExprCompiler =
     let stack = CompileStack()
     stack.Push(CompileTarget expr)
 
+    let mutable lambdaCount = 0
+
     while stack.Count <> 0 do
       match stack.Pop() with
       | RestoreGen g -> gen.Close(); gen <- g
@@ -91,9 +93,9 @@ module ExprCompiler =
               let baseType = fsharpFuncType var.Type body.Type
               let baseCtor =
                 baseType.GetConstructor(BindingFlags.NonPublic ||| BindingFlags.Instance, null, [||], null)
-              // TODO : unique name
               let lambda =
-                parentMod.DefineType("lambda0", TypeAttributes.Public, baseType, [])
+                parentMod.DefineType("lambda" + (string lambdaCount), TypeAttributes.Public, baseType, [])
+              lambdaCount <- lambdaCount + 1
 
               let ctor = lambda.DefineConstructor(MethodAttributes.Public, [])
               let ctorGen = ctor.GetILGenerator()

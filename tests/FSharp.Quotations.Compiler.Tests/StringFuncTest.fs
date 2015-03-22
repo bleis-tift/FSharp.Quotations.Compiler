@@ -30,3 +30,7 @@ module StringFuncTest =
   [<Test>]
   let ``String.filter`` () =
     <@ String.forall (fun ch -> Char.IsLetter(ch)) "abc" @> |> check true
+
+  [<Test>]
+  let ``nested case`` () =
+    <@ String.forall (fun ch -> Char.IsLetter(ch)) (String.map (fun ch -> char (int ch + 1)) "abc") @> |> check true
