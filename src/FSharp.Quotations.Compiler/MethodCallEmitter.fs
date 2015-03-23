@@ -124,21 +124,24 @@ module internal MethodCallEmitter =
   // shadowing the functions of the Microsoft.FSharp.Core.Operators.Checked module
   open Microsoft.FSharp.Core.Operators
 
-  let private emitImpl (mi: MethodInfo) isTailCall (gen: ILGeneratorWrapper) =
+  let private getPushingCompileStackInfos (mi: MethodInfo) isTailCall =
     match altEmitterTable1.TryGetValue(mi) with
-    | true, emitter -> emitter gen
+    | true, emitter -> [ Compiling emitter ]
     | _ ->
         match altEmitterTable2.TryGetValue(mi) with
-        | true, emitter -> emitter gen
+        | true, emitter -> [ Compiling emitter ]
         | _ ->
             let isReturnVoid = mi.ReturnType = typeof<Void>
             if isTailCall && not isReturnVoid then
-              gen.Emit(Tailcall)
-            gen.Emit(Call (Method mi))
-            if isReturnVoid then
-              gen.Emit(Ldnull)
+              [ Compiling (fun gen -> gen.Emit(Tailcall); gen.Emit(Call (Method mi))) ]
+            elif isReturnVoid then
+              [ Assumed (function
+                         | IfSequential, _ -> ()
+                         | _, gen -> gen.Emit(Ldnull))
+                Compiling (fun gen -> gen.Emit(Call (Method mi))) ]
+            else
+              [ Compiling (fun gen -> gen.Emit(Call (Method mi))) ]
 
   let emit (mi: MethodInfo, argsExprs: Expr list) (stack: CompileStack) =
-    stack.Push(Compiling (fun gen ->
-      emitImpl mi (stack.Count = 0) gen))
+    getPushingCompileStackInfos mi (stack.Count = 0) |> List.iter stack.Push
     argsExprs |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))

@@ -59,6 +59,16 @@ module ExprCompiler =
     while stack.Count <> 0 do
       match stack.Pop() with
       | RestoreGen g -> gen.Close(); gen <- g
+      | Assumed f ->
+          if stack.Count = 0 then
+            f (False, gen)
+          else
+            match stack.Pop() with
+            | Assumption a -> f (a, gen)
+            | other ->
+                f (False, gen)
+                stack.Push(other)
+      | Assumption _ -> () // do nothing
       | Compiling f -> f gen
       | CompilingIfThenElse (falseLabel, ifEndLabel, cond, truePart, falsePart) ->
           match cond, truePart, falsePart with
@@ -80,7 +90,7 @@ module ExprCompiler =
           match target with
           | Sequential (e1, e2) ->
               stack.Push(CompileTarget e2)
-              stack.Push(Compiling (fun gen -> gen.Emit(Pop)))
+              stack.Push(Assumption IfSequential)
               stack.Push(CompileTarget e1)
           | IfThenElse (cond, truePart, falsePart) ->
               stack.Push(CompilingIfThenElse (gen.DefineLabel(), gen.DefineLabel(), NotYet cond, NotYet truePart, NotYet falsePart))
@@ -150,7 +160,7 @@ module ExprCompiler =
           | FieldGet (None, fi) ->
               gen.Emit(Ldsfld fi)
           | Value (null, _) ->
-              gen.Emit(Ldnull)
+              stack.Push(Assumed (function IfSequential, _gen -> () | _, gen -> gen.Emit(Ldnull)))
           | Value (value, typ) ->
               if typ = typeof<int> then
                 emitLoadInteger<int> value gen
