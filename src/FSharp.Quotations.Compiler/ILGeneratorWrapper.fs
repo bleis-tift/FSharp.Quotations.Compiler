@@ -76,7 +76,7 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
     | Ldc_I4_S i | Ldc_I4 i | Ldarg i | Starg i ->
         this.WriteLineAndMark(raw.Name + " " + string i)
         gen.Emit(raw, i)
-    | Call target ->
+    | Call target | Callvirt target ->
         match target with
         | Method mi ->
             this.WriteLineAndMark(raw.Name + " " + mi.ToReadableText())

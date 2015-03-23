@@ -131,16 +131,20 @@ module internal MethodCallEmitter =
         match altEmitterTable2.TryGetValue(mi) with
         | true, emitter -> [ Compiling emitter ]
         | _ ->
+            let emitCall (gen: ILGeneratorWrapper) =
+              if mi.IsVirtual then gen.Emit(Callvirt (Method mi))
+              else gen.Emit(Call (Method mi))
+
             let isReturnVoid = mi.ReturnType = typeof<Void>
             if isTailCall && not isReturnVoid then
-              [ Compiling (fun gen -> gen.Emit(Tailcall); gen.Emit(Call (Method mi))) ]
+              [ Compiling (fun gen -> gen.Emit(Tailcall); emitCall gen) ]
             elif isReturnVoid then
               [ Assumed (function
                          | IfSequential, _ -> ()
                          | _, gen -> gen.Emit(Ldnull))
-                Compiling (fun gen -> gen.Emit(Call (Method mi))) ]
+                Compiling emitCall ]
             else
-              [ Compiling (fun gen -> gen.Emit(Call (Method mi))) ]
+              [ Compiling emitCall ]
 
   let emit (mi: MethodInfo, argsExprs: Expr list) (stack: CompileStack) =
     getPushingCompileStackInfos mi (stack.Count = 0) |> List.iter stack.Push

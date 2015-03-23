@@ -64,6 +64,7 @@ type ILOpCode =
   | Stelem of Type
   | Tailcall
   | Call of CallTarget
+  | Callvirt of CallTarget
   | Newarr of Type
   | Newobj of ConstructorInfo
   | Dup
@@ -127,6 +128,7 @@ module ILOpCode =
   | Stelem _ -> OpCodes.Stelem
   | Tailcall -> OpCodes.Tailcall
   | Call _ -> OpCodes.Call
+  | Callvirt _ -> OpCodes.Callvirt
   | Newarr _ -> OpCodes.Newarr
   | Newobj _ -> OpCodes.Newobj
   | Dup -> OpCodes.Dup
