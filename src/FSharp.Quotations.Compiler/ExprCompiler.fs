@@ -197,6 +197,8 @@ module ExprCompiler =
                 MethodCallEmitter.emit (mi, recv::argsExprs) stack
             | PropertyGet (Some recv, pi, argsExprs) ->
                 MethodCallEmitter.emit (pi.GetMethod, recv::argsExprs) stack
+            | PropertySet (Some recv, pi, argsExprs, expr) ->
+                MethodCallEmitter.emit (pi.SetMethod, recv::(argsExprs @ [expr])) stack
             | FieldGet (None, fi) ->
                 gen.Emit(Ldsfld fi)
             | NewObject (ctor, argsExprs) ->
