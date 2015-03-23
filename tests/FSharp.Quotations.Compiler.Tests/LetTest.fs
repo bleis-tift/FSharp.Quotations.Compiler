@@ -61,3 +61,11 @@ module LetTest =
        f 10 20
     @>
     |> check 30
+
+  [<Test>]
+  let ``nested application`` () =
+    <@
+       let f x = x + 10
+       (fun x -> f x) 20
+    @>
+    |> check 30
