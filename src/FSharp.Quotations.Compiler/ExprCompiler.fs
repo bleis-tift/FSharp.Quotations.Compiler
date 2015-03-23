@@ -112,12 +112,11 @@ module ExprCompiler =
               stack.Push(Compiling (fun _ ->
                 varEnv := (!varEnv).Tail
               ))
-              let local = ref Unchecked.defaultof<LocalBuilder>
-              stack.Push(Compiling (fun gen -> gen.Emit(Stloc !local)))
               stack.Push(CompileTarget body)
-              stack.Push(Compiling (fun gen ->
-                local := gen.DeclareLocal(var.Type)
-                varEnv := (var.Name, Local !local)::(!varEnv)
+              let local = gen.DeclareLocal(var.Type)
+              stack.Push(Compiling (fun gen -> gen.Emit(Stloc local)))
+              stack.Push(Compiling (fun _ ->
+                varEnv := (var.Name, Local local)::(!varEnv)
               ))
               stack.Push(CompileTarget expr)
           | Lambda (var, body) ->
@@ -179,6 +178,13 @@ module ExprCompiler =
               | Arg 3 -> gen.Emit(Ldarg_3)
               | Arg idx -> gen.Emit(Ldarg idx)
               | Local local -> gen.Emit(Ldloc local)
+          | VarSet (v, expr) ->
+              stack.Push(Compiling (fun gen ->
+                match List.pick (fun (n, info) -> if n = v.Name then Some info else None) !varEnv with
+                | Arg idx -> gen.Emit(Starg idx)
+                | Local local -> gen.Emit(Stloc local)
+              ))
+              stack.Push(CompileTarget expr)
           | expr ->
               gen.Close()
               failwithf "unsupported expr: %A" expr

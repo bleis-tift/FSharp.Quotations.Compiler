@@ -39,6 +39,7 @@ type ILOpCode =
   | Unbox_Any of Type
   | Stloc of LocalBuilder
   | Ldloc of LocalBuilder
+  | Starg of int
   | Ldarg_0
   | Ldarg_1
   | Ldarg_2
@@ -97,6 +98,7 @@ module ILOpCode =
   | Unbox_Any _ -> OpCodes.Unbox_Any
   | Stloc _ -> OpCodes.Stloc
   | Ldloc _ -> OpCodes.Ldloc
+  | Starg _ -> OpCodes.Starg
   | Ldarg_0 -> OpCodes.Ldarg_0
   | Ldarg_1 -> OpCodes.Ldarg_1
   | Ldarg_2 -> OpCodes.Ldarg_2
