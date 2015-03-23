@@ -4,6 +4,7 @@
 module ObjTest =
   type Class (value: int) =
     member val Value = value with get, set
+    static member val SValue = -1 with get, set
     override __.Equals(x) =
       match x with
       | :? Class as other -> value = other.Value
@@ -26,3 +27,6 @@ module ObjTest =
        c.Value <- 10
        c.Value
     @> |> check 10
+
+  [<Test>]
+  let ``static property get`` () = <@ Class.SValue @> |> check -1
