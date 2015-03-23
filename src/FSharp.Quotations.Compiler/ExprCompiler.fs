@@ -216,6 +216,13 @@ module ExprCompiler =
                 | Local local -> gen.Emit(Stloc local)
               ))
               stack.Push(CompileTarget expr)
+          | Coerce (expr, typ) ->
+              if typ = typeof<obj> then
+                if expr.Type.IsValueType then
+                  stack.Push(Compiling (fun gen ->
+                    gen.Emit(Box expr.Type)
+                  ))
+              stack.Push(CompileTarget expr)
           | expr ->
               gen.Close()
               failwithf "unsupported expr: %A" expr

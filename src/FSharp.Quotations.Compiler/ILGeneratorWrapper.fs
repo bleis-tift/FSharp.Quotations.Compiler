@@ -90,7 +90,7 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
         | PropGet pi ->
             this.WriteLineAndMark(raw.Name + " " + pi.ToReadableText())
             gen.Emit(raw, pi.GetMethod)
-    | Newarr typ | Stelem typ ->
+    | Newarr typ | Stelem typ | Box typ ->
         this.WriteLineAndMark(raw.Name + " " + typ.ToReadableText())
         gen.Emit(raw, typ)
     | Newobj ci ->

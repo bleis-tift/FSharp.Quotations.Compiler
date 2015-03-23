@@ -74,6 +74,7 @@
     <Compile Include="ArithmeticOpTest.fs" />
     <Compile Include="BitOpTest.fs" />
     <Compile Include="CmpOpTest.fs" />
+    <Compile Include="TypeOpTest.fs" />
     <Compile Include="ConvertFuncTest.fs" />
     <Compile Include="CoreFuncTest.fs" />
     <Compile Include="BoolOpTest.fs" />
