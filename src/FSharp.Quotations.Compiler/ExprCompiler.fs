@@ -222,6 +222,11 @@ module ExprCompiler =
                   stack.Push(Compiling (fun gen ->
                     gen.Emit(Box expr.Type)
                   ))
+              elif expr.Type.IsValueType then
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Box expr.Type)
+                  gen.Emit(Unbox_Any typ)
+                ))
               stack.Push(CompileTarget expr)
           | expr ->
               gen.Close()

@@ -22,7 +22,6 @@ type ILOpCode =
   | Rem
   | Sub
   | Sub_Ovf
-  | Box of Type
   | Brfalse of Label
   | Br of Label
   | Conv_I
@@ -37,6 +36,7 @@ type ILOpCode =
   | Conv_Ovf_U2
   | Conv_Ovf_U4
   | Conv_Ovf_U8
+  | Box of Type
   | Unbox_Any of Type
   | Stloc of LocalBuilder
   | Ldloc of LocalBuilder
@@ -85,7 +85,6 @@ module ILOpCode =
   | Rem -> OpCodes.Rem
   | Sub -> OpCodes.Sub
   | Sub_Ovf -> OpCodes.Sub_Ovf
-  | Box _ -> OpCodes.Box
   | Brfalse _ -> OpCodes.Brfalse
   | Br _ -> OpCodes.Br
   | Conv_I -> OpCodes.Conv_I
@@ -100,6 +99,7 @@ module ILOpCode =
   | Conv_Ovf_U2 -> OpCodes.Conv_Ovf_U2
   | Conv_Ovf_U4 -> OpCodes.Conv_Ovf_U4
   | Conv_Ovf_U8 -> OpCodes.Conv_Ovf_U8
+  | Box _ -> OpCodes.Box
   | Unbox_Any _ -> OpCodes.Unbox_Any
   | Stloc _ -> OpCodes.Stloc
   | Ldloc _ -> OpCodes.Ldloc
