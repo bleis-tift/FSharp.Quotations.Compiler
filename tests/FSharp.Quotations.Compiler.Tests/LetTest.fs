@@ -32,3 +32,12 @@ module LetTest =
 
   [<Test>]
   let ``simple let rec`` () = <@ let rec n = 42 in n @> |> check 42
+
+  [<Test>]
+  let ``let rec list`` () =
+    <@
+       let rec a = 10
+       and b = 20
+       a + b
+    @>
+    |> check 30
