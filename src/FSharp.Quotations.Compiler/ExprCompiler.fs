@@ -195,10 +195,12 @@ module ExprCompiler =
                 MethodCallEmitter.emit (mi, argsExprs) stack
             | Call (Some recv, mi, argsExprs) ->
                 MethodCallEmitter.emit (mi, recv::argsExprs) stack
-            | PropertyGet (Some recv, pi, argsExprs) ->
-                MethodCallEmitter.emit (pi.GetMethod, recv::argsExprs) stack
             | PropertyGet (None, pi, argsExprs) ->
                 MethodCallEmitter.emit (pi.GetMethod, argsExprs) stack
+            | PropertyGet (Some recv, pi, argsExprs) ->
+                MethodCallEmitter.emit (pi.GetMethod, recv::argsExprs) stack
+            | PropertySet (None, pi, argsExprs, expr) ->
+                MethodCallEmitter.emit (pi.SetMethod, (argsExprs @ [expr])) stack
             | PropertySet (Some recv, pi, argsExprs, expr) ->
                 MethodCallEmitter.emit (pi.SetMethod, recv::(argsExprs @ [expr])) stack
             | FieldGet (None, fi) ->

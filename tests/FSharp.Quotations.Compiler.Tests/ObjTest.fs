@@ -30,3 +30,9 @@ module ObjTest =
 
   [<Test>]
   let ``static property get`` () = <@ Class.SValue @> |> check -1
+
+  [<Test>]
+  let ``static property set`` () =
+    <@ Class.SValue <- 10
+       Class.SValue
+    @> |> check 10
