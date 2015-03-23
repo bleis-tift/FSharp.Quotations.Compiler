@@ -170,6 +170,20 @@ module ExprCompiler =
               MethodCallEmitter.emit (pi.GetMethod, recv::argsExprs) stack
           | FieldGet (None, fi) ->
               gen.Emit(Ldsfld fi)
+          | NewArray (typ, elems) ->
+              let count = elems.Length
+              emitLoadInteger<int> count gen
+              gen.Emit(Newarr typ)
+
+              for e, i in List.zip elems [0..count - 1] |> List.rev do
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Stelem typ)
+                ))
+                stack.Push(CompileTarget e)
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Dup)
+                  emitLoadInteger<int> i gen
+                ))
           | Value (null, _) ->
               stack.Push(Assumed (function IfSequential, _gen -> () | _, gen -> gen.Emit(Ldnull)))
           | Value (value, typ) ->

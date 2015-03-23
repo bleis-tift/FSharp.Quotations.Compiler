@@ -60,9 +60,12 @@ type ILOpCode =
   | Ldc_I4_8
   | Ldc_I4_S of int
   | Ldc_I4 of int
+  | Stelem of Type
   | Tailcall
   | Call of CallTarget
+  | Newarr of Type
   | Newobj of ConstructorInfo
+  | Dup
   | Pop
   | Ret
 
@@ -119,8 +122,11 @@ module ILOpCode =
   | Ldc_I4_8 -> OpCodes.Ldc_I4_8
   | Ldc_I4_S _ -> OpCodes.Ldc_I4_S
   | Ldc_I4 _ -> OpCodes.Ldc_I4
+  | Stelem _ -> OpCodes.Stelem
   | Tailcall -> OpCodes.Tailcall
   | Call _ -> OpCodes.Call
+  | Newarr _ -> OpCodes.Newarr
   | Newobj _ -> OpCodes.Newobj
+  | Dup -> OpCodes.Dup
   | Pop -> OpCodes.Pop
   | Ret -> OpCodes.Ret
