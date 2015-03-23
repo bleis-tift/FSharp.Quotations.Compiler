@@ -41,3 +41,23 @@ module LetTest =
        a + b
     @>
     |> check 30
+
+  [<Test>]
+  let ``application`` () =
+    <@
+       let f (x: obj) =
+         match x with
+         | :? string -> "str"
+         | :? int -> "int"
+         | _ -> "other"
+       (f ("hoge" :> obj)) + (f (20 :> obj))
+    @>
+    |> check "strint"
+
+  [<Test>]
+  let ``application 2`` () =
+    <@
+       let f a b = a + b
+       f 10 20
+    @>
+    |> check 30

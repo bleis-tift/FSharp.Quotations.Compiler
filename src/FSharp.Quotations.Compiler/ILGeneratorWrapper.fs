@@ -67,7 +67,7 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
     | Stloc local | Ldloc local ->
         this.WriteLineAndMark(raw.Name + " " + string local.LocalIndex)
         gen.Emit(raw, local)
-    | Ldsfld fld ->
+    | Ldsfld fld | Stfld fld | Ldfld fld ->
         this.WriteLineAndMark(raw.Name + " " + (fld.ToReadableText()))
         gen.Emit(raw, fld)
     | Ldstr str ->

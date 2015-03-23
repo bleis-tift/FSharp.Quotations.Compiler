@@ -11,8 +11,9 @@ module ExprCompiler =
   type VariableInfo =
     | Arg of int
     | Local of LocalBuilder
+    | Field of FieldInfo
 
-  type VariableEnv = (string * VariableInfo) list
+  type VariableEnv = (string * Type * VariableInfo) list
 
   let inline emitLoadInteger< ^TInteger when ^TInteger : (static member op_Explicit: ^TInteger -> int) > (value: obj) (gen: ILGeneratorWrapper) =
     match int (unbox< ^TInteger > value) with
@@ -54,7 +55,6 @@ module ExprCompiler =
     let mutable lambdaCount = 0
 
     let varEnv: VariableEnv ref = ref []
-    let args = ref 0
 
     while stack.Count <> 0 do
       match stack.Pop() with
@@ -116,7 +116,7 @@ module ExprCompiler =
               let local = gen.DeclareLocal(var.Type)
               stack.Push(Compiling (fun gen -> gen.Emit(Stloc local)))
               stack.Push(Compiling (fun _ ->
-                varEnv := (var.Name, Local local)::(!varEnv)
+                varEnv := (var.Name, var.Type, Local local)::(!varEnv)
               ))
               stack.Push(CompileTarget expr)
           | LetRecursive (varAndExprList, body) ->
@@ -128,7 +128,7 @@ module ExprCompiler =
                 let local = gen.DeclareLocal(var.Type)
                 stack.Push(Compiling (fun gen -> gen.Emit(Stloc local)))
                 stack.Push(Compiling (fun _ ->
-                  varEnv := (var.Name, Local local)::(!varEnv)
+                  varEnv := (var.Name, var.Type, Local local)::(!varEnv)
                 ))
                 stack.Push(CompileTarget expr)
           | Lambda (var, body) ->
@@ -139,29 +139,57 @@ module ExprCompiler =
                 parentMod.DefineType("lambda" + (string lambdaCount), TypeAttributes.Public, baseType, [])
               lambdaCount <- lambdaCount + 1
 
-              let ctor = lambda.DefineConstructor(MethodAttributes.Public, [])
+              let needVarInfos =
+                !varEnv
+                |> List.fold (fun acc (n, t, info) -> if List.forall (fun (n2, _, _) -> n <> n2) acc then (n, t, info)::acc else acc) []
+                |> List.rev
+              let varTypes = needVarInfos |> List.map (fun (_, t, _) -> t)
+              let ctor = lambda.DefineConstructor(MethodAttributes.Public, varTypes)
               let ctorGen = ctor.GetILGenerator()
               ctorGen.Emit(Ldarg_0)
               ctorGen.Emit(Call (Ctor baseCtor))
+              let fields =
+                List.map (fun (name, typ, _) -> lambda.DefineField(name, typ, FieldAttributes.Private)) needVarInfos
+              for i, field in List.zip [1..fields.Length] fields do
+                ctorGen.Emit(Ldarg_0)
+                ctorGen.Emit(Ldarg i)
+                ctorGen.Emit(Stfld field)
               ctorGen.Emit(Ret)
               ctorGen.Close()
 
               let invoke =
                 lambda.DefineOverrideMethod(baseType, "Invoke", MethodAttributes.Public, body.Type, [ var.Type ])
               let invokeGen = invoke.GetILGenerator()
+              let orgVarEnv = !varEnv
               stack.Push(Compiling (fun _ ->
-                varEnv := (!varEnv).Tail
-                decr args
+                varEnv := orgVarEnv
               ))
-              stack.Push(Compiling (fun gen -> gen.Emit(Newobj ctor.RawBuilder)))
+              stack.Push(Compiling (fun gen ->
+                for _, _, info in needVarInfos do
+                  match info with
+                  | Arg i -> gen.Emit(Ldarg i)
+                  | Local local -> gen.Emit(Ldloc local)
+                  | Field fi -> gen.Emit(Ldfld fi)
+                gen.Emit(Newobj ctor.RawBuilder)
+              ))
               stack.Push(RestoreGen gen)
               gen <- invokeGen
               stack.Push(Compiling (fun gen -> gen.Emit(Ret); lambda.CreateType() |> ignore))
               stack.Push(CompileTarget body)
+              let newVarEnv =
+                List.zip needVarInfos fields
+                |> List.map (fun ((name, typ, _), fi) -> (name, typ, Field fi))
               stack.Push(Compiling (fun _gen ->
-                varEnv := (var.Name, Arg (!args + 1))::(!varEnv)
-                incr args
+                varEnv := (var.Name, var.Type, Arg 1)::newVarEnv
               ))
+          | Application (fExpr, argExpr) ->
+              stack.Push(Compiling (fun gen ->
+                if stack.Count = 0 then
+                  gen.Emit(Tailcall)
+                gen.Emit(Callvirt (Method (fExpr.Type.GetMethod("Invoke"))))
+              ))
+              stack.Push(CompileTarget argExpr)
+              stack.Push(CompileTarget fExpr)
           | Call (None, mi, argsExprs) ->
               MethodCallEmitter.emit (mi, argsExprs) stack
           | Call (Some recv, mi, argsExprs) ->
@@ -202,18 +230,20 @@ module ExprCompiler =
                 gen.Close()
                 failwithf "unsupported value type: %A" typ
           | Var v ->
-              match List.pick (fun (n, info) -> if n = v.Name then Some info else None) !varEnv with
+              match List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv with
               | Arg 0 -> gen.Emit(Ldarg_0)
               | Arg 1 -> gen.Emit(Ldarg_1)
               | Arg 2 -> gen.Emit(Ldarg_2)
               | Arg 3 -> gen.Emit(Ldarg_3)
               | Arg idx -> gen.Emit(Ldarg idx)
               | Local local -> gen.Emit(Ldloc local)
+              | Field fi -> gen.Emit(Ldarg_0); gen.Emit(Ldfld fi)
           | VarSet (v, expr) ->
               stack.Push(Compiling (fun gen ->
-                match List.pick (fun (n, info) -> if n = v.Name then Some info else None) !varEnv with
+                match List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv with
                 | Arg idx -> gen.Emit(Starg idx)
                 | Local local -> gen.Emit(Stloc local)
+                | Field fi -> gen.Emit(Ldarg_0); gen.Emit(Stfld fi)
               ))
               stack.Push(CompileTarget expr)
           | TypeTest (expr, typ) ->

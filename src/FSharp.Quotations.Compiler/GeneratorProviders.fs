@@ -45,3 +45,6 @@ module TypeBuilderWrapperExtension =
 
     member this.DefineConstructor(attrs, argsTypes) =
       CtorBuilderWrapper.Create(this.Parent, this, this.RawBuilder.DefineConstructor(attrs, CallingConventions.Standard, Array.ofList argsTypes))
+
+    member this.DefineField(name, typ, attrs) =
+      this.RawBuilder.DefineField(name, typ, attrs)
