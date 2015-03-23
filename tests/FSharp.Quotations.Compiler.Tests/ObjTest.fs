@@ -1,0 +1,15 @@
+﻿namespace FSharp.Quotations.Compiler.Tests
+
+[<TestModule>]
+module ObjTest =
+  type Class (value: int) =
+    member private __.Value = value
+    override __.Equals(x) =
+      match x with
+      | :? Class as other -> value = other.Value
+      | _ -> false
+    override __.GetHashCode() = value
+    override __.ToString() = sprintf "Class(%d)" value
+
+  [<Test>]
+  let ``new`` () = <@ new Class(42) @> |> check (new Class(42))

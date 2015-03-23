@@ -70,6 +70,7 @@
     <Content Include="app.config" />
     <Compile Include="TestUtil.fs" />
     <Compile Include="LiteralTest.fs" />
+    <Compile Include="ObjTest.fs" />
     <Compile Include="ArithmeticOpTest.fs" />
     <Compile Include="BitOpTest.fs" />
     <Compile Include="CmpOpTest.fs" />

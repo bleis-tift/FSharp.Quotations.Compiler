@@ -170,6 +170,11 @@ module ExprCompiler =
               MethodCallEmitter.emit (pi.GetMethod, recv::argsExprs) stack
           | FieldGet (None, fi) ->
               gen.Emit(Ldsfld fi)
+          | NewObject (ctor, argsExprs) ->
+              stack.Push(Compiling (fun gen ->
+                gen.Emit(Newobj ctor)
+              ))
+              argsExprs |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))
           | NewArray (typ, elems) ->
               let count = elems.Length
               emitLoadInteger<int> count gen
