@@ -234,7 +234,6 @@ module ExprCompiler =
                 elif typ = typeof<string> then
                   gen.Emit(Ldstr (unbox<string> value))
                 else
-                  gen.Close()
                   failwithf "unsupported value type: %A" typ
             | Var v ->
                 match List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv with
@@ -276,7 +275,6 @@ module ExprCompiler =
                   ))
                 stack.Push(CompileTarget expr)
             | expr ->
-                gen.Close()
                 failwithf "unsupported expr: %A" expr
 
       gen.Emit(Ret)
