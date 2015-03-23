@@ -19,6 +19,8 @@ module internal MethodCallEmitter =
   | PropertyGet (_, pi, _) -> pi
   | expr -> failwithf "expr is not property get: %A" expr
 
+  let typeTestGenericInt32MethodInfo = getMethod <@ box 42 :? int @>
+
   let private identityEqualityComparer =
     { new IEqualityComparer<MethodInfo> with
         member __.Equals(x, y) = (x = y)

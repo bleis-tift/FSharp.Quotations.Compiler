@@ -16,3 +16,19 @@ module ControlFlowExprTest =
     <@ (); 10 @> |> check 10
     <@ ignore 10; 20 @> |> check 20
     <@ ignore 10; ignore 20; 30 @> |> check 30
+
+  [<Test>]
+  let ``match type test`` () =
+    <@
+      let x =
+        match "hoge" :> obj with
+        | :? string -> "str"
+        | :? int -> "int"
+        | _ -> "other"
+      let y =
+        match 42 :> obj with
+        | :? string -> "str"
+        | :? int -> "int"
+        | _ -> "other"
+      x + y
+    @> |> check "strint"

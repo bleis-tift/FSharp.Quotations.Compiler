@@ -216,6 +216,16 @@ module ExprCompiler =
                 | Local local -> gen.Emit(Stloc local)
               ))
               stack.Push(CompileTarget expr)
+          | TypeTest (expr, typ) ->
+              if typ = typeof<int> then
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Call (Method MethodCallEmitter.typeTestGenericInt32MethodInfo))
+                ))
+              else
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Isinst typ)
+                ))
+              stack.Push(CompileTarget expr)
           | Coerce (expr, typ) ->
               if typ = typeof<obj> then
                 if expr.Type.IsValueType then
