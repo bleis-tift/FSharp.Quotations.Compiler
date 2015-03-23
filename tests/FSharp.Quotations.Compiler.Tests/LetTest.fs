@@ -29,3 +29,6 @@ module LetTest =
          a + 2
        a + b @>
     |> check 32
+
+  [<Test>]
+  let ``simple let rec`` () = <@ let rec n = 42 in n @> |> check 42

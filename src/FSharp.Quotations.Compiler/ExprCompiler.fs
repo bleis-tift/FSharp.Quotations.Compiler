@@ -119,6 +119,18 @@ module ExprCompiler =
                 varEnv := (var.Name, Local local)::(!varEnv)
               ))
               stack.Push(CompileTarget expr)
+          | LetRecursive (varAndExprList, body) ->
+              stack.Push(Compiling (fun _ ->
+                varEnv := (!varEnv) |> Seq.skip varAndExprList.Length |> Seq.toList
+              ))
+              stack.Push(CompileTarget body)
+              for var, expr in varAndExprList do
+                let local = gen.DeclareLocal(var.Type)
+                stack.Push(Compiling (fun gen -> gen.Emit(Stloc local)))
+                stack.Push(Compiling (fun _ ->
+                  varEnv := (var.Name, Local local)::(!varEnv)
+                ))
+                stack.Push(CompileTarget expr)
           | Lambda (var, body) ->
               let baseType = fsharpFuncType var.Type body.Type
               let baseCtor =
