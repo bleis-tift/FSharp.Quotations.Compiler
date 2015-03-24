@@ -99,7 +99,15 @@ module ExprCompiler =
                 let res = gen.DeclareLocal(body.Type)
                 gen.BeginExceptionBlock() |> ignore
                 stack.Push(Compiling (fun gen -> gen.Emit(Stloc res); gen.EndExceptionBlock(); gen.Emit(Ldloc res)))
+                stack.Push(Compiling (fun _ ->
+                  varEnv := (!varEnv).Tail
+                ))
                 stack.Push(CompileTarget exnHandler)
+                let local = gen.DeclareLocal(e.Type)
+                stack.Push(Compiling (fun gen -> gen.Emit(Stloc local)))
+                stack.Push(Compiling (fun _ ->
+                  varEnv := (e.Name, e.Type, Local local) :: (!varEnv)
+                ))
                 stack.Push(Compiling (fun gen -> gen.Emit(Stloc res); gen.BeginCatchBlock(e.Type)))
                 stack.Push(CompileTarget body)
             | TryFinally (body, handler) ->
