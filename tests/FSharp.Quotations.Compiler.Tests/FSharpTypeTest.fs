@@ -24,3 +24,8 @@ module FSharpTypeTest =
 
   [<Test>]
   let ``new simple DU with value`` () = <@ Tag 42 @> |> check (Tag 42)
+
+  [<Test>]
+  let ``option`` () =
+    <@ Some 42 @> |> check (Some 42)
+    <@ None @> |> check None

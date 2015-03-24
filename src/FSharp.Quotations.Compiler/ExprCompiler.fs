@@ -217,13 +217,22 @@ module ExprCompiler =
                 TupleEmitter.emit elems stack
             | NewUnionCase (case, argsExprs) ->
                 let typ = case.DeclaringType
-                match case.GetFields() with
-                | [||] ->
-                    let pi = typ.GetProperty(case.Name, typ)
-                    MethodCallEmitter.emit (pi.GetMethod, argsExprs) stack
-                | _fields ->
-                    let mi = typ.GetMethod("New" + case.Name)
-                    MethodCallEmitter.emit (mi, argsExprs) stack
+                if typ.IsGenericType && typ.GetGenericTypeDefinition() = typedefof<_ option> then
+                  match case.Name with
+                  | "Some" ->
+                      let mi = typ.GetMethod("Some")
+                      MethodCallEmitter.emit (mi, argsExprs) stack
+                  | _ ->
+                      let pi = typ.GetProperty(case.Name, typ)
+                      MethodCallEmitter.emit (pi.GetMethod, argsExprs) stack
+                else
+                  match case.GetFields() with
+                  | [||] ->
+                      let pi = typ.GetProperty(case.Name, typ)
+                      MethodCallEmitter.emit (pi.GetMethod, argsExprs) stack
+                  | _fields ->
+                      let mi = typ.GetMethod("New" + case.Name)
+                      MethodCallEmitter.emit (mi, argsExprs) stack
             | NewRecord (typ, argsExprs) ->
                 let ctor = typ.GetConstructor(argsExprs |> List.map (fun e -> e.Type) |> List.toArray)
                 stack.Push(Compiling (fun gen ->
