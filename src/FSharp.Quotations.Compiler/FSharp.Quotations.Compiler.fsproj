@@ -68,6 +68,7 @@
     <Compile Include="ILGeneratorWrapper.fs" />
     <Compile Include="CompileStack.fs" />
     <Compile Include="MethodCallEmitter.fs" />
+    <Compile Include="TupleEmitter.fs" />
     <Compile Include="ExprCompiler.fs" />
   </ItemGroup>
   <ItemGroup>

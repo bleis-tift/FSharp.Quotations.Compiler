@@ -205,6 +205,8 @@ module ExprCompiler =
                 MethodCallEmitter.emit (pi.SetMethod, recv::(argsExprs @ [expr])) stack
             | FieldGet (None, fi) ->
                 gen.Emit(Ldsfld fi)
+            | NewTuple (elems) ->
+                TupleEmitter.emit elems stack
             | NewObject (ctor, argsExprs) ->
                 stack.Push(Compiling (fun gen ->
                   gen.Emit(Newobj ctor)

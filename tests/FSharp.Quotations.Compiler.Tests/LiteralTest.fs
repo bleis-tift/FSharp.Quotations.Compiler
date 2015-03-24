@@ -19,3 +19,8 @@ module LiteralTest =
     <@ [|1; 2; 3|] @> |> check [|1; 2; 3|]
     <@ [|1..3|] @> |> check [|1; 2; 3|]
     <@ [|1..2..5|] @> |> check [|1; 3; 5|]
+
+  [<Test>]
+  let tuple () =
+    <@ (1, "str") @> |> check (1, "str")
+    <@ (1, 2, 3) @> |> check (1, 2, 3)
