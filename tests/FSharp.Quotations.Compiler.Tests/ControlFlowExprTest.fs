@@ -12,6 +12,11 @@ module ControlFlowExprTest =
     <@ try 10 finally () @> |> check 10
 
   [<Test>]
+  let ``try-with raise exception`` () =
+    <@ try failwith "oops!" with e -> e.Message @>
+    |> check "oops!"
+
+  [<Test>]
   let ``sequential`` () =
     <@ (); 10 @> |> check 10
     <@ ignore 10; 20 @> |> check 20
