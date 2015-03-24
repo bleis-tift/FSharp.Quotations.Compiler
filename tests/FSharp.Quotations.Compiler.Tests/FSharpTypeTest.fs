@@ -19,3 +19,8 @@ module FSharpTypeTest =
 
   [<Test>]
   let ``new simple DU`` () = <@ Tag @> |> check Tag
+
+  type SimpleDUWithValue = Tag of int
+
+  [<Test>]
+  let ``new simple DU with value`` () = <@ Tag 42 @> |> check (Tag 42)
