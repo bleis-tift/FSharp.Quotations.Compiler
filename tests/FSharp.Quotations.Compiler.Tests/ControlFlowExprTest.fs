@@ -88,3 +88,14 @@ module ControlFlowExprTest =
        f Tag1 + f (Tag2 Tag1)
     @>
     |> check "tag1tag2"
+
+  [<Test>]
+  let ``match list`` () =
+    <@
+       let f lst =
+         match lst with
+         | x::xs -> string x + ":" + (string xs.Length)
+         | [] -> "empty"
+       f [] + f [1; 2; 3]
+    @>
+    |> check "empty1:2"
