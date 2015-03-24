@@ -76,6 +76,17 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
     | Ldc_I4_S i | Ldc_I4 i | Ldarg i | Starg i ->
         this.WriteLineAndMark(raw.Name + " " + string i)
         gen.Emit(raw, i)
+    | Ldtoken tok ->
+        match tok with
+        | TokType t ->
+            this.WriteLineAndMark(raw.Name + " " + t.ToReadableText())
+            gen.Emit(raw, t)
+        | TokMethod m ->
+            this.WriteLineAndMark(raw.Name + " " + m.ToReadableText())
+            gen.Emit(raw, m)
+        | TokField f ->
+            this.WriteLineAndMark(raw.Name + " " + f.ToReadableText())
+            gen.Emit(raw, f)
     | Call target | Callvirt target ->
         match target with
         | Method mi ->

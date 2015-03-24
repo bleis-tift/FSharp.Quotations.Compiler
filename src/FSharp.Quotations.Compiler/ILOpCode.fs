@@ -9,6 +9,11 @@ type CallTarget =
   | Ctor of ConstructorInfo
   | PropGet of PropertyInfo
 
+type Token =
+  | TokType of Type
+  | TokMethod of MethodInfo
+  | TokField of FieldInfo
+
 type ILOpCode =
   | And
   | Or
@@ -65,6 +70,7 @@ type ILOpCode =
   | Ldc_I4_S of int
   | Ldc_I4 of int
   | Stelem of Type
+  | Ldtoken of Token
   | Tailcall
   | Call of CallTarget
   | Callvirt of CallTarget
@@ -132,6 +138,7 @@ module ILOpCode =
   | Ldc_I4_S _ -> OpCodes.Ldc_I4_S
   | Ldc_I4 _ -> OpCodes.Ldc_I4
   | Stelem _ -> OpCodes.Stelem
+  | Ldtoken _ -> OpCodes.Ldtoken
   | Tailcall -> OpCodes.Tailcall
   | Call _ -> OpCodes.Call
   | Callvirt _ -> OpCodes.Callvirt
