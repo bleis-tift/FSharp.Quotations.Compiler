@@ -10,3 +10,7 @@ module FSharpTypeTest =
   [<Test>]
   let ``new record`` () =
     <@ { Value1 = 10; Value2 = "str" } @> |> check { Value1 = 10; Value2 = "str" }
+
+  [<Test>]
+  let ``new generic record`` () =
+    <@ { contents = 10 } @> |> check (ref 10)
