@@ -75,3 +75,16 @@ module ControlFlowExprTest =
        f (Tag1 0) + f Tag2
     @>
     |> check "0tag2"
+
+  type RecDU = Tag1 | Tag2 of RecDU
+
+  [<Test>]
+  let ``match recursive DU`` () =
+    <@
+       let f x =
+         match x with
+         | Tag1 -> "tag1"
+         | Tag2 _ -> "tag2"
+       f Tag1 + f (Tag2 Tag1)
+    @>
+    |> check "tag1tag2"
