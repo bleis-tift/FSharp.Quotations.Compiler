@@ -207,6 +207,12 @@ module ExprCompiler =
                 gen.Emit(Ldsfld fi)
             | NewTuple (elems) ->
                 TupleEmitter.emit elems stack
+            | NewRecord (typ, argsExprs) ->
+                let ctor = typ.GetConstructor(argsExprs |> List.map (fun e -> e.Type) |> List.toArray)
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Newobj ctor)
+                ))
+                argsExprs |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))
             | NewObject (ctor, argsExprs) ->
                 stack.Push(Compiling (fun gen ->
                   gen.Emit(Newobj ctor)
