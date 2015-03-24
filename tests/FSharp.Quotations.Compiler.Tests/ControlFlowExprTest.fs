@@ -62,3 +62,16 @@ module ControlFlowExprTest =
        f Tag1 + f Tag2
     @>
     |> check "12"
+
+  type SimpleDUWithValue = Tag1 of int | Tag2
+
+  [<Test>]
+  let ``match DU with value`` () =
+    <@
+       let f x =
+         match x with
+         | Tag1 i -> string i
+         | Tag2 -> "tag2"
+       f (Tag1 0) + f Tag2
+    @>
+    |> check "0tag2"
