@@ -215,6 +215,10 @@ module ExprCompiler =
                 gen.Emit(Ldsfld fi)
             | NewTuple (elems) ->
                 TupleEmitter.emit elems stack
+            | NewUnionCase (case, argsExprs) ->
+                let typ = case.DeclaringType
+                let pi = typ.GetProperty(case.Name, typ)
+                MethodCallEmitter.emit (pi.GetMethod, argsExprs) stack
             | NewRecord (typ, argsExprs) ->
                 let ctor = typ.GetConstructor(argsExprs |> List.map (fun e -> e.Type) |> List.toArray)
                 stack.Push(Compiling (fun gen ->

@@ -14,3 +14,8 @@ module FSharpTypeTest =
   [<Test>]
   let ``new generic record`` () =
     <@ { contents = 10 } @> |> check (ref 10)
+
+  type SimpleDU = Tag
+
+  [<Test>]
+  let ``new simple DU`` () = <@ Tag @> |> check Tag
