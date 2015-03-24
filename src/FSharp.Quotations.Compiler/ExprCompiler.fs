@@ -284,15 +284,19 @@ module ExprCompiler =
                 let typ = case.DeclaringType
                 match case.GetFields() with
                 | [||] ->
-                    let nestedType = typ.GetNestedType("_" + case.Name, BindingFlags.NonPublic)
-                    if nestedType <> null then
-                      stack.Push(Compiling (fun gen ->
-                        gen.Emit(Isinst nestedType)
-                      ))
-                      stack.Push(CompileTarget expr)
+                    let prop = typ.GetProperty("Is" + case.Name)
+                    if prop <> null then
+                      MethodCallEmitter.emit (prop.GetMethod, [expr]) stack
                     else
-                      let mi = MethodCallEmitter.genericEqualityIntrinsicM.MakeGenericMethod(typ)
-                      MethodCallEmitter.emit (mi, [expr; <@@ null @@>]) stack
+                      let nestedType = typ.GetNestedType("_" + case.Name, BindingFlags.NonPublic)
+                      if nestedType <> null then
+                        stack.Push(Compiling (fun gen ->
+                          gen.Emit(Isinst nestedType)
+                        ))
+                        stack.Push(CompileTarget expr)
+                      else
+                        let mi = MethodCallEmitter.genericEqualityIntrinsicM.MakeGenericMethod(typ)
+                        MethodCallEmitter.emit (mi, [expr; <@@ null @@>]) stack
                 | _fields ->
                     let nestedType = typ.GetNestedType(case.Name)
                     stack.Push(Compiling (fun gen ->

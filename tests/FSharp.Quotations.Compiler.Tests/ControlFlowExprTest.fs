@@ -40,7 +40,7 @@ module ControlFlowExprTest =
     |> check "strint"
 
   [<Test>]
-  let ``match`` () =
+  let ``match option`` () =
     <@
        let f x =
          match x with
@@ -49,3 +49,16 @@ module ControlFlowExprTest =
        f (Some 42) + f None
     @>
     |> check "42none"
+
+  type SimpleDU = Tag1 | Tag2
+
+  [<Test>]
+  let ``match simple DU`` () =
+    <@
+       let f x =
+         match x with
+         | Tag1 -> "1"
+         | Tag2 -> "2"
+       f Tag1 + f Tag2
+    @>
+    |> check "12"
