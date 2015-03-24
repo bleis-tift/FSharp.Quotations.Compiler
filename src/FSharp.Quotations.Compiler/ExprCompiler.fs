@@ -280,6 +280,25 @@ module ExprCompiler =
                   | Field fi -> gen.Emit(Ldarg_0); gen.Emit(Stfld fi)
                 ))
                 stack.Push(CompileTarget expr)
+            | UnionCaseTest (expr, case) ->
+                let typ = case.DeclaringType
+                match case.GetFields() with
+                | [||] ->
+                    let nestedType = typ.GetNestedType("_" + case.Name, BindingFlags.NonPublic)
+                    if nestedType <> null then
+                      stack.Push(Compiling (fun gen ->
+                        gen.Emit(Isinst nestedType)
+                      ))
+                      stack.Push(CompileTarget expr)
+                    else
+                      let mi = MethodCallEmitter.genericEqualityIntrinsicM.MakeGenericMethod(typ)
+                      MethodCallEmitter.emit (mi, [expr; <@@ null @@>]) stack
+                | _fields ->
+                    let nestedType = typ.GetNestedType(case.Name)
+                    stack.Push(Compiling (fun gen ->
+                      gen.Emit(Isinst nestedType)
+                    ))
+                    stack.Push(CompileTarget expr)
             | TypeTest (expr, typ) ->
                 if typ = typeof<int> then
                   stack.Push(Compiling (fun gen ->

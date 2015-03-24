@@ -9,6 +9,8 @@ open System.Globalization
 open System.Collections.Generic
 open System.Runtime.CompilerServices
 
+#nowarn "1204"
+
 module internal MethodCallEmitter =
 
   let private getMethod = function
@@ -20,6 +22,7 @@ module internal MethodCallEmitter =
   | expr -> failwithf "expr is not property get: %A" expr
 
   let typeTestGenericInt32MethodInfo = getMethod <@ box 42 :? int @>
+  let genericEqualityIntrinsicM = (getMethod <@ LanguagePrimitives.HashCompare.GenericEqualityIntrinsic null null @>).GetGenericMethodDefinition()
 
   let private identityEqualityComparer =
     { new IEqualityComparer<MethodInfo> with

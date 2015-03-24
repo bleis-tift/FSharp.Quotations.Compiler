@@ -36,4 +36,16 @@ module ControlFlowExprTest =
         | :? int -> "int"
         | _ -> "other"
       x + y
-    @> |> check "strint"
+    @>
+    |> check "strint"
+
+  [<Test>]
+  let ``match`` () =
+    <@
+       let f x =
+         match x with
+         | Some n -> string n
+         | None -> "none"
+       f (Some 42) + f None
+    @>
+    |> check "42none"
