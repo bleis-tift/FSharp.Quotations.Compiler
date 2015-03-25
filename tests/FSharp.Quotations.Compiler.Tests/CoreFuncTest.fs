@@ -27,6 +27,11 @@ module CoreFuncTest =
   let ``compare string string`` () = <@ compare "str" "str" @> |> check 0
 
   [<Test>]
+  let ``defaultArg (string option) string`` () =
+    <@ defaultArg None "default" @> |> check "default"
+    <@ defaultArg (Some "str") "default" @> |> check "str"
+
+  [<Test>]
   let ``hash int`` () = <@ hash 1 @> |> check 1
 
   [<Test>]
