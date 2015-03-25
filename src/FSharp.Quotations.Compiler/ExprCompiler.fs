@@ -213,9 +213,24 @@ module ExprCompiler =
                 MethodCallEmitter.emit (pi.SetMethod, recv::(argsExprs @ [expr])) stack
             | FieldGet (None, fi) ->
                 gen.Emit(Ldsfld fi)
-            | TupleGet (expr, idx) ->
+            | TupleGet (expr, idx) when idx < 7 ->
                 let pi = expr.Type.GetProperty("Item" + string (idx + 1))
                 MethodCallEmitter.emit (pi.GetMethod, [expr]) stack
+            | TupleGet (expr, idx) ->
+                let restCount = idx / 7 - 1
+                let itemN = idx % 7 + 1
+                let pi = expr.Type.GetProperty("Rest")
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Call (Method pi.GetMethod))
+                  let typ = ref pi.PropertyType
+                  for _ in 1..restCount do
+                    let pi = (!typ).GetProperty("Rest")
+                    gen.Emit(Call (Method pi.GetMethod))
+                    typ := pi.PropertyType
+                  let pi = (!typ).GetProperty("Item" + string itemN)
+                  gen.Emit(Call (Method pi.GetMethod))
+                ))
+                stack.Push(CompileTarget expr)
             | NewTuple (elems) ->
                 TupleEmitter.emit elems stack
             | NewUnionCase (case, argsExprs) ->

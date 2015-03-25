@@ -34,3 +34,19 @@ module FSharpTypeTest =
   let ``tuple get`` () =
     <@ let a, b = 10, "hoge" in string a + b @>
     |> check "10hoge"
+
+  [<Test>]
+  let ``10 tuple get`` () =
+    <@
+       let x1, x2, x3, x4, x5, x6, x7, x8, x9, x10 = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+       [x1; x2; x3; x4; x5; x6; x7; x8; x9; x10]
+    @>
+    |> check [1..10]
+
+  [<Test>]
+  let ``15 tuple get`` () =
+    <@
+       let x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15 = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+       [x1; x2; x3; x4; x5; x6; x7; x8; x9; x10; x11; x12; x13; x14; x15]
+    @>
+    |> check [1..15]
