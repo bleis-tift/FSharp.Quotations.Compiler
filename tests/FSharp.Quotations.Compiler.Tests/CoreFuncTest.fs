@@ -32,6 +32,11 @@ module CoreFuncTest =
     <@ defaultArg (Some "str") "default" @> |> check "str"
 
   [<Test>]
+  let ``defaultArg with pipeline op`` () =
+    <@ (None, "default") ||> defaultArg @> |> check "default"
+    <@ (Some "str", "default") ||> defaultArg @> |> check "str"
+
+  [<Test>]
   let ``hash int`` () = <@ hash 1 @> |> check 1
 
   [<Test>]
