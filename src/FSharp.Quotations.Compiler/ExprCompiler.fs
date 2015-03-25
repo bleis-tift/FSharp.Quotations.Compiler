@@ -297,6 +297,11 @@ module ExprCompiler =
                   gen.Emit(Ldstr (unbox<string> value))
                 else
                   failwithf "unsupported value type: %A" typ
+            | DefaultValue typ ->
+                let local = gen.DeclareLocal(typ)
+                gen.Emit(Ldloca local)
+                gen.Emit(Initobj typ)
+                gen.Emit(Ldloc local)
             | Var v ->
                 match List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv with
                 | Arg 0 -> gen.Emit(Ldarg_0)

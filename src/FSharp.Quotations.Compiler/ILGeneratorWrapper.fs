@@ -64,7 +64,7 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
     | Brfalse label | Br label ->
         this.WriteLineAndMark(raw.Name + " " + string (label.GetHashCode()))
         gen.Emit(raw, label)
-    | Stloc local | Ldloc local ->
+    | Stloc local | Ldloc local | Ldloca local ->
         this.WriteLineAndMark(raw.Name + " " + string local.LocalIndex)
         gen.Emit(raw, local)
     | Ldsfld fld | Stfld fld | Ldfld fld ->
@@ -98,7 +98,7 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
         | PropGet pi ->
             this.WriteLineAndMark(raw.Name + " " + pi.ToReadableText())
             gen.Emit(raw, pi.GetMethod)
-    | Newarr typ | Stelem typ | Box typ | Unbox_Any typ | Isinst typ ->
+    | Newarr typ | Stelem typ | Initobj typ | Box typ | Unbox_Any typ | Isinst typ ->
         this.WriteLineAndMark(raw.Name + " " + typ.ToReadableText())
         gen.Emit(raw, typ)
     | Newobj ci ->

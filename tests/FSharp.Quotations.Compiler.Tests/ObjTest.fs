@@ -19,6 +19,9 @@ module ObjTest =
   let ``new`` () = <@ new Class(42) @> |> check (new Class(42))
 
   [<Test>]
+  let ``struct default value`` () = <@ System.Guid() @> |> check (System.Guid())
+
+  [<Test>]
   let ``ToString()`` () = <@ (Class(42).ToString()) @> |> check (Class(42).ToString())
 
   [<Test>]

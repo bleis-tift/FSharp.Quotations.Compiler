@@ -46,6 +46,7 @@ type ILOpCode =
   | Unbox_Any of Type
   | Stloc of LocalBuilder
   | Ldloc of LocalBuilder
+  | Ldloca of LocalBuilder
   | Starg of int
   | Ldarg_0
   | Ldarg_1
@@ -76,6 +77,7 @@ type ILOpCode =
   | Callvirt of CallTarget
   | Newarr of Type
   | Newobj of ConstructorInfo
+  | Initobj of Type
   | Dup
   | Pop
   | Ret
@@ -114,6 +116,7 @@ module ILOpCode =
   | Unbox_Any _ -> OpCodes.Unbox_Any
   | Stloc _ -> OpCodes.Stloc
   | Ldloc _ -> OpCodes.Ldloc
+  | Ldloca _ -> OpCodes.Ldloca
   | Starg _ -> OpCodes.Starg
   | Ldarg_0 -> OpCodes.Ldarg_0
   | Ldarg_1 -> OpCodes.Ldarg_1
@@ -144,6 +147,7 @@ module ILOpCode =
   | Callvirt _ -> OpCodes.Callvirt
   | Newarr _ -> OpCodes.Newarr
   | Newobj _ -> OpCodes.Newobj
+  | Initobj _ -> OpCodes.Initobj
   | Dup -> OpCodes.Dup
   | Pop -> OpCodes.Pop
   | Ret -> OpCodes.Ret
