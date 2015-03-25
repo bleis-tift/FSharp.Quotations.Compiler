@@ -8,13 +8,20 @@ module ControlFlowExprTest =
     <@ try failwith "" with _e -> -1 @> |> check -1
 
   [<Test>]
-  let ``try-finally`` () =
-    <@ try 10 finally () @> |> check 10
-
-  [<Test>]
   let ``try-with raise exception`` () =
     <@ try failwith "oops!" with e -> e.Message @>
     |> check "oops!"
+
+  [<Test>]
+  let ``try-with filter`` () =
+    <@ try failwith "x" with e when e.Message = "x" -> "ok" | _ -> "ng" @>
+    |> check "ok"
+    <@ try failwith "y" with e when e.Message = "x" -> "ok" | _ -> "ng" @>
+    |> check "ng"
+
+  [<Test>]
+  let ``try-finally`` () =
+    <@ try 10 finally () @> |> check 10
 
   [<Test>]
   let ``sequential`` () =
