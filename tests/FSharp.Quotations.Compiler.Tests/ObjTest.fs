@@ -42,3 +42,10 @@ module ObjTest =
 
   [<Test>]
   let ``field get`` () = <@ let c = Class(10) in c.InstanceField @> |> check "str"
+
+  [<Test>]
+  let ``field set`` () =
+    <@ let c = Class(10)
+       c.InstanceField <- "new str"
+       c.InstanceField
+    @> |> check "new str"

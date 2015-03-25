@@ -211,6 +211,17 @@ module ExprCompiler =
                 MethodCallEmitter.emit (pi.SetMethod, (argsExprs @ [expr])) stack
             | PropertySet (Some recv, pi, argsExprs, expr) ->
                 MethodCallEmitter.emit (pi.SetMethod, recv::(argsExprs @ [expr])) stack
+            | FieldSet (None, fi, expr) ->
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Stfld fi)
+                ))
+                stack.Push(CompileTarget expr)
+            | FieldSet (Some recv, fi, expr) ->
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Stfld fi)
+                ))
+                stack.Push(CompileTarget expr)
+                stack.Push(CompileTarget recv)
             | FieldGet (None, fi) ->
                 gen.Emit(Ldsfld fi)
             | FieldGet (Some recv, fi) ->
