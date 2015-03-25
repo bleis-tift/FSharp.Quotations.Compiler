@@ -213,6 +213,9 @@ module ExprCompiler =
                 MethodCallEmitter.emit (pi.SetMethod, recv::(argsExprs @ [expr])) stack
             | FieldGet (None, fi) ->
                 gen.Emit(Ldsfld fi)
+            | TupleGet (expr, idx) ->
+                let pi = expr.Type.GetProperty("Item" + string (idx + 1))
+                MethodCallEmitter.emit (pi.GetMethod, [expr]) stack
             | NewTuple (elems) ->
                 TupleEmitter.emit elems stack
             | NewUnionCase (case, argsExprs) ->

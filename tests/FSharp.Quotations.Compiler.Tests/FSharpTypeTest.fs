@@ -29,3 +29,8 @@ module FSharpTypeTest =
   let ``option`` () =
     <@ Some 42 @> |> check (Some 42)
     <@ None @> |> check None
+
+  [<Test>]
+  let ``tuple get`` () =
+    <@ let a, b = 10, "hoge" in string a + b @>
+    |> check "10hoge"
