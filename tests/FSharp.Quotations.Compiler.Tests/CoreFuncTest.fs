@@ -98,6 +98,12 @@ module CoreFuncTest =
   [<Test>]
   let ``sign int`` () = <@ sign -10 @> |> check -1
 
+  [<Test>]
+  let ``fst int * string`` () = <@ fst (1, "str") @> |> check 1
+
+  [<Test>]
+  let ``snd int * string`` () = <@ snd (1, "str") @> |> check "str"
+
   module Unchecked =
     open Microsoft.FSharp.Core.Operators.Unchecked
 
