@@ -2,7 +2,10 @@
 
 [<TestModule>]
 module ObjTest =
-  type Class (value: int) =
+  type Class (value: int) as this =
+    [<DefaultValue>] val mutable public InstanceField : string
+    do
+      this.InstanceField <- "str"
     member val Value = value with get, set
     static member val SValue = -1 with get, set
     override __.Equals(x) =
@@ -36,3 +39,6 @@ module ObjTest =
     <@ Class.SValue <- 10
        Class.SValue
     @> |> check 10
+
+  [<Test>]
+  let ``field get`` () = <@ let c = Class(10) in c.InstanceField @> |> check "str"

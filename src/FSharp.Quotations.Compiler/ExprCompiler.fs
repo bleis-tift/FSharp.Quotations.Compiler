@@ -213,6 +213,11 @@ module ExprCompiler =
                 MethodCallEmitter.emit (pi.SetMethod, recv::(argsExprs @ [expr])) stack
             | FieldGet (None, fi) ->
                 gen.Emit(Ldsfld fi)
+            | FieldGet (Some recv, fi) ->
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Ldfld fi)
+                ))
+                stack.Push(CompileTarget recv)
             | TupleGet (expr, idx) when idx < 7 ->
                 let pi = expr.Type.GetProperty("Item" + string (idx + 1))
                 MethodCallEmitter.emit (pi.GetMethod, [expr]) stack
