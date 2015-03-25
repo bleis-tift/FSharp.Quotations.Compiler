@@ -1,5 +1,7 @@
 ﻿namespace FSharp.Quotations.Compiler.Tests
 
+open System
+
 [<TestModule>]
 module ControlFlowExprTest =
   [<Test>]
@@ -18,6 +20,19 @@ module ControlFlowExprTest =
     |> check "ok"
     <@ try failwith "y" with e when e.Message = "x" -> "ok" | _ -> "ng" @>
     |> check "ng"
+
+  [<Test>]
+  let ``try-with type test`` () =
+    <@
+       let f exn =
+         try raise exn
+         with
+         | :? InvalidOperationException -> "invalid op"
+         | :? ArgumentException -> " arg exn"
+         | _ -> " other exn"
+       f (InvalidOperationException()) + f (ArgumentException()) + f (Exception())
+    @>
+    |> check "invalid op arg exn other exn"
 
   [<Test>]
   let ``try-finally`` () =
