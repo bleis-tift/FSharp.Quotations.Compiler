@@ -10,6 +10,7 @@ type CompilingState =
 
 type Assumption =
   | IfSequential
+  | IfRet
   | False
 
 type CompileStackInfo =

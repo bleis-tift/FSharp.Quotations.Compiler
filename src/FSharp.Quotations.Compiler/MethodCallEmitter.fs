@@ -29,11 +29,19 @@ module internal MethodCallEmitter =
         member __.Equals(x, y) = (x = y)
         member __.GetHashCode(x) = RuntimeHelpers.GetHashCode(x) }
 
-  let doNothing (_: ILGeneratorWrapper) = ()
+  let doNothing = Compiling (fun (_: ILGeneratorWrapper) -> ())
 
-  let emitOpCode opcode (gen: ILGeneratorWrapper) = gen.Emit(opcode)
+  let emitOpCode opcode = Compiling (fun (gen: ILGeneratorWrapper) -> gen.Emit(opcode))
 
-  let private (|>>) emit1 emit2 = (fun (gen: ILGeneratorWrapper) -> emit1 gen; emit2 gen)
+  let private (|>>) emit1 emit2 =
+    match emit1, emit2 with
+    | Compiling e1, Compiling e2 -> Compiling (fun (gen: ILGeneratorWrapper) -> e1 gen; e2 gen)
+    | _ -> failwith "oops!"
+
+  let emitCallMethod mi =
+    Assumed (function
+             | IfRet, gen -> gen.Emit(Tailcall); gen.Emit(Call (Method mi))
+             | _, gen -> gen.Emit(Call (Method mi)))
 
   let emitStrToFloat (mi: MethodInfo) =
     emitOpCode (Ldc_I4 (int NumberStyles.Float))
@@ -42,7 +50,7 @@ module internal MethodCallEmitter =
     |>> emitOpCode (Call (Method mi))
 
   let private altEmitterTable1 =
-    let dict = Dictionary<MethodInfo, (ILGeneratorWrapper -> unit)>(identityEqualityComparer)
+    let dict = Dictionary<MethodInfo, CompileStackInfo>(identityEqualityComparer)
     dict.Add(getMethod <@ +(1) @>, doNothing)
     dict.Add(getMethod <@ -(1) @>, emitOpCode Neg)
     dict.Add(getMethod <@ 1 - 1 @>, emitOpCode Sub)
@@ -57,7 +65,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ byte 1 @>, doNothing)
     dict.Add(getMethod <@ sbyte 1 @>, doNothing)
     dict.Add(getMethod <@ char 1 @>, doNothing)
-    dict.Add(getMethod <@ decimal 1 @>, emitOpCode (Call (Method (getMethod <@ Convert.ToDecimal(1) @>))))
+    dict.Add(getMethod <@ decimal 1 @>, emitCallMethod (getMethod <@ Convert.ToDecimal(1) @>))
     dict.Add(getMethod <@ float 1 @>, emitOpCode Conv_R8)
     dict.Add(getMethod <@ float32 1 @>, emitOpCode Conv_R4)
     dict.Add(getMethod <@ int 1 @>, doNothing)
@@ -73,19 +81,19 @@ module internal MethodCallEmitter =
                                       |>> emitOpCode Conv_Ovf_U1)
     dict.Add(getMethod <@ sbyte "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt32("") @>)))
                                        |>> emitOpCode Conv_Ovf_I1)
-    dict.Add(getMethod <@ char "" @>, emitOpCode (Call (Method (getMethod <@ Char.Parse("") @>))))
+    dict.Add(getMethod <@ char "" @>, emitCallMethod (getMethod <@ Char.Parse("") @>))
     dict.Add(getMethod <@ decimal "" @>, emitStrToFloat (getMethod <@ Decimal.Parse("", NumberStyles.None, Unchecked.defaultof<IFormatProvider>) @>))
     dict.Add(getMethod <@ float "" @>, emitStrToFloat (getMethod <@ Double.Parse("", NumberStyles.None, Unchecked.defaultof<IFormatProvider>) @>))
     dict.Add(getMethod <@ float32 "" @>, emitStrToFloat (getMethod <@ Single.Parse("", NumberStyles.None, Unchecked.defaultof<IFormatProvider>) @>))
-    dict.Add(getMethod <@ int "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt32("") @>))))
+    dict.Add(getMethod <@ int "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseInt32("") @>))
     dict.Add(getMethod <@ int16 "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt32("") @>)))
                                        |>> emitOpCode Conv_Ovf_I2)
     dict.Add(getMethod <@ uint16 "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseUInt32("") @>)))
                                         |>> emitOpCode Conv_Ovf_U2)
-    dict.Add(getMethod <@ int32 "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt32("") @>))))
-    dict.Add(getMethod <@ uint32 "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseUInt32("") @>))))
-    dict.Add(getMethod <@ int64 "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt64("") @>))))
-    dict.Add(getMethod <@ uint64 "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseUInt64("") @>))))
+    dict.Add(getMethod <@ int32 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseInt32("") @>))
+    dict.Add(getMethod <@ uint32 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseUInt32("") @>))
+    dict.Add(getMethod <@ int64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseInt64("") @>))
+    dict.Add(getMethod <@ uint64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseUInt64("") @>))
 
     dict.Add(getMethod <@ int 'a' @>, emitOpCode Conv_I4)
 
@@ -94,7 +102,7 @@ module internal MethodCallEmitter =
   open Microsoft.FSharp.Core.Operators.Checked
 
   let private altEmitterTable2 =
-    let dict = Dictionary<MethodInfo, (ILGeneratorWrapper -> unit)>(identityEqualityComparer)
+    let dict = Dictionary<MethodInfo, CompileStackInfo>(identityEqualityComparer)
     dict.Add(getMethod <@ -(1) @>, emitOpCode Ldc_I4_M1 |>> emitOpCode Mul_Ovf)
     dict.Add(getMethod <@ 1 - 1 @>, emitOpCode Sub_Ovf)
     dict.Add(getMethod <@ 1 * 1 @>, emitOpCode Mul_Ovf)
@@ -115,42 +123,42 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ sbyte "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt32("") @>)))
                                        |>> emitOpCode Conv_Ovf_I1)
     dict.Add(getMethod <@ char "" @>, emitOpCode (Call (Method (getMethod <@ Char.Parse("") @>))))
-    dict.Add(getMethod <@ int "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt32("") @>))))
+    dict.Add(getMethod <@ int "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseInt32("") @>))
     dict.Add(getMethod <@ int16 "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt32("") @>)))
                                        |>> emitOpCode Conv_Ovf_I2)
     dict.Add(getMethod <@ uint16 "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseUInt32("") @>)))
                                         |>> emitOpCode Conv_Ovf_U2)
-    dict.Add(getMethod <@ int32 "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt32("") @>))))
-    dict.Add(getMethod <@ uint32 "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseUInt32("") @>))))
-    dict.Add(getMethod <@ int64 "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt64("") @>))))
-    dict.Add(getMethod <@ uint64 "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseUInt64("") @>))))
+    dict.Add(getMethod <@ int32 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseInt32("") @>))
+    dict.Add(getMethod <@ uint32 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseUInt32("") @>))
+    dict.Add(getMethod <@ int64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseInt64("") @>))
+    dict.Add(getMethod <@ uint64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseUInt64("") @>))
     dict :> IReadOnlyDictionary<_, _>
 
   // shadowing the functions of the Microsoft.FSharp.Core.Operators.Checked module
   open Microsoft.FSharp.Core.Operators
 
-  let private getPushingCompileStackInfos (mi: MethodInfo) isTailCall =
+  let private getPushingCompileStackInfos (mi: MethodInfo) =
     match altEmitterTable1.TryGetValue(mi) with
-    | true, emitter -> [ Compiling emitter ]
+    | true, emitter -> [emitter]
     | _ ->
         match altEmitterTable2.TryGetValue(mi) with
-        | true, emitter -> [ Compiling emitter ]
+        | true, emitter -> [emitter]
         | _ ->
             let emitCall (gen: ILGeneratorWrapper) =
               if mi.IsVirtual then gen.Emit(Callvirt (Method mi))
               else gen.Emit(Call (Method mi))
 
             let isReturnVoid = mi.ReturnType = typeof<Void>
-            if isTailCall && not isReturnVoid then
-              [ Compiling (fun gen -> gen.Emit(Tailcall); emitCall gen) ]
-            elif isReturnVoid then
+            if isReturnVoid then
               [ Assumed (function
                          | IfSequential, _ -> ()
                          | _, gen -> gen.Emit(Ldnull))
                 Compiling emitCall ]
             else
-              [ Compiling emitCall ]
+              [ Assumed (function
+                         | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
+                         | _, gen -> emitCall gen) ]
 
   let emit (mi: MethodInfo, argsExprs: Expr list) (stack: CompileStack) =
-    getPushingCompileStackInfos mi (stack.Count = 0) |> List.iter stack.Push
+    getPushingCompileStackInfos mi |> List.iter stack.Push
     argsExprs |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))

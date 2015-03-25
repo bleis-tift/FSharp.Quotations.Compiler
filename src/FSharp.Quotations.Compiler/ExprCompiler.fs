@@ -50,6 +50,8 @@ module ExprCompiler =
     let mutable gen = m.GetILGenerator()
 
     let stack = CompileStack()
+    stack.Push(Compiling (fun gen -> gen.Emit(Ret)))
+    stack.Push(Assumption IfRet)
     stack.Push(CompileTarget expr)
 
     let mutable lambdaCount = 0
@@ -156,6 +158,8 @@ module ExprCompiler =
                 let ctor = lambda.DefineConstructor(MethodAttributes.Public, varTypes)
                 let ctorGen = ctor.GetILGenerator()
                 ctorGen.Emit(Ldarg_0)
+                if needVarInfos.Length = 0 then
+                  ctorGen.Emit(Tailcall)
                 ctorGen.Emit(Call (Ctor baseCtor))
                 let fields =
                   List.map (fun (name, typ, _) -> lambda.DefineField(name, typ, FieldAttributes.Private)) needVarInfos
@@ -184,6 +188,7 @@ module ExprCompiler =
                 stack.Push(RestoreGen gen)
                 gen <- invokeGen
                 stack.Push(Compiling (fun gen -> gen.Emit(Ret); lambda.CreateType() |> ignore))
+                stack.Push(Assumption IfRet)
                 stack.Push(CompileTarget body)
                 let newVarEnv =
                   List.zip needVarInfos fields
@@ -192,13 +197,7 @@ module ExprCompiler =
                   varEnv := (var.Name, var.Type, Arg 1)::newVarEnv
                 ))
             | Application (fExpr, argExpr) ->
-                stack.Push(Compiling (fun gen ->
-                  if stack.Count = 0 then
-                    gen.Emit(Tailcall)
-                  gen.Emit(Callvirt (Method (fExpr.Type.GetMethod("Invoke"))))
-                ))
-                stack.Push(CompileTarget argExpr)
-                stack.Push(CompileTarget fExpr)
+                MethodCallEmitter.emit (fExpr.Type.GetMethod("Invoke"), [fExpr; argExpr]) stack
             | Call (None, mi, argsExprs) ->
                 MethodCallEmitter.emit (mi, argsExprs) stack
             | Call (Some recv, mi, argsExprs) ->
@@ -236,6 +235,10 @@ module ExprCompiler =
                 let restCount = idx / 7 - 1
                 let itemN = idx % 7 + 1
                 let pi = expr.Type.GetProperty("Rest")
+                let itemPi: PropertyInfo ref = ref null
+                stack.Push(Assumed (function
+                                    | IfRet, gen -> gen.Emit(Tailcall); gen.Emit(Call (Method (!itemPi).GetMethod))
+                                    | _, gen -> gen.Emit(Call (Method (!itemPi).GetMethod))))
                 stack.Push(Compiling (fun gen ->
                   gen.Emit(Call (Method pi.GetMethod))
                   let typ = ref pi.PropertyType
@@ -243,8 +246,7 @@ module ExprCompiler =
                     let pi = (!typ).GetProperty("Rest")
                     gen.Emit(Call (Method pi.GetMethod))
                     typ := pi.PropertyType
-                  let pi = (!typ).GetProperty("Item" + string itemN)
-                  gen.Emit(Call (Method pi.GetMethod))
+                  itemPi := (!typ).GetProperty("Item" + string itemN)
                 ))
                 stack.Push(CompileTarget expr)
             | NewTuple (elems) ->
@@ -347,8 +349,6 @@ module ExprCompiler =
                 stack.Push(CompileTarget expr)
             | expr ->
                 failwithf "unsupported expr: %A" expr
-
-      gen.Emit(Ret)
     finally
       // clean up all gen
       while stack.Count <> 0 do
