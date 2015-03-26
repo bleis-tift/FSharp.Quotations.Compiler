@@ -17,6 +17,9 @@ module LiteralTest =
   let string (str: string) = <@ str @> |> check str
 
   [<Test>]
+  let char ([<CharRange('\000', '\128')>] c: char) = <@ c @> |> check c
+
+  [<Test>]
   let array () =
     <@ [||] @> |> check [||]
     <@ [|1; 2; 3|] @> |> check [|1; 2; 3|]

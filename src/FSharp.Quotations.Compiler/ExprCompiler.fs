@@ -259,6 +259,8 @@ module ExprCompiler =
                   emitLoadInteger<int> (if unbox<bool> value then 1 else 0) gen
                 elif typ = typeof<string> then
                   gen.Emit(Ldstr (unbox<string> value))
+                elif typ = typeof<char> then
+                  emitLoadInteger<char> value gen
                 else
                   failwithf "unsupported value type: %A" typ
             | DefaultValue typ ->

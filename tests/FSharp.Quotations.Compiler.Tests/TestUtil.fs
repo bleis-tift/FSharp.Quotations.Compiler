@@ -24,6 +24,11 @@ module TestUtil =
 
     new (from, ``to``) = IntRange(from, ``to``, 1)
 
+  type CharRange(from: char, ``to``: char) =
+    inherit ValuesAttribute([|from .. ``to``|] |> Array.map (fun e -> e :> obj))
+
+    new (from, ``to``) = CharRange(from, ``to``)
+
   let check (expected: 'T) (expr: Expr<'T>) =
     expr |> ExprCompiler.compile
     |> should equal expected
