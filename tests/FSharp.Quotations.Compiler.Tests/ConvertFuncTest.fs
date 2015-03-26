@@ -212,6 +212,10 @@ module ConvertFuncTest =
     testIntFrom ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
+  let ``uint32 char`` () =
+    testUInt32From ['a'; Char.MaxValue; Char.MinValue]
+
+  [<Test>]
   let ``uint64 char`` () =
     testInt64From ['a'; Char.MaxValue; Char.MinValue]
 
