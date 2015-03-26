@@ -10,7 +10,7 @@ module ExprCompiler =
 
   type VariableInfo =
     | Arg of int
-    | Local of LocalBuilder
+    | Local of LocalBuilder * string
     | Field of FieldInfo
 
   type VariableEnv = (string * Type * VariableInfo) list
@@ -100,24 +100,24 @@ module ExprCompiler =
             | TryWith (body, _, _, e, exnHandler) ->
                 let res = gen.DeclareLocal("$res", body.Type)
                 gen.BeginExceptionBlock() |> ignore
-                stack.Push(Compiling (fun gen -> gen.Emit(Stloc res); gen.EndExceptionBlock(); gen.Emit(Ldloc res)))
+                stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.EndExceptionBlock(); gen.Emit(ILOpCode.ldloc res "$res")))
                 stack.Push(Compiling (fun _ ->
                   varEnv := (!varEnv).Tail
                 ))
                 stack.Push(CompileTarget exnHandler)
                 let local = gen.DeclareLocal(e.Name, e.Type)
-                stack.Push(Compiling (fun gen -> gen.Emit(Stloc local)))
+                stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc local e.Name)))
                 stack.Push(Compiling (fun _ ->
-                  varEnv := (e.Name, e.Type, Local local) :: (!varEnv)
+                  varEnv := (e.Name, e.Type, Local (local, e.Name)) :: (!varEnv)
                 ))
-                stack.Push(Compiling (fun gen -> gen.Emit(Stloc res); gen.BeginCatchBlock(e.Type)))
+                stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.BeginCatchBlock(e.Type)))
                 stack.Push(CompileTarget body)
             | TryFinally (body, handler) ->
                 let res = gen.DeclareLocal("$res", body.Type)
                 gen.BeginExceptionBlock() |> ignore
-                stack.Push(Compiling (fun gen -> gen.EndExceptionBlock(); gen.Emit(Ldloc res)))
+                stack.Push(Compiling (fun gen -> gen.EndExceptionBlock(); gen.Emit(ILOpCode.ldloc res "$res")))
                 stack.Push(CompileTarget handler)
-                stack.Push(Compiling (fun gen -> gen.Emit(Stloc res); gen.BeginFinallyBlock()))
+                stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.BeginFinallyBlock()))
                 stack.Push(CompileTarget body)
             | Let (var, expr, body) ->
                 stack.Push(Compiling (fun _ ->
@@ -125,9 +125,9 @@ module ExprCompiler =
                 ))
                 stack.Push(CompileTarget body)
                 let local = gen.DeclareLocal(var.Name, var.Type)
-                stack.Push(Compiling (fun gen -> gen.Emit(Stloc local)))
+                stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc local var.Name)))
                 stack.Push(Compiling (fun _ ->
-                  varEnv := (var.Name, var.Type, Local local)::(!varEnv)
+                  varEnv := (var.Name, var.Type, Local (local, var.Name))::(!varEnv)
                 ))
                 stack.Push(CompileTarget expr)
             | LetRecursive (varAndExprList, body) ->
@@ -137,9 +137,9 @@ module ExprCompiler =
                 stack.Push(CompileTarget body)
                 for var, expr in varAndExprList do
                   let local = gen.DeclareLocal(var.Name, var.Type)
-                  stack.Push(Compiling (fun gen -> gen.Emit(Stloc local)))
+                  stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc local var.Name)))
                   stack.Push(Compiling (fun _ ->
-                    varEnv := (var.Name, var.Type, Local local)::(!varEnv)
+                    varEnv := (var.Name, var.Type, Local (local, var.Name))::(!varEnv)
                   ))
                   stack.Push(CompileTarget expr)
             | Lambda (var, body) ->
@@ -181,7 +181,7 @@ module ExprCompiler =
                   for _, _, info in needVarInfos do
                     match info with
                     | Arg i -> gen.Emit(Ldarg i)
-                    | Local local -> gen.Emit(Ldloc local)
+                    | Local (local, name) -> gen.Emit(ILOpCode.ldloc local name)
                     | Field fi -> gen.Emit(Ldfld fi)
                   gen.Emit(Newobj ctor.RawBuilder)
                 ))
@@ -301,9 +301,9 @@ module ExprCompiler =
                   failwithf "unsupported value type: %A" typ
             | DefaultValue typ ->
                 let local = gen.DeclareLocal("$defaultValue", typ)
-                gen.Emit(Ldloca local)
+                gen.Emit(ILOpCode.ldloca local "$defaultValue")
                 gen.Emit(Initobj typ)
-                gen.Emit(Ldloc local)
+                gen.Emit(ILOpCode.ldloc local "$defaultValue")
             | Var v ->
                 match List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv with
                 | Arg 0 -> gen.Emit(Ldarg_0)
@@ -311,13 +311,13 @@ module ExprCompiler =
                 | Arg 2 -> gen.Emit(Ldarg_2)
                 | Arg 3 -> gen.Emit(Ldarg_3)
                 | Arg idx -> gen.Emit(Ldarg idx)
-                | Local local -> gen.Emit(Ldloc local)
+                | Local (local, name) -> gen.Emit(ILOpCode.ldloc local name)
                 | Field fi -> gen.Emit(Ldarg_0); gen.Emit(Ldfld fi)
             | VarSet (v, expr) ->
                 stack.Push(Compiling (fun gen ->
                   match List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv with
                   | Arg idx -> gen.Emit(Starg idx)
-                  | Local local -> gen.Emit(Stloc local)
+                  | Local (local, name) -> gen.Emit(ILOpCode.stloc local name)
                   | Field fi -> gen.Emit(Ldarg_0); gen.Emit(Stfld fi)
                 ))
                 stack.Push(CompileTarget expr)

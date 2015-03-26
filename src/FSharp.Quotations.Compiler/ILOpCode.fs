@@ -44,9 +44,9 @@ type ILOpCode =
   | Conv_Ovf_U8
   | Box of Type
   | Unbox_Any of Type
-  | Stloc of LocalBuilder
-  | Ldloc of LocalBuilder
-  | Ldloca of LocalBuilder
+  | Stloc of LocalBuilder * string option
+  | Ldloc of LocalBuilder * string option
+  | Ldloca of LocalBuilder * string option
   | Starg of int
   | Ldarg_0
   | Ldarg_1
@@ -84,6 +84,27 @@ type ILOpCode =
 
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module ILOpCode =
+  let stloc local _nameOpt =
+    #if DEBUG
+    Stloc (local, Some _nameOpt)
+    #else
+    Stloc (local, None)
+    #endif
+
+  let ldloc local _nameOpt =
+    #if DEBUG
+    Ldloc (local, Some _nameOpt)
+    #else
+    Ldloc (local, None)
+    #endif
+
+  let ldloca local _nameOpt =
+    #if DEBUG
+    Ldloca (local, Some _nameOpt)
+    #else
+    Ldloca (local, None)
+    #endif
+
   let toRawOpCode = function
   | And -> OpCodes.And
   | Or -> OpCodes.Or

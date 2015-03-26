@@ -18,12 +18,12 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
   static member Create(builder, gen, name, doc) =
     ILGeneratorWrapper(builder, gen, name, doc)
 
-  member __.Write(str: string) = writer |> Option.iter (fun w -> w.Write(withIndent str))
   member __.WriteLine(line: string) =
     writer |> Option.iter (fun w ->
       w.WriteLine(withIndent line)
       lineNumber <- lineNumber + 1
     )
+  member this.WriteLines(lines: string list) = lines |> List.iter (this.WriteLine)
   member __.WriteLineAndMark(line: string) =
     writer |> Option.iter (fun w ->
       w.WriteLine(withIndent line)
@@ -32,35 +32,36 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
     )
   member __.Close() = writer |> Option.iter (fun w -> w.Close())
 
-  member __.DeclareLocal(_name: string, typ: Type) =
+  member this.DeclareLocal(_name: string, typ: Type) =
     let loc = gen.DeclareLocal(typ)
     #if DEBUG
     loc.SetLocalSymInfo(_name)
+    this.WriteLine("// declare local: " + typ.ToReadableText() + " " + _name)
     #endif
     loc
 
   member this.BeginExceptionBlock() =
-    this.WriteLine("begin try")
+    this.WriteLines([".try"; "{"])
     pushIndent ()
     gen.BeginExceptionBlock()
   member this.BeginCatchBlock(typ: Type) =
     popIndent ()
-    this.WriteLine("begin catch " + typ.ToReadableText())
+    this.WriteLines(["}"; "catch " + typ.ToReadableText(); "{"])
     pushIndent ()
     gen.BeginCatchBlock(typ)
   member this.BeginFinallyBlock() =
     popIndent ()
-    this.WriteLine("begin finally")
+    this.WriteLines(["}"; "finally"; "{"])
     pushIndent ()
     gen.BeginFinallyBlock()
   member this.EndExceptionBlock() =
     popIndent ()
-    this.WriteLine("end")
+    this.WriteLine("}")
     gen.EndExceptionBlock()
 
-  member this.DefineLabel() = gen.DefineLabel()
+  member __.DefineLabel() = gen.DefineLabel()
   member this.MarkLabel(label) =
-    this.Write(string (label.GetHashCode()) + ": ")
+    this.WriteLine(string (label.GetHashCode()) + ": ")
     gen.MarkLabel(label)
 
   member this.Emit(opcode) =
@@ -69,8 +70,9 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
     | Brfalse label | Br label ->
         this.WriteLineAndMark(raw.Name + " " + string (label.GetHashCode()))
         gen.Emit(raw, label)
-    | Stloc local | Ldloc local | Ldloca local ->
-        this.WriteLineAndMark(raw.Name + " " + string local.LocalIndex)
+    | Stloc (local, nameOpt) | Ldloc (local, nameOpt) | Ldloca (local, nameOpt) ->
+        let hint = match nameOpt with Some name -> "  // " + name | None -> ""
+        this.WriteLineAndMark(raw.Name + " " + string local.LocalIndex + hint)
         gen.Emit(raw, local)
     | Ldsfld fld | Stfld fld | Ldfld fld ->
         this.WriteLineAndMark(raw.Name + " " + (fld.ToReadableText()))
