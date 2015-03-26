@@ -139,10 +139,10 @@ module internal MethodCallEmitter =
 
   let private getPushingCompileStackInfos (mi: MethodInfo) =
     match altEmitterTable1.TryGetValue(mi) with
-    | true, emitter -> [emitter]
+    | true, emitter -> if obj.ReferenceEquals(emitter, doNothing) then [] else [emitter]
     | _ ->
         match altEmitterTable2.TryGetValue(mi) with
-        | true, emitter -> [emitter]
+        | true, emitter -> if obj.ReferenceEquals(emitter, doNothing) then [] else [emitter]
         | _ ->
             let emitCall (gen: ILGeneratorWrapper) =
               if mi.IsVirtual then gen.Emit(Callvirt (Method mi))
