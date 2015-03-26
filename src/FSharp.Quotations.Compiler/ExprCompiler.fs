@@ -8,13 +8,6 @@ open System.Reflection.Emit
 
 module ExprCompiler =
 
-  type VariableInfo =
-    | Arg of int
-    | Local of LocalBuilder * string
-    | Field of FieldInfo
-
-  type VariableEnv = (string * Type * VariableInfo) list
-
   let inline emitLoadInteger< ^TInteger when ^TInteger : (static member op_Explicit: ^TInteger -> int) > (value: obj) (gen: ILGeneratorWrapper) =
     match int (unbox< ^TInteger > value) with
     | -1 -> gen.Emit(Ldc_I4_M1)
@@ -34,9 +27,6 @@ module ExprCompiler =
 
   type ICompiledType<'T> =
     abstract member ExecuteCompiledCode: unit -> 'T
-
-  let fsharpFuncType argType retType =
-    typedefof<FSharpFunc<_, _>>.MakeGenericType([|argType; retType|])
 
   let compile (expr: Expr<'T>) : 'T =
     let asm =
@@ -97,32 +87,40 @@ module ExprCompiler =
                 stack.Push(CompileTarget e1)
             | IfThenElse (cond, truePart, falsePart) ->
                 stack.Push(CompilingIfThenElse (gen.DefineLabel(), gen.DefineLabel(), NotYet cond, NotYet truePart, NotYet falsePart))
-            | TryWith (body, _, _, e, exnHandler) ->
-                let res = gen.DeclareLocal("$res", body.Type)
-                let label = gen.BeginExceptionBlock()
-                stack.Push(Compiling (fun gen ->
-                  gen.Emit(ILOpCode.stloc res "$res")
-                  gen.Emit(Leave label)
-                  gen.EndExceptionBlock()
-                  gen.Emit(ILOpCode.ldloc res "$res")))
-                stack.Push(Compiling (fun _ ->
-                  varEnv := (!varEnv).Tail
-                ))
-                stack.Push(CompileTarget exnHandler)
-                let local = gen.DeclareLocal(e.Name, e.Type)
-                stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc local e.Name)))
-                stack.Push(Compiling (fun _ ->
-                  varEnv := (e.Name, e.Type, Local (local, e.Name)) :: (!varEnv)
-                ))
-                stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.Emit(Leave label); gen.BeginCatchBlock(e.Type)))
-                stack.Push(CompileTarget body)
-            | TryFinally (body, handler) ->
-                let res = gen.DeclareLocal("$res", body.Type)
-                let label = gen.BeginExceptionBlock()
-                stack.Push(Compiling (fun gen -> gen.Emit(Endfinally); gen.EndExceptionBlock(); gen.Emit(ILOpCode.ldloc res "$res")))
-                stack.Push(CompileTarget handler)
-                stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.Emit(Leave label); gen.BeginFinallyBlock()))
-                stack.Push(CompileTarget body)
+            | Lambda (var, TryWith (body, _, _, e, exnHandler)) when var.Type = typeof<unit> ->
+                gen <- LambdaEmitter.emit parentMod (gen, varEnv, var, body.Type) (Compiling (fun gen ->
+                  let res = gen.DeclareLocal("$res", body.Type)
+                  let label = gen.BeginExceptionBlock()
+                  stack.Push(Compiling (fun gen ->
+                    gen.Emit(ILOpCode.stloc res "$res")
+                    gen.Emit(Leave label)
+                    gen.EndExceptionBlock()
+                    gen.Emit(ILOpCode.ldloc res "$res")))
+                  stack.Push(Compiling (fun _ ->
+                    varEnv := (!varEnv).Tail
+                  ))
+                  stack.Push(CompileTarget exnHandler)
+                  let local = gen.DeclareLocal(e.Name, e.Type)
+                  stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc local e.Name)))
+                  stack.Push(Compiling (fun _ ->
+                    varEnv := (e.Name, e.Type, Local (local, e.Name)) :: (!varEnv)
+                  ))
+                  stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.Emit(Leave label); gen.BeginCatchBlock(e.Type)))
+                  stack.Push(CompileTarget body)
+                )) stack
+            | TryWith _ as tryWithExpr ->
+                stack.Push(CompileTarget (Expr.Application(Expr.Lambda(Var("unitVar", typeof<unit>), tryWithExpr), <@ () @>)))
+            | Lambda (var, TryFinally (body, handler)) when var.Type = typeof<unit> ->
+                gen <- LambdaEmitter.emit parentMod (gen, varEnv, var, body.Type) (Compiling (fun gen ->
+                  let res = gen.DeclareLocal("$res", body.Type)
+                  let label = gen.BeginExceptionBlock()
+                  stack.Push(Compiling (fun gen -> gen.Emit(Endfinally); gen.EndExceptionBlock(); gen.Emit(ILOpCode.ldloc res "$res")))
+                  stack.Push(CompileTarget handler)
+                  stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.Emit(Leave label); gen.BeginFinallyBlock()))
+                  stack.Push(CompileTarget body)
+                )) stack
+            | TryFinally _ as tryFinallyExpr ->
+                stack.Push(CompileTarget (Expr.Application(Expr.Lambda(Var("unitVar", typeof<unit>), tryFinallyExpr), <@ () @>)))
             | Let (var, expr, body) ->
                 stack.Push(Compiling (fun _ ->
                   varEnv := (!varEnv).Tail
@@ -147,59 +145,7 @@ module ExprCompiler =
                   ))
                   stack.Push(CompileTarget expr)
             | Lambda (var, body) ->
-                let baseType = fsharpFuncType var.Type body.Type
-                let baseCtor =
-                  baseType.GetConstructor(BindingFlags.NonPublic ||| BindingFlags.Instance, null, [||], null)
-                let lambda =
-                  parentMod.DefineType("lambda" + (string lambdaCount), TypeAttributes.Public, baseType, [])
-                lambdaCount <- lambdaCount + 1
-
-                let needVarInfos =
-                  !varEnv
-                  |> List.fold (fun acc (n, t, info) -> if List.forall (fun (n2, _, _) -> n <> n2) acc then (n, t, info)::acc else acc) []
-                  |> List.rev
-                let varNamesAndTypes = needVarInfos |> List.map (fun (n, t, _) -> (n, t))
-                let ctor = lambda.DefineConstructor(MethodAttributes.Public, varNamesAndTypes)
-                let ctorGen = ctor.GetILGenerator()
-                ctorGen.Emit(Ldarg_0)
-                if needVarInfos.Length = 0 then
-                  ctorGen.Emit(Tailcall)
-                ctorGen.Emit(Call (Ctor baseCtor))
-                let fields =
-                  List.map (fun (name, typ, _) -> lambda.DefineField(name, typ, FieldAttributes.Private)) needVarInfos
-                for i, field in List.zip [1..fields.Length] fields do
-                  ctorGen.Emit(Ldarg_0)
-                  ctorGen.Emit(Ldarg i)
-                  ctorGen.Emit(Stfld field)
-                ctorGen.Emit(Ret)
-                ctorGen.Close()
-
-                let invoke =
-                  lambda.DefineOverrideMethod(baseType, "Invoke", MethodAttributes.Public, body.Type, [ var ])
-                let invokeGen = invoke.GetILGenerator()
-                let orgVarEnv = !varEnv
-                stack.Push(Compiling (fun _ ->
-                  varEnv := orgVarEnv
-                ))
-                stack.Push(Compiling (fun gen ->
-                  for _, _, info in needVarInfos do
-                    match info with
-                    | Arg i -> gen.Emit(Ldarg i)
-                    | Local (local, name) -> gen.Emit(ILOpCode.ldloc local name)
-                    | Field fi -> gen.Emit(Ldfld fi)
-                  gen.Emit(Newobj ctor.RawBuilder)
-                ))
-                stack.Push(RestoreGen gen)
-                gen <- invokeGen
-                stack.Push(Compiling (fun gen -> gen.Emit(Ret); lambda.CreateType() |> ignore))
-                stack.Push(Assumption IfRet)
-                stack.Push(CompileTarget body)
-                let newVarEnv =
-                  List.zip needVarInfos fields
-                  |> List.map (fun ((name, typ, _), fi) -> (name, typ, Field fi))
-                stack.Push(Compiling (fun _gen ->
-                  varEnv := (var.Name, var.Type, Arg 1)::newVarEnv
-                ))
+                gen <- LambdaEmitter.emit parentMod (gen, varEnv, var, body.Type) (CompileTarget body) stack
             | Application (fExpr, argExpr) ->
                 MethodCallEmitter.emit (fExpr.Type.GetMethod("Invoke"), [fExpr; argExpr]) stack
             | Call (None, mi, argsExprs) ->
