@@ -61,22 +61,6 @@ module ExprCompiler =
                   stack.Push(other)
         | Assumption _ -> () // do nothing
         | Compiling f -> f gen
-        | CompilingIfThenElse (falseLabel, ifEndLabel, cond, truePart, falsePart) ->
-            match cond, truePart, falsePart with
-            | NotYet cond, _, _ ->
-                stack.Push(CompilingIfThenElse (falseLabel, ifEndLabel, Done, truePart, falsePart))
-                stack.Push(CompileTarget cond)
-            | Done, NotYet truePart, _ ->
-                gen.Emit(Brfalse falseLabel)
-                stack.Push(CompilingIfThenElse (falseLabel, ifEndLabel, Done, Done, falsePart))
-                stack.Push(CompileTarget truePart)
-            | Done, Done, NotYet falsePart ->
-                gen.Emit(Br ifEndLabel)
-                gen.MarkLabel(falseLabel)
-                stack.Push(CompilingIfThenElse (falseLabel, ifEndLabel, Done, Done, Done))
-                stack.Push(CompileTarget falsePart)
-            | Done, Done, Done ->
-                gen.MarkLabel(ifEndLabel)
         | CompileTarget target ->
             match target with
             | Sequential (e1, e2) ->
@@ -84,7 +68,44 @@ module ExprCompiler =
                 stack.Push(Assumption IfSequential)
                 stack.Push(CompileTarget e1)
             | IfThenElse (cond, truePart, falsePart) ->
-                stack.Push(CompilingIfThenElse (gen.DefineLabel(), gen.DefineLabel(), NotYet cond, NotYet truePart, NotYet falsePart))
+                let falseLabel = gen.DefineLabel()
+                let ifEndLabel = gen.DefineLabel()
+
+                let assumptionOpt =
+                  if stack.Count <> 0 then
+                    match stack.Pop() with
+                    | Assumption _ as assumption -> Some assumption
+                    | other -> stack.Push(other); None
+                  else
+                    None
+                match assumptionOpt with
+                | Some a ->
+                    stack.Push(Compiling (fun gen ->
+                      gen.MarkLabel(ifEndLabel)
+                    ))
+                    stack.Push(a)
+                | None ->
+                    stack.Push(Compiling (fun gen ->
+                      gen.MarkLabel(ifEndLabel)
+                    ))
+                stack.Push(CompileTarget falsePart)
+                match assumptionOpt with
+                | Some a ->
+                    stack.Push(Compiling (fun gen ->
+                      gen.Emit(Br ifEndLabel)
+                      gen.MarkLabel(falseLabel)
+                    ))
+                    stack.Push(a)
+                | None ->
+                    stack.Push(Compiling (fun gen ->
+                      gen.Emit(Br ifEndLabel)
+                      gen.MarkLabel(falseLabel)
+                    ))
+                stack.Push(CompileTarget truePart)
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Brfalse falseLabel)
+                ))
+                stack.Push(CompileTarget cond)
             | Lambda (var, TryWith (body, _, _, e, exnHandler)) when var.Type = typeof<unit> ->
                 gen <- LambdaEmitter.emit parentMod (gen, varEnv, var, body.Type) (Compiling (fun gen ->
                   let res = gen.DeclareLocal("$res", body.Type)

@@ -18,7 +18,6 @@ type CompileStackInfo =
   | Assumed of (Assumption * ILGeneratorWrapper -> unit)
   | Assumption of Assumption
   | Compiling of (ILGeneratorWrapper -> unit)
-  | CompilingIfThenElse of falseLabel:Label * ifEndLabel:Label * cond:CompilingState * truePart:CompilingState * falsePart:CompilingState
   | RestoreGen of ILGeneratorWrapper
 
 type CompileStack = Stack<CompileStackInfo>

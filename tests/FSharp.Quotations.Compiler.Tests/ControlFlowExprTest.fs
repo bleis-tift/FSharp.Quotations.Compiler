@@ -16,6 +16,21 @@ module ControlFlowExprTest =
     <@ if false then "T" else "F" @> |> check "F"
 
   [<Test>]
+  let ``if-then-else (unit)`` () =
+    <@ let mutable n = 0 
+       if false then ()
+       else n <- 10
+       n @>
+    |> check 10
+
+  [<Test>]
+  let ``if-then without else`` () =
+    <@ let mutable n = 0 
+       if true then n <- 10
+       n @>
+    |> check 10
+
+  [<Test>]
   let ``try-with`` () =
     <@ try 10 with _e -> -1 @> |> check 10
     <@ try failwith "" with _e -> -1 @> |> check -1
