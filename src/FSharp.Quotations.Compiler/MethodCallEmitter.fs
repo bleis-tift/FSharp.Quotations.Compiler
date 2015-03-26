@@ -105,6 +105,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ sbyte 'a' @>, emitOpCode Conv_I1)
     dict.Add(getMethod <@ char 'a' @>, doNothing)
     dict.Add(getMethod <@ float 'a' @>, emitOpCode Conv_R8)
+    dict.Add(getMethod <@ float32 'a' @>, emitOpCode Conv_R4)
 
     dict :> IReadOnlyDictionary<_, _>
 

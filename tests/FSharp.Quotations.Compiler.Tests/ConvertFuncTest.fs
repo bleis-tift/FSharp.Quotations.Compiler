@@ -88,8 +88,8 @@ module ConvertFuncTest =
       "str"; null
     ]
 
-  let inline testFloat32From< ^T when ^T : (static member op_Explicit: ^T -> float) > data =
-    test { Data = data; ExprFun = (fun (x: ^T) -> <@ float x @>); Fun = float }
+  let inline testFloat32From< ^T when ^T : (static member op_Explicit: ^T -> float32) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ float32 x @>); Fun = float32 }
 
   [<Test>]
   let ``float32 int`` () = testFloat32From<int> [1]
@@ -230,6 +230,10 @@ module ConvertFuncTest =
   [<Test>]
   let ``float char`` () =
     testFloatFrom ['a'; Char.MaxValue; Char.MinValue]
+
+  [<Test>]
+  let ``float32 char`` () =
+    testFloat32From ['a'; Char.MaxValue; Char.MinValue]
 
   type MyClass() =
     override __.ToString() = "hello"
