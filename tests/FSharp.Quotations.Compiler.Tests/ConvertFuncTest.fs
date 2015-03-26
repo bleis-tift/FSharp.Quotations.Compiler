@@ -219,6 +219,10 @@ module ConvertFuncTest =
   let ``byte char`` () =
     testByteFrom ['a'; char (Byte.MaxValue + byte 1); char (Byte.MinValue - byte 1)]
 
+  [<Test>]
+  let ``sbyte char`` () =
+    testSByteFrom ['a'; char (SByte.MaxValue + sbyte 1); char (SByte.MinValue - sbyte 1)]
+
   type MyClass() =
     override __.ToString() = "hello"
 

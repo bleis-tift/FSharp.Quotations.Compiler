@@ -34,6 +34,7 @@ type ILOpCode =
   | Endfinally
   | Isinst of Type
   | Conv_I
+  | Conv_I1
   | Conv_I4
   | Conv_I8
   | Conv_R4
@@ -128,6 +129,7 @@ module ILOpCode =
   | Endfinally -> OpCodes.Endfinally
   | Isinst _ -> OpCodes.Isinst
   | Conv_I -> OpCodes.Conv_I
+  | Conv_I1 -> OpCodes.Conv_I1
   | Conv_I4 -> OpCodes.Conv_I4
   | Conv_I8 -> OpCodes.Conv_I8
   | Conv_R4 -> OpCodes.Conv_R4
