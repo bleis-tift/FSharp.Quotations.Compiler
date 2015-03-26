@@ -213,6 +213,10 @@ module ConvertFuncTest =
     testInt16From ['a'; char (Int16.MaxValue + int16 1); Char.MinValue]
 
   [<Test>]
+  let ``uint16 char`` () =
+    testUInt16From ['a'; Char.MaxValue; Char.MinValue]
+
+  [<Test>]
   let ``int char`` () =
     testIntFrom ['a'; Char.MaxValue; Char.MinValue]
 
