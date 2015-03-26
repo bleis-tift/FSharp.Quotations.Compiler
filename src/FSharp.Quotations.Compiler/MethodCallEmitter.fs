@@ -97,7 +97,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ uint64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseUInt64("") @>))
 
     dict.Add(getMethod <@ 'a' + 'a' @>, emitOpCode Add)
-    dict.Add(getMethod <@ int16 'a' @>, emitCallMethod (getMethod <@ Convert.ToInt16('a') @>))
+    dict.Add(getMethod <@ int16 'a' @>, emitOpCode Conv_I2)
     dict.Add(getMethod <@ uint16 'a' @>, emitCallMethod (getMethod <@ Convert.ToUInt16('a') @>))
     dict.Add(getMethod <@ int 'a' @>, emitOpCode Conv_I4)
     dict.Add(getMethod <@ uint32 'a' @>, emitCallMethod (getMethod <@ Convert.ToUInt32('a') @>))

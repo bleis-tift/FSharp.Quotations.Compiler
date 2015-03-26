@@ -208,6 +208,11 @@ module ConvertFuncTest =
     <@ string [||] @> |> check "System.Object[]"
     <@ string (null: int[]) @> |> check ""
 
+  [<Test>]
+  let ``int16 char`` () =
+    testInt16From ['a'; char (Int16.MaxValue + int16 1); Char.MinValue]
+
+  [<Test>]
   let ``int char`` () =
     testIntFrom ['a'; Char.MaxValue; Char.MinValue]
 
