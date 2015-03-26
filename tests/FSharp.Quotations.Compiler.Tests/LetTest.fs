@@ -69,3 +69,13 @@ module LetTest =
        (fun x -> f x) 20
     @>
     |> check 30
+
+  [<Test>]
+  let ``application try-with`` () =
+    let expr = <@ let const10 = fun (_: int) -> 10 in const10 (try 1 with _ -> 0) @>
+    expr |> check 10
+
+  [<Test>]
+  let ``application try-finally`` () =
+    let expr = <@ let const10 = fun (_: int) -> 10 in const10 (try 1 finally ()) @>
+    expr |> check 10
