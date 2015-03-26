@@ -202,6 +202,9 @@ module ConvertFuncTest =
     <@ string "str" @> |> check "str"
     <@ string (null: string) @> |> check ""
 
+  let inline testNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> nativeint) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ nativeint x @>); Fun = nativeint }
+
   [<Test>]
   let ``string int[]`` () =
     <@ string [|10|] @> |> check "System.Int32[]"
@@ -231,6 +234,10 @@ module ConvertFuncTest =
   [<Test>]
   let ``uint64 char`` () =
     testUInt64From ['a'; Char.MaxValue; Char.MinValue]
+
+  [<Test>]
+  let ``nativeint char`` () =
+    testNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
   let ``byte char`` () =
