@@ -28,6 +28,22 @@ module ExprCompiler =
   type ICompiledType<'T> =
     abstract member ExecuteCompiledCode: unit -> 'T
 
+  let private tryPopAssumption (stack: CompileStack) =
+    if stack.Count <> 0 then
+      match stack.Pop() with
+      | Assumption _ as assumption -> Some assumption
+      | other -> stack.Push(other); None
+    else
+      None
+
+  let private pushTearDown assumptionOpt f (stack: CompileStack) =
+    match assumptionOpt with
+    | Some a ->
+        stack.Push(Compiling f)
+        stack.Push(a)
+    | None ->
+        stack.Push(Compiling f)
+
   let compile (expr: Expr<'T>) : 'T =
     let asm =
       AppDomain.CurrentDomain.DefineDynamicAssembly(
@@ -71,36 +87,10 @@ module ExprCompiler =
                 let falseLabel = gen.DefineLabel()
                 let ifEndLabel = gen.DefineLabel()
 
-                let assumptionOpt =
-                  if stack.Count <> 0 then
-                    match stack.Pop() with
-                    | Assumption _ as assumption -> Some assumption
-                    | other -> stack.Push(other); None
-                  else
-                    None
-                match assumptionOpt with
-                | Some a ->
-                    stack.Push(Compiling (fun gen ->
-                      gen.MarkLabel(ifEndLabel)
-                    ))
-                    stack.Push(a)
-                | None ->
-                    stack.Push(Compiling (fun gen ->
-                      gen.MarkLabel(ifEndLabel)
-                    ))
+                let assumptionOpt = tryPopAssumption stack
+                pushTearDown assumptionOpt (fun gen -> gen.MarkLabel(ifEndLabel)) stack
                 stack.Push(CompileTarget falsePart)
-                match assumptionOpt with
-                | Some a ->
-                    stack.Push(Compiling (fun gen ->
-                      gen.Emit(Br ifEndLabel)
-                      gen.MarkLabel(falseLabel)
-                    ))
-                    stack.Push(a)
-                | None ->
-                    stack.Push(Compiling (fun gen ->
-                      gen.Emit(Br ifEndLabel)
-                      gen.MarkLabel(falseLabel)
-                    ))
+                pushTearDown assumptionOpt (fun gen -> gen.Emit(Br ifEndLabel); gen.MarkLabel(falseLabel)) stack
                 stack.Push(CompileTarget truePart)
                 stack.Push(Compiling (fun gen ->
                   gen.Emit(Brfalse falseLabel)
@@ -141,9 +131,8 @@ module ExprCompiler =
             | TryFinally _ as tryFinallyExpr ->
                 stack.Push(CompileTarget (Expr.Application(Expr.Lambda(Var("unitVar", typeof<unit>), tryFinallyExpr), <@ () @>)))
             | Let (var, expr, body) ->
-                stack.Push(Compiling (fun _ ->
-                  varEnv := (!varEnv).Tail
-                ))
+                let assumptionOpt = tryPopAssumption stack
+                pushTearDown assumptionOpt (fun _ -> varEnv := (!varEnv).Tail) stack
                 stack.Push(CompileTarget body)
                 let local = gen.DeclareLocal(var.Name, var.Type)
                 stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc local var.Name)))
@@ -152,9 +141,8 @@ module ExprCompiler =
                 ))
                 stack.Push(CompileTarget expr)
             | LetRecursive (varAndExprList, body) ->
-                stack.Push(Compiling (fun _ ->
-                  varEnv := (!varEnv) |> Seq.skip varAndExprList.Length |> Seq.toList
-                ))
+                let assumptionOpt = tryPopAssumption stack
+                pushTearDown assumptionOpt (fun _ -> varEnv := !varEnv |> Seq.skip varAndExprList.Length |> Seq.toList) stack
                 stack.Push(CompileTarget body)
                 for var, expr in varAndExprList do
                   let local = gen.DeclareLocal(var.Name, var.Type)
