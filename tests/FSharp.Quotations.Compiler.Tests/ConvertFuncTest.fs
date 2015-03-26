@@ -215,6 +215,10 @@ module ConvertFuncTest =
   let ``uint64 char`` () =
     testInt64From ['a'; Char.MaxValue; Char.MinValue]
 
+  [<Test>]
+  let ``byte char`` () =
+    testByteFrom ['a'; char (Byte.MaxValue + byte 1); char (Byte.MinValue - byte 1)]
+
   type MyClass() =
     override __.ToString() = "hello"
 
