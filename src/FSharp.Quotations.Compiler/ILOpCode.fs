@@ -29,6 +29,8 @@ type ILOpCode =
   | Sub_Ovf
   | Brfalse of Label
   | Br of Label
+  | Leave of Label
+  | Endfinally
   | Isinst of Type
   | Conv_I
   | Conv_I4
@@ -120,6 +122,8 @@ module ILOpCode =
   | Sub_Ovf -> OpCodes.Sub_Ovf
   | Brfalse _ -> OpCodes.Brfalse
   | Br _ -> OpCodes.Br
+  | Leave _ -> OpCodes.Leave
+  | Endfinally -> OpCodes.Endfinally
   | Isinst _ -> OpCodes.Isinst
   | Conv_I -> OpCodes.Conv_I
   | Conv_I4 -> OpCodes.Conv_I4

@@ -99,8 +99,12 @@ module ExprCompiler =
                 stack.Push(CompilingIfThenElse (gen.DefineLabel(), gen.DefineLabel(), NotYet cond, NotYet truePart, NotYet falsePart))
             | TryWith (body, _, _, e, exnHandler) ->
                 let res = gen.DeclareLocal("$res", body.Type)
-                gen.BeginExceptionBlock() |> ignore
-                stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.EndExceptionBlock(); gen.Emit(ILOpCode.ldloc res "$res")))
+                let label = gen.BeginExceptionBlock()
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(ILOpCode.stloc res "$res")
+                  gen.Emit(Leave label)
+                  gen.EndExceptionBlock()
+                  gen.Emit(ILOpCode.ldloc res "$res")))
                 stack.Push(Compiling (fun _ ->
                   varEnv := (!varEnv).Tail
                 ))
@@ -110,14 +114,14 @@ module ExprCompiler =
                 stack.Push(Compiling (fun _ ->
                   varEnv := (e.Name, e.Type, Local (local, e.Name)) :: (!varEnv)
                 ))
-                stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.BeginCatchBlock(e.Type)))
+                stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.Emit(Leave label); gen.BeginCatchBlock(e.Type)))
                 stack.Push(CompileTarget body)
             | TryFinally (body, handler) ->
                 let res = gen.DeclareLocal("$res", body.Type)
-                gen.BeginExceptionBlock() |> ignore
-                stack.Push(Compiling (fun gen -> gen.EndExceptionBlock(); gen.Emit(ILOpCode.ldloc res "$res")))
+                let label = gen.BeginExceptionBlock()
+                stack.Push(Compiling (fun gen -> gen.Emit(Endfinally); gen.EndExceptionBlock(); gen.Emit(ILOpCode.ldloc res "$res")))
                 stack.Push(CompileTarget handler)
-                stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.BeginFinallyBlock()))
+                stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.Emit(Leave label); gen.BeginFinallyBlock()))
                 stack.Push(CompileTarget body)
             | Let (var, expr, body) ->
                 stack.Push(Compiling (fun _ ->

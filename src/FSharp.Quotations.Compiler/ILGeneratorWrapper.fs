@@ -70,6 +70,9 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
     | Brfalse label | Br label ->
         this.WriteLineAndMark(raw.Name + " " + string (label.GetHashCode()))
         gen.Emit(raw, label)
+    | Leave label ->
+        this.WriteLineAndMark(raw.Name)
+        gen.Emit(raw, label)
     | Stloc (local, nameOpt) | Ldloc (local, nameOpt) | Ldloca (local, nameOpt) ->
         let hint = match nameOpt with Some name -> "  // " + name | None -> ""
         this.WriteLineAndMark(raw.Name + " " + string local.LocalIndex + hint)
@@ -115,7 +118,7 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
     | Conv_I | Conv_I4 | Conv_I8 | Conv_R4 | Conv_R8 | Conv_Ovf_I1 | Conv_Ovf_I2 | Conv_Ovf_U | Conv_Ovf_U1 | Conv_Ovf_U2 | Conv_Ovf_U4 | Conv_Ovf_U8
     | Ldarg_0 | Ldarg_1 | Ldarg_2 | Ldarg_3
     | Ldnull | Ldc_I4_M1 | Ldc_I4_0 | Ldc_I4_1 | Ldc_I4_2 | Ldc_I4_3 | Ldc_I4_4 | Ldc_I4_5 | Ldc_I4_6 | Ldc_I4_7 | Ldc_I4_8
-    | Tailcall | Dup | Pop | Ret ->
+    | Tailcall | Dup | Pop | Ret | Endfinally ->
         this.WriteLineAndMark(raw.Name)
         gen.Emit(raw)
 
