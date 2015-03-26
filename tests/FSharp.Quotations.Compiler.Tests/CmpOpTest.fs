@@ -149,3 +149,36 @@ module CmpOpTest =
     <@ [|1|] >= [|2|] @> |> check false
     <@ [|1|] >= [|1; 1|] @> |> check false
     <@ [|2|] >= [|1; 1|] @> |> check false
+
+  let ``char = char`` () =
+    <@ 'a' = 'a' @> |> check true
+    <@ 'a' = 'b' @> |> check false
+
+  [<Test>]
+  let ``char <> char`` () =
+    <@ 'a' <> 'a' @> |> check false
+    <@ 'a' <> 'b' @> |> check true
+
+  [<Test>]
+  let ``char < char`` () =
+    <@ 'a' < 'a' @> |> check false
+    <@ 'a' < 'b' @> |> check true
+    <@ 'b' < 'a' @> |> check false
+
+  [<Test>]
+  let ``char <= char`` () =
+    <@ 'a' <= 'a' @> |> check true
+    <@ 'a' <= 'b' @> |> check true
+    <@ 'b' <= 'a' @> |> check false
+
+  [<Test>]
+  let ``char > char`` () =
+    <@ 'a' > 'a' @> |> check false
+    <@ 'a' > 'b' @> |> check false
+    <@ 'b' > 'a' @> |> check true
+
+  [<Test>]
+  let ``char >= char`` () =
+    <@ 'a' >= 'a' @> |> check true
+    <@ 'a' >= 'b' @> |> check false
+    <@ 'b' >= 'a' @> |> check true
