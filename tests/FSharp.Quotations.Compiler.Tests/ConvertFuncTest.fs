@@ -227,6 +227,10 @@ module ConvertFuncTest =
   let ``char char`` () =
     testCharFrom ['a'; Char.MaxValue; Char.MinValue]
 
+  [<Test>]
+  let ``float char`` () =
+    testFloatFrom ['a'; Char.MaxValue; Char.MinValue]
+
   type MyClass() =
     override __.ToString() = "hello"
 
