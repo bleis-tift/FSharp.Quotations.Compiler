@@ -18,6 +18,9 @@ module CoreFuncTest =
   let ``box int[]`` () = <@ box [|10|] @> |> check (box [|10|])
 
   [<Test>]
+  let ``box char`` () = <@ box 'a' @> |> check (box 'a')
+
+  [<Test>]
   let ``failwith string`` () = <@ failwith "str" @> |> checkExnType typeof<exn>
 
   [<Test>]
@@ -33,9 +36,17 @@ module CoreFuncTest =
   let ``compare int[] int[]`` () = <@ compare [|10|] [|10|] @> |> check 0
 
   [<Test>]
+  let ``compare char char`` () = <@ compare 'a' 'a' @> |> check 0
+
+  [<Test>]
   let ``defaultArg (string option) string`` () =
     <@ defaultArg None "default" @> |> check "default"
     <@ defaultArg (Some "str") "default" @> |> check "str"
+
+  [<Test>]
+  let ``defaultArg (char option) char `` () =
+    <@ defaultArg None 'd' @> |> check 'd'
+    <@ defaultArg (Some 'c') 'd' @> |> check 'c'
 
   [<Test>]
   let ``defaultArg with pipeline op`` () =
@@ -55,6 +66,9 @@ module CoreFuncTest =
   let ``hash int[]`` () = <@ hash [|10|] @> |> check (hash [|10|])
 
   [<Test>]
+  let ``hash char`` () = <@ hash 'c' @> |> check (hash 'c')
+
+  [<Test>]
   let ``limitedHash int int`` () = <@ limitedHash 1 1 @> |> check 1
 
   [<Test>]
@@ -65,6 +79,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``limitedHash int int[]`` () = <@ limitedHash 1 [|10|] @> |> check (limitedHash 1 [|10|])
+
+  [<Test>]
+  let ``limitedHash int char`` () = <@ limitedHash 1 'c' @> |> check (limitedHash 1 'c')
 
   [<Test>]
   let ``id int`` () = <@ id 1 @> |> check 1
@@ -79,6 +96,9 @@ module CoreFuncTest =
   let ``id int[]`` () = <@ id [|10|] @> |> check [|10|]
 
   [<Test>]
+  let ``id char`` () = <@ id 'c' @> |> check 'c'
+
+  [<Test>]
   let ``ignore int`` () = <@ ignore 1 @> |> check ()
 
   [<Test>]
@@ -89,6 +109,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``ignore int[]`` () = <@ ignore [|10|] @> |> check ()
+
+  [<Test>]
+  let ``ignore char`` () = <@ ignore 'c' @> |> check ()
 
   [<Test>]
   let ``invalidArg string string`` () =
@@ -111,6 +134,9 @@ module CoreFuncTest =
   let ``max int[] int[]`` () = <@ max [|10|] [|20|] @> |> check [|20|]
 
   [<Test>]
+  let ``max char char`` () = <@ max 'a' 'b' @> |> check 'b'
+
+  [<Test>]
   let ``min int int`` () = <@ min 10 20 @> |> check 10
 
   [<Test>]
@@ -121,6 +147,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``min int[] int[]`` () = <@ min [|10|] [|20|] @> |> check [|10|]
+
+  [<Test>]
+  let ``min char char`` () = <@ min 'a' 'b' @> |> check 'a'
 
   [<Test>]
   let ``not bool`` () = <@ not true @> |> check false
@@ -149,3 +178,15 @@ module CoreFuncTest =
 
     [<Test>]
     let ``Unchecked.equals int int`` () = <@ equals 1 1 @> |> check true
+
+    [<Test>]
+    let ``Unchecked.compare char char`` () = <@ compare 'a' 'a' @> |> check 0
+
+    [<Test>]
+    let ``Unchecked.hash char char`` () = <@ hash 'c' @> |> check (hash 'c')
+
+    [<Test>]
+    let ``Unchecked.equals char char`` () = <@ equals 'c' 'c' @> |> check true
+
+    [<Test>]
+    let ``Unchecked.defaultof char`` () = <@ defaultof<char> @> |> check defaultof<char>
