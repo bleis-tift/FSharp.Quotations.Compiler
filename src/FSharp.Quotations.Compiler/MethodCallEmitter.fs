@@ -96,6 +96,9 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ int64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseInt64("") @>))
     dict.Add(getMethod <@ uint64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseUInt64("") @>))
 
+    dict.Add(getMethod <@ 'a' + 'a' @>, emitOpCode Add)
+    dict.Add(getMethod <@ int16 'a' @>, emitCallMethod (getMethod <@ Convert.ToInt16('a') @>))
+    dict.Add(getMethod <@ uint16 'a' @>, emitCallMethod (getMethod <@ Convert.ToUInt16('a') @>))
     dict.Add(getMethod <@ int 'a' @>, emitOpCode Conv_I4)
 
     dict :> IReadOnlyDictionary<_, _>
@@ -133,6 +136,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ uint32 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseUInt32("") @>))
     dict.Add(getMethod <@ int64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseInt64("") @>))
     dict.Add(getMethod <@ uint64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseUInt64("") @>))
+
     dict :> IReadOnlyDictionary<_, _>
 
   // shadowing the functions of the Microsoft.FSharp.Core.Operators.Checked module

@@ -25,6 +25,7 @@ type ILOpCode =
   | Mul_Ovf
   | Neg
   | Rem
+  | Add
   | Sub
   | Sub_Ovf
   | Brfalse of Label
@@ -118,6 +119,7 @@ module ILOpCode =
   | Mul_Ovf -> OpCodes.Mul_Ovf
   | Neg -> OpCodes.Neg
   | Rem -> OpCodes.Rem
+  | Add -> OpCodes.Add
   | Sub -> OpCodes.Sub
   | Sub_Ovf -> OpCodes.Sub_Ovf
   | Brfalse _ -> OpCodes.Brfalse

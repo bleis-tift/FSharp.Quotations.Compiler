@@ -41,6 +41,10 @@ module ArithmeticOpTest =
   let ``string + string`` () =
     <@ "aaa" + "bbb" @> |> check "aaabbb"
 
+  [<Test>]
+  let ``char + char`` () =
+    <@ 'a' + 'a' @> |> check ('a' + 'a')
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
@@ -67,3 +71,7 @@ module ArithmeticOpTest =
     [<Test>]
     let ``string + string`` () =
       <@ "aaa" + "bbb" @> |> check "aaabbb"
+
+    [<Test>]
+    let ``char + char`` () =
+      <@ 'a' + 'a' @> |> check ('a' + 'a')
