@@ -34,17 +34,35 @@ type CtorBuilderWrapper private (moduleBuilder: ModuleBuilderWrapper, typeBuilde
 
 [<AutoOpen>]
 module TypeBuilderWrapperExtension =
-  type TypeBuilderWrapper with
-    member this.DefineMethod(name, attrs, retType, argsTypes) =
-      MethodBuilderWrapper.Create(this.Parent, this, this.RawBuilder.DefineMethod(name, attrs, retType, Array.ofList argsTypes), name)
+  open Microsoft.FSharp.Quotations
 
-    member this.DefineOverrideMethod(baseType: Type, name, attrs, retType, argsTypes) =
-      let m = this.DefineMethod(name, attrs ||| MethodAttributes.Virtual, retType, argsTypes)
+  type TypeBuilderWrapper with
+    member this.DefineMethod(name, attrs, retType, args: Var list) =
+      let argsTypes = args |> List.map (fun arg -> arg.Type)
+      let m =
+        MethodBuilderWrapper.Create(this.Parent, this, this.RawBuilder.DefineMethod(name, attrs, retType, Array.ofList argsTypes), name)
+      #if DEBUG
+      m.RawBuilder.DefineParameter(0, ParameterAttributes.Out, "") |> ignore
+      for arg, i in List.zip args [1..args.Length] do
+        m.RawBuilder.DefineParameter(i, ParameterAttributes.In, arg.Name) |> ignore
+      #endif
+      m
+
+    member this.DefineOverrideMethod(baseType: Type, name, attrs, retType, args: Var list) =
+      let argsTypes = args |> List.map (fun arg -> arg.Type)
+      let m = this.DefineMethod(name, attrs ||| MethodAttributes.Virtual, retType, args)
       this.RawBuilder.DefineMethodOverride(m.RawBuilder, baseType.GetMethod(name, Array.ofList argsTypes))
       m
 
-    member this.DefineConstructor(attrs, argsTypes) =
-      CtorBuilderWrapper.Create(this.Parent, this, this.RawBuilder.DefineConstructor(attrs, CallingConventions.Standard, Array.ofList argsTypes))
+    member this.DefineConstructor(attrs, argNameAndTypes) =
+      let argsTypes = argNameAndTypes |> List.map snd
+      let c =
+        CtorBuilderWrapper.Create(this.Parent, this, this.RawBuilder.DefineConstructor(attrs, CallingConventions.Standard, Array.ofList argsTypes))
+      #if DEBUG
+      for name, i in List.zip (argNameAndTypes |> List.map fst) [1..argNameAndTypes.Length] do
+        c.RawBuilder.DefineParameter(i, ParameterAttributes.In, name) |> ignore
+      #endif
+      c
 
     member this.DefineField(name, typ, attrs) =
       this.RawBuilder.DefineField(name, typ, attrs)

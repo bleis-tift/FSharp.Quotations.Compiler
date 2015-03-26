@@ -32,7 +32,12 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
     )
   member __.Close() = writer |> Option.iter (fun w -> w.Close())
 
-  member __.DeclareLocal(typ: Type) = gen.DeclareLocal(typ)
+  member __.DeclareLocal(_name: string, typ: Type) =
+    let loc = gen.DeclareLocal(typ)
+    #if DEBUG
+    loc.SetLocalSymInfo(_name)
+    #endif
+    loc
 
   member this.BeginExceptionBlock() =
     this.WriteLine("begin try")
@@ -114,9 +119,9 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
 
 [<AutoOpen>]
 module GeneratorProvidersExtension =
-  let private defineDoc (name: string) (builder: ModuleBuilderWrapper) =
+  let private defineDoc (_name: string) (_builder: ModuleBuilderWrapper) =
     #if DEBUG
-    Some (builder.RawBuilder.DefineDocument(name + ".il", SymDocumentType.Text, SymLanguageType.ILAssembly, SymLanguageVendor.Microsoft))
+    Some (_builder.RawBuilder.DefineDocument(_name + ".il", SymDocumentType.Text, SymLanguageType.ILAssembly, SymLanguageVendor.Microsoft))
     #else
     None
     #endif

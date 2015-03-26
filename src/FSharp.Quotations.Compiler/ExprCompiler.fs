@@ -98,14 +98,14 @@ module ExprCompiler =
             | IfThenElse (cond, truePart, falsePart) ->
                 stack.Push(CompilingIfThenElse (gen.DefineLabel(), gen.DefineLabel(), NotYet cond, NotYet truePart, NotYet falsePart))
             | TryWith (body, _, _, e, exnHandler) ->
-                let res = gen.DeclareLocal(body.Type)
+                let res = gen.DeclareLocal("$res", body.Type)
                 gen.BeginExceptionBlock() |> ignore
                 stack.Push(Compiling (fun gen -> gen.Emit(Stloc res); gen.EndExceptionBlock(); gen.Emit(Ldloc res)))
                 stack.Push(Compiling (fun _ ->
                   varEnv := (!varEnv).Tail
                 ))
                 stack.Push(CompileTarget exnHandler)
-                let local = gen.DeclareLocal(e.Type)
+                let local = gen.DeclareLocal(e.Name, e.Type)
                 stack.Push(Compiling (fun gen -> gen.Emit(Stloc local)))
                 stack.Push(Compiling (fun _ ->
                   varEnv := (e.Name, e.Type, Local local) :: (!varEnv)
@@ -113,7 +113,7 @@ module ExprCompiler =
                 stack.Push(Compiling (fun gen -> gen.Emit(Stloc res); gen.BeginCatchBlock(e.Type)))
                 stack.Push(CompileTarget body)
             | TryFinally (body, handler) ->
-                let res = gen.DeclareLocal(body.Type)
+                let res = gen.DeclareLocal("$res", body.Type)
                 gen.BeginExceptionBlock() |> ignore
                 stack.Push(Compiling (fun gen -> gen.EndExceptionBlock(); gen.Emit(Ldloc res)))
                 stack.Push(CompileTarget handler)
@@ -124,7 +124,7 @@ module ExprCompiler =
                   varEnv := (!varEnv).Tail
                 ))
                 stack.Push(CompileTarget body)
-                let local = gen.DeclareLocal(var.Type)
+                let local = gen.DeclareLocal(var.Name, var.Type)
                 stack.Push(Compiling (fun gen -> gen.Emit(Stloc local)))
                 stack.Push(Compiling (fun _ ->
                   varEnv := (var.Name, var.Type, Local local)::(!varEnv)
@@ -136,7 +136,7 @@ module ExprCompiler =
                 ))
                 stack.Push(CompileTarget body)
                 for var, expr in varAndExprList do
-                  let local = gen.DeclareLocal(var.Type)
+                  let local = gen.DeclareLocal(var.Name, var.Type)
                   stack.Push(Compiling (fun gen -> gen.Emit(Stloc local)))
                   stack.Push(Compiling (fun _ ->
                     varEnv := (var.Name, var.Type, Local local)::(!varEnv)
@@ -154,8 +154,8 @@ module ExprCompiler =
                   !varEnv
                   |> List.fold (fun acc (n, t, info) -> if List.forall (fun (n2, _, _) -> n <> n2) acc then (n, t, info)::acc else acc) []
                   |> List.rev
-                let varTypes = needVarInfos |> List.map (fun (_, t, _) -> t)
-                let ctor = lambda.DefineConstructor(MethodAttributes.Public, varTypes)
+                let varNamesAndTypes = needVarInfos |> List.map (fun (n, t, _) -> (n, t))
+                let ctor = lambda.DefineConstructor(MethodAttributes.Public, varNamesAndTypes)
                 let ctorGen = ctor.GetILGenerator()
                 ctorGen.Emit(Ldarg_0)
                 if needVarInfos.Length = 0 then
@@ -171,7 +171,7 @@ module ExprCompiler =
                 ctorGen.Close()
 
                 let invoke =
-                  lambda.DefineOverrideMethod(baseType, "Invoke", MethodAttributes.Public, body.Type, [ var.Type ])
+                  lambda.DefineOverrideMethod(baseType, "Invoke", MethodAttributes.Public, body.Type, [ var ])
                 let invokeGen = invoke.GetILGenerator()
                 let orgVarEnv = !varEnv
                 stack.Push(Compiling (fun _ ->
@@ -300,7 +300,7 @@ module ExprCompiler =
                 else
                   failwithf "unsupported value type: %A" typ
             | DefaultValue typ ->
-                let local = gen.DeclareLocal(typ)
+                let local = gen.DeclareLocal("$defaultValue", typ)
                 gen.Emit(Ldloca local)
                 gen.Emit(Initobj typ)
                 gen.Emit(Ldloc local)
