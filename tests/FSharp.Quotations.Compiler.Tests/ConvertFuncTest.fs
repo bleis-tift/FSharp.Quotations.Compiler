@@ -385,3 +385,67 @@ module ConvertFuncTest =
     let ``unativeint int`` () =
       <@ unativeint 0 @> |> check 0un
       <@ unativeint -1 @> |> checkExn<_, OverflowException>
+
+    let inline testNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> nativeint) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ nativeint x @>); Fun = nativeint }
+
+    let inline testUNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> unativeint) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ unativeint x @>); Fun = unativeint }
+
+    let inline testFloatFrom< ^T when ^T : (static member op_Explicit: ^T -> float) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ float x @>); Fun = float }
+
+    let inline testFloat32From< ^T when ^T : (static member op_Explicit: ^T -> float32) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ float32 x @>); Fun = float32 }
+
+    [<Test>]
+    let ``int16 char`` () =
+      testInt16From ['a'; char Int16.MaxValue; Char.MinValue]
+
+    [<Test>]
+    let ``uint16 char`` () =
+      testUInt16From ['a'; Char.MaxValue; Char.MinValue]
+
+    [<Test>]
+    let ``int char`` () =
+      testIntFrom ['a'; Char.MaxValue; Char.MinValue]
+
+    [<Test>]
+    let ``uint char`` () =
+      testUInt32From ['a'; Char.MaxValue; Char.MinValue]
+
+    [<Test>]
+    let ``int64 char`` () =
+      testInt64From ['a'; Char.MaxValue; Char.MinValue]
+
+    [<Test>]
+    let ``uint64 char`` () =
+      testUInt64From ['a'; Char.MaxValue; Char.MinValue]
+
+    [<Test>]
+    let ``nativeint char`` () =
+      testNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]
+
+    [<Test>]
+    let ``unativeint char`` () =
+      testUNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]
+
+    [<Test>]
+    let ``byte char`` () =
+      testByteFrom ['a'; char Byte.MaxValue; char Byte.MinValue]
+
+    [<Test>]
+    let ``sbyte char`` () =
+      testByteFrom ['a'; char SByte.MaxValue; Char.MinValue]
+
+    [<Test>]
+    let ``char char`` () =
+      testCharFrom ['a'; Char.MaxValue; Char.MinValue]
+
+    [<Test>]
+    let ``float char`` () =
+      testFloatFrom ['a'; Char.MaxValue; Char.MinValue]
+
+    [<Test>]
+    let ``float32 char`` () =
+      testFloat32From ['a'; Char.MaxValue; Char.MinValue] 

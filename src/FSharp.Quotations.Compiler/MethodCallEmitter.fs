@@ -150,6 +150,20 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ int64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseInt64("") @>))
     dict.Add(getMethod <@ uint64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseUInt64("") @>))
 
+    dict.Add(getMethod <@ int16 'a' @>, emitCallMethod (getMethod <@ Convert.ToInt16('a') @>))
+    dict.Add(getMethod <@ uint16 'a' @>, emitCallMethod (getMethod <@ Convert.ToUInt16('a') @>))
+    dict.Add(getMethod <@ int 'a' @>, emitOpCode Conv_I4)
+    dict.Add(getMethod <@ uint32 'a' @>, emitOpCode Conv_I4)
+    dict.Add(getMethod <@ int64 'a' @>, emitOpCode Conv_I8)
+    dict.Add(getMethod <@ uint64 'a' @>, emitOpCode Conv_I8)
+    dict.Add(getMethod <@ nativeint 'a' @>, emitOpCode Conv_I)
+    dict.Add(getMethod <@ unativeint 'a' @>, emitOpCode Conv_I)
+    dict.Add(getMethod <@ byte 'a' @>, emitCallMethod (getMethod <@ Convert.ToByte('a') @>))
+    dict.Add(getMethod <@ sbyte 'a' @>, emitCallMethod (getMethod <@ Convert.ToSByte('a') @>))
+    dict.Add(getMethod <@ char 'a' @>, doNothing)
+    dict.Add(getMethod <@ float 'a' @>, emitOpCode Conv_R8)
+    dict.Add(getMethod <@ float32 'a' @>, emitOpCode Conv_R4)
+
     dict :> IReadOnlyDictionary<_, _>
 
   // shadowing the functions of the Microsoft.FSharp.Core.Operators.Checked module
