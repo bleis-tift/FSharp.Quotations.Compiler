@@ -36,7 +36,7 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
     let loc = gen.DeclareLocal(typ)
     #if DEBUG
     loc.SetLocalSymInfo(_name)
-    this.WriteLine("// declare local: " + typ.ToReadableText() + " " + _name)
+    this.WriteLine("// declare local: { val " + _name + ": " + typ.ToReadableText() + " }")
     #endif
     loc
 
