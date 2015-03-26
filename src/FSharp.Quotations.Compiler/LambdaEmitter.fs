@@ -6,17 +6,6 @@ open System.Reflection.Emit
 open Microsoft.FSharp.Quotations
 
 module internal LambdaEmitter =
-
-  let private genericFSharpFuncType = typedefof<_ -> _>
-  let private fsharpFuncType argType retType = genericFSharpFuncType.MakeGenericType([|argType; retType|])
-
-  let mutable private lambdaCount = 0
-
-  let private freshLambdaName () =
-    let l = lambdaCount
-    lambdaCount <- lambdaCount + 1
-    "lambda" + (string l)
-
   let private emitCtor (baseType: Type) (lambda: TypeBuilderWrapper) (fields: FieldBuilder list) (varEnv: VariableEnv) =
     let varNamesAndTypes = varEnv |> List.map (fun (n, t, _) -> (n, t))
     let baseCtor = baseType.GetConstructor(BindingFlags.NonPublic ||| BindingFlags.Instance, null, [||], null)
@@ -39,7 +28,7 @@ module internal LambdaEmitter =
     finally
       ctorGen.Close()
 
-  let emitInvoke (baseType: Type) (lambda: TypeBuilderWrapper, fields, ctor) (gen, varEnvRef: VariableEnv ref, needVarInfos: VariableEnv, argVar: Var, bodyType: Type) bodyCompileInfo (stack: CompileStack) =
+  let private emitInvoke (baseType: Type) (lambda: TypeBuilderWrapper, fields, ctor) (gen, varEnvRef: VariableEnv ref, needVarInfos: VariableEnv, argVar: Var, bodyType: Type) bodyCompileInfo (stack: CompileStack) =
     let varEnv = !varEnvRef
 
     let invoke = lambda.DefineOverrideMethod(baseType, "Invoke", MethodAttributes.Public, bodyType, [ argVar ])
@@ -73,8 +62,8 @@ module internal LambdaEmitter =
   let emit (parentMod: ModuleBuilderWrapper) (gen, varEnvRef: VariableEnv ref, argVar: Var, bodyType: Type) bodyCompileInfo (stack: CompileStack) =
     let varEnv = !varEnvRef
 
-    let baseType = fsharpFuncType argVar.Type bodyType
-    let lambda = parentMod.DefineType(freshLambdaName (), TypeAttributes.Public, baseType, [])
+    let lambda = parentMod.DefineLambda(argVar.Type, bodyType)
+    let baseType = lambda.BaseType
 
     let needVarInfos =
       varEnv
