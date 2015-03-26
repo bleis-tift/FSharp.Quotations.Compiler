@@ -44,8 +44,6 @@ module ExprCompiler =
     stack.Push(Assumption IfRet)
     stack.Push(CompileTarget expr)
 
-    let mutable lambdaCount = 0
-
     let varEnv: VariableEnv ref = ref []
 
     try
