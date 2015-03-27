@@ -100,6 +100,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ int16 'a' @>, emitCallMethod (getMethod <@ Convert.ToInt16('a') @>))
     dict.Add(getMethod <@ uint16 'a' @>, emitCallMethod (getMethod <@ Convert.ToUInt16('a') @>))
     dict.Add(getMethod <@ int 'a' @>, emitOpCode Conv_I4)
+    dict.Add(getMethod <@ int64 'a' @>, emitCallMethod (getMethod <@ Convert.ToInt64('a') @>))
 
     dict :> IReadOnlyDictionary<_, _>
 
