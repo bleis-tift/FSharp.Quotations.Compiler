@@ -400,7 +400,12 @@ module ConvertFuncTest =
 
     [<Test>]
     let ``int16 char`` () =
-      testInt16From ['a'; char Int16.MaxValue; Char.MinValue]
+      testInt16From ['a'; Char.MinValue]
+
+    [<Test>]
+    let ``int16 char overflow`` () =
+      let max = (char Int16.MaxValue + char 1)
+      <@ int16 max @> |> checkExn<_, OverflowException>
 
     [<Test>]
     let ``uint16 char`` () =
@@ -432,11 +437,21 @@ module ConvertFuncTest =
 
     [<Test>]
     let ``byte char`` () =
-      testByteFrom ['a'; char Byte.MaxValue; char Byte.MinValue]
+      testByteFrom ['a'; Char.MinValue]
+
+    [<Test>]
+    let ``byte char overflow`` () =
+      let max = (char Byte.MaxValue + char 1)
+      <@ byte max @> |> checkExn<_, OverflowException>
 
     [<Test>]
     let ``sbyte char`` () =
-      testByteFrom ['a'; char SByte.MaxValue; Char.MinValue]
+      testSByteFrom ['a'; Char.MinValue]
+
+    [<Test>]
+    let ``sbyte char overflow`` () =
+      let max = (char SByte.MaxValue + char 1)
+      <@ sbyte max @> |> checkExn<_, OverflowException>
 
     [<Test>]
     let ``char char`` () =
@@ -448,4 +463,4 @@ module ConvertFuncTest =
 
     [<Test>]
     let ``float32 char`` () =
-      testFloat32From ['a'; Char.MaxValue; Char.MinValue] 
+      testFloat32From ['a'; Char.MaxValue; Char.MinValue]
