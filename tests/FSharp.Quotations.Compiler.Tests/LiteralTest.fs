@@ -3,6 +3,9 @@
 [<TestModule>]
 module LiteralTest =
   [<Test>]
+  let unit () = <@ () @> |> check ()
+
+  [<Test>]
   let int ([<IntRange(-2, 128)>] i: int) = <@ i @> |> check i
 
   [<TestCase(true)>]
