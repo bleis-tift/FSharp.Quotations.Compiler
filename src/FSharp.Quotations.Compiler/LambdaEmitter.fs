@@ -41,7 +41,7 @@ module internal LambdaEmitter =
         match info with
         | Arg i -> gen.Emit(Ldarg i)
         | Local (local, name) -> gen.Emit(ILOpCode.ldloc local name)
-        | Field fi -> gen.Emit(Ldfld fi) // TODO : thisのload(gen.Emit(Ldarg0))は不要？
+        | Field fi -> gen.Emit(Ldarg_0); gen.Emit(Ldfld fi)
       gen.Emit(Newobj ctor)
     ))
     stack.Push(RestoreGen gen)
