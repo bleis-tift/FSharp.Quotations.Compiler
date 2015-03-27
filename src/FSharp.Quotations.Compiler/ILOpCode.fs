@@ -87,21 +87,21 @@ type ILOpCode =
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module ILOpCode =
   let stloc local _nameOpt =
-    #if DEBUG
+    #if DEVELOPMENT
     Stloc (local, Some _nameOpt)
     #else
     Stloc (local, None)
     #endif
 
   let ldloc local _nameOpt =
-    #if DEBUG
+    #if DEVELOPMENT
     Ldloc (local, Some _nameOpt)
     #else
     Ldloc (local, None)
     #endif
 
   let ldloca local _nameOpt =
-    #if DEBUG
+    #if DEVELOPMENT
     Ldloca (local, Some _nameOpt)
     #else
     Ldloca (local, None)

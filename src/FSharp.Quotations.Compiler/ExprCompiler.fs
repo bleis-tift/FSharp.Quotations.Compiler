@@ -48,12 +48,13 @@ module ExprCompiler =
     let asm =
       AppDomain.CurrentDomain.DefineDynamicAssembly(
         AssemblyName("CompiledAssembly"),
-        AssemblyBuilderAccess.Run)
+        DebugUtil.assemblyBuilderAccess
+      )
     let parentMod = ModuleBuilderWrapper.Create(asm, "CompiledModule")
     let typ = parentMod.DefineType("CompiledType", TypeAttributes.Public, typeof<obj>, [typeof<ICompiledType<'T>>])
     let m = typ.DefineOverrideMethod(typeof<ICompiledType<'T>>, "ExecuteCompiledCode", MethodAttributes.Public, typeof<'T>, [])
 
-    let mutable gen = m.GetILGenerator()
+    let mutable gen = m.GetILGenerator(expr.Type)
 
     let stack = CompileStack()
     stack.Push(Compiling (fun gen -> gen.Emit(Ret)))
@@ -319,4 +320,5 @@ module ExprCompiler =
       gen.Close()
 
     let x = Activator.CreateInstance(typ.CreateType()) :?> ICompiledType<'T>
+    DebugUtil.save asm
     x.ExecuteCompiledCode()

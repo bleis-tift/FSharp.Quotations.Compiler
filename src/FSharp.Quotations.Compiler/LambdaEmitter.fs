@@ -10,7 +10,7 @@ module internal LambdaEmitter =
     let varNamesAndTypes = varEnv |> List.map (fun (n, t, _) -> (n, t))
     let baseCtor = baseType.GetConstructor(BindingFlags.NonPublic ||| BindingFlags.Instance, null, [||], null)
     let ctor = lambda.DefineConstructor(MethodAttributes.Public, varNamesAndTypes)
-    let ctorGen = ctor.GetILGenerator()
+    let ctorGen = ctor.GetILGenerator(varNamesAndTypes)
     try
       // emit: call base ctor
       ctorGen.Emit(Ldarg_0)
@@ -32,7 +32,7 @@ module internal LambdaEmitter =
     let varEnv = !varEnvRef
 
     let invoke = lambda.DefineOverrideMethod(baseType, "Invoke", MethodAttributes.Public, bodyType, [ argVar ])
-    let invokeGen = invoke.GetILGenerator()
+    let invokeGen = invoke.GetILGenerator(argVar, bodyType)
     stack.Push(Compiling (fun _ ->
       varEnvRef := varEnv
     ))

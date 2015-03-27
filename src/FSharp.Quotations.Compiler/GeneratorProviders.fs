@@ -41,7 +41,7 @@ module TypeBuilderWrapperExtension =
       let argsTypes = args |> List.map (fun arg -> arg.Type)
       let m =
         MethodBuilderWrapper.Create(this.Parent, this, this.RawBuilder.DefineMethod(name, attrs, retType, Array.ofList argsTypes), name)
-      #if DEBUG
+      #if DEVELOPMENT
       m.RawBuilder.DefineParameter(0, ParameterAttributes.Out, "") |> ignore
       for arg, i in List.zip args [1..args.Length] do
         m.RawBuilder.DefineParameter(i, ParameterAttributes.In, arg.Name) |> ignore
@@ -58,7 +58,7 @@ module TypeBuilderWrapperExtension =
       let argsTypes = argNameAndTypes |> List.map snd
       let c =
         CtorBuilderWrapper.Create(this.Parent, this, this.RawBuilder.DefineConstructor(attrs, CallingConventions.Standard, Array.ofList argsTypes))
-      #if DEBUG
+      #if DEVELOPMENT
       for name, i in List.zip (argNameAndTypes |> List.map fst) [1..argNameAndTypes.Length] do
         c.RawBuilder.DefineParameter(i, ParameterAttributes.In, name) |> ignore
       #endif

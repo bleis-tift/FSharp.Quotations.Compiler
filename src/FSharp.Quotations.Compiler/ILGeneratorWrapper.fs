@@ -5,10 +5,10 @@ open System.Reflection.Emit
 open System.Diagnostics.SymbolStore
 open System.IO
 
-type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, name: string, doc: ISymbolDocumentWriter option) =
-  let mutable lineNumber = 1
+type ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string, gen: ILGenerator, name: string, doc: ISymbolDocumentWriter option) =
+  let mutable lineNumber = 2
   let mutable indentCount = 0
-  let writer = doc |> Option.map (fun d -> File.CreateText(name + ".il"))
+  let writer = doc |> Option.map (fun _ -> let w = File.CreateText(name + ".il") in w.WriteLine("// " + signature); w)
 
   let pushIndent () = indentCount <- indentCount + 2
   let popIndent () = indentCount <- indentCount - 2
@@ -17,8 +17,8 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
 
   let emittedOpCodes = ResizeArray<_>()
 
-  static member Create(builder, gen, name, doc) =
-    ILGeneratorWrapper(builder, gen, name, doc)
+  static member Create(builder, signature, gen, name, doc) =
+    ILGeneratorWrapper(builder, signature, gen, name, doc)
 
   member __.WriteLine(line: string) =
     writer |> Option.iter (fun w ->
@@ -28,13 +28,14 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
   member this.WriteLines(lines: string list) = lines |> List.iter (this.WriteLine)
   member __.WriteLineAndMark(line: string) =
     writer |> Option.iter (fun w ->
-      w.WriteLine(withIndent line)
+      let label = DebugUtil.label gen
+      w.WriteLine(withIndent (label + line))
       gen.MarkSequencePoint(doc.Value, lineNumber, indentCount + 1, lineNumber, indentCount + line.Length + 1)
       lineNumber <- lineNumber + 1
     )
   member __.Close() =
     writer |> Option.iter (fun w -> w.Close())
-    #if DEBUG
+    #if DEVELOPMENT
     if emittedOpCodes.Count >= 3 then
       match emittedOpCodes |> Seq.toList |> List.rev with
       | last::preLast::prePreLast::_ ->
@@ -49,7 +50,7 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
 
   member this.DeclareLocal(_name: string, typ: Type) =
     let loc = gen.DeclareLocal(typ)
-    #if DEBUG
+    #if DEVELOPMENT
     loc.SetLocalSymInfo(_name)
     this.WriteLine("// declare local: { val " + _name + ": " + typ.ToReadableText() + " }")
     #endif
@@ -142,21 +143,35 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
 
 [<AutoOpen>]
 module GeneratorProvidersExtension =
+  open Microsoft.FSharp.Quotations
+
   let private defineDoc (_name: string) (_builder: ModuleBuilderWrapper) =
-    #if DEBUG
+    #if DEVELOPMENT
     Some (_builder.RawBuilder.DefineDocument(_name + ".il", SymDocumentType.Text, SymLanguageType.ILAssembly, SymLanguageVendor.Microsoft))
     #else
     None
     #endif
 
+  let methodSig name (args: Var list) (retType: Type) =
+    let argsStr = args |> List.map (fun v -> v.Name + ":" + v.Type.ToReadableText()) |> String.concat " -> "
+    name + " : " + (if argsStr = "" then "unit" else argsStr) + "  ->  " + retType.ToReadableText()
+
   type MethodBuilderWrapper with
-    member this.GetILGenerator() =
+    member this.GetILGenerator(retType: Type) =
       let gen = this.GetGenerator()
       let doc = defineDoc this.FullName this.ModuleBuilder
-      ILGeneratorWrapper.Create(this, gen, this.FullName, doc)
+      ILGeneratorWrapper.Create(this, methodSig this.Name [] retType, gen, this.FullName, doc)
+    member this.GetILGenerator(arg: Var, retType: Type) =
+      let gen = this.GetGenerator()
+      let doc = defineDoc this.FullName this.ModuleBuilder
+      ILGeneratorWrapper.Create(this, methodSig this.Name [arg] retType, gen, this.FullName, doc)
+
+  let ctorSig (varNamesAndTypes: (string * Type) list) =
+    let str = varNamesAndTypes |> List.map (fun (n, t) -> n + ":" + t.ToReadableText()) |> String.concat " -> "
+    "new : " + str + "  ->  this"
 
   type CtorBuilderWrapper with
-    member this.GetILGenerator() =
+    member this.GetILGenerator(varNamesAndTypes: (string * Type) list) =
       let gen = this.GetGenerator()
       let doc = defineDoc this.FullName this.ModuleBuilder
-      ILGeneratorWrapper.Create(this, gen, this.FullName, doc)
+      ILGeneratorWrapper.Create(this, ctorSig varNamesAndTypes, gen, this.FullName, doc)

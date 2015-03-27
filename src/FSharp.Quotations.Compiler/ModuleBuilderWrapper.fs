@@ -14,9 +14,11 @@ module ModuleBuilder =
     asm.SetCustomAttribute(builder)
 
   let defineDynamicModule name (asm: AssemblyBuilder) =
-    #if DEBUG
+    #if DEVELOPMENT
     setDebuggingAttr asm
-    asm.DefineDynamicModule(name, true)
+    match DebugUtil.assemblyFilePath with
+    | Some path -> asm.DefineDynamicModule(name, path, true)
+    | None -> asm.DefineDynamicModule(name, true)
     #else
     asm.DefineDynamicModule(name)
     #endif
