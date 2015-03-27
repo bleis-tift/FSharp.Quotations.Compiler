@@ -208,6 +208,9 @@ module ConvertFuncTest =
     <@ string [||] @> |> check "System.Object[]"
     <@ string (null: int[]) @> |> check ""
 
+  let ``int char`` () =
+    testIntFrom ['a'; Char.MaxValue; Char.MinValue]
+
   type MyClass() =
     override __.ToString() = "hello"
 
