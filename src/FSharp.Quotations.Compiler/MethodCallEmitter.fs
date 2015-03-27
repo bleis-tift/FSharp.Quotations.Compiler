@@ -29,28 +29,29 @@ module internal MethodCallEmitter =
         member __.Equals(x, y) = (x = y)
         member __.GetHashCode(x) = RuntimeHelpers.GetHashCode(x) }
 
-  let doNothing = Compiling (fun (_: ILGeneratorWrapper) -> ())
+  let doNothing = []
 
-  let emitOpCode opcode = Compiling (fun (gen: ILGeneratorWrapper) -> gen.Emit(opcode))
+  let emitOpCode opcode = [ Compiling (fun (gen: ILGeneratorWrapper) -> gen.Emit(opcode)) ]
 
   let private (|>>) emit1 emit2 =
     match emit1, emit2 with
-    | Compiling e1, Compiling e2 -> Compiling (fun (gen: ILGeneratorWrapper) -> e1 gen; e2 gen)
+    | [Compiling e1], [Compiling e2] -> [ Compiling (fun (gen: ILGeneratorWrapper) -> e1 gen; e2 gen) ]
+    | [Compiling e1], [Assumed e2] -> [ Assumed e2; Compiling e1 ]
     | _ -> failwith "oops!"
 
   let emitCallMethod mi =
-    Assumed (function
-             | IfRet, gen -> gen.Emit(Tailcall); gen.Emit(Call (Method mi))
-             | _, gen -> gen.Emit(Call (Method mi)))
+    [ Assumed (function
+               | IfRet, gen -> gen.Emit(Tailcall); gen.Emit(Call (Method mi))
+               | _, gen -> gen.Emit(Call (Method mi))) ]
 
   let emitStrToFloat (mi: MethodInfo) =
     emitOpCode (Ldc_I4 (int NumberStyles.Float))
     |>> emitOpCode (Call (PropGet (getProperty <@ CultureInfo.InvariantCulture @>)))
     |>> emitOpCode (Unbox_Any typeof<IFormatProvider>)
-    |>> emitOpCode (Call (Method mi))
+    |>> emitCallMethod mi
 
   let private altEmitterTable1 =
-    let dict = Dictionary<MethodInfo, CompileStackInfo>(identityEqualityComparer)
+    let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
     dict.Add(getMethod <@ +(1) @>, doNothing)
     dict.Add(getMethod <@ -(1) @>, emitOpCode Neg)
     dict.Add(getMethod <@ 1 - 1 @>, emitOpCode Sub)
@@ -102,7 +103,7 @@ module internal MethodCallEmitter =
   open Microsoft.FSharp.Core.Operators.Checked
 
   let private altEmitterTable2 =
-    let dict = Dictionary<MethodInfo, CompileStackInfo>(identityEqualityComparer)
+    let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
     dict.Add(getMethod <@ -(1) @>, emitOpCode Ldc_I4_M1 |>> emitOpCode Mul_Ovf)
     dict.Add(getMethod <@ 1 - 1 @>, emitOpCode Sub_Ovf)
     dict.Add(getMethod <@ 1 * 1 @>, emitOpCode Mul_Ovf)
@@ -122,7 +123,7 @@ module internal MethodCallEmitter =
                                       |>> emitOpCode Conv_Ovf_U1)
     dict.Add(getMethod <@ sbyte "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt32("") @>)))
                                        |>> emitOpCode Conv_Ovf_I1)
-    dict.Add(getMethod <@ char "" @>, emitOpCode (Call (Method (getMethod <@ Char.Parse("") @>))))
+    dict.Add(getMethod <@ char "" @>, emitCallMethod (getMethod <@ Char.Parse("") @>))
     dict.Add(getMethod <@ int "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseInt32("") @>))
     dict.Add(getMethod <@ int16 "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt32("") @>)))
                                        |>> emitOpCode Conv_Ovf_I2)
@@ -139,10 +140,10 @@ module internal MethodCallEmitter =
 
   let private getPushingCompileStackInfos (mi: MethodInfo) =
     match altEmitterTable1.TryGetValue(mi) with
-    | true, emitter -> if obj.ReferenceEquals(emitter, doNothing) then [] else [emitter]
+    | true, emitter -> emitter
     | _ ->
         match altEmitterTable2.TryGetValue(mi) with
-        | true, emitter -> if obj.ReferenceEquals(emitter, doNothing) then [] else [emitter]
+        | true, emitter -> emitter
         | _ ->
             let emitCall (gen: ILGeneratorWrapper) =
               if mi.IsVirtual then gen.Emit(Callvirt (Method mi))

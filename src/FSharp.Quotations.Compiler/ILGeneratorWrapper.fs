@@ -15,6 +15,8 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
   let withIndent(str) =
     (String.replicate indentCount " ") + str
 
+  let emittedOpCodes = ResizeArray<_>()
+
   static member Create(builder, gen, name, doc) =
     ILGeneratorWrapper(builder, gen, name, doc)
 
@@ -30,7 +32,20 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
       gen.MarkSequencePoint(doc.Value, lineNumber, indentCount + 1, lineNumber, indentCount + line.Length + 1)
       lineNumber <- lineNumber + 1
     )
-  member __.Close() = writer |> Option.iter (fun w -> w.Close())
+  member __.Close() =
+    writer |> Option.iter (fun w -> w.Close())
+    #if DEBUG
+    if emittedOpCodes.Count >= 3 then
+      match emittedOpCodes |> Seq.toList |> List.rev with
+      | last::preLast::prePreLast::_ ->
+          assert (last = Ret)
+          match preLast with
+          | Call _ | Callvirt _ ->
+              if prePreLast <> Tailcall then
+                failwith "detect tail call but did not emitted tailcall."
+          | _ -> ()
+      | _ -> invalidOp ""
+    #endif
 
   member this.DeclareLocal(_name: string, typ: Type) =
     let loc = gen.DeclareLocal(typ)
@@ -64,7 +79,10 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, gen: ILGenerator, 
     this.WriteLine(string (label.GetHashCode()) + ": ")
     gen.MarkLabel(label)
 
+  member __.EmittedOpCodes = emittedOpCodes.AsReadOnly()
+
   member this.Emit(opcode) =
+    emittedOpCodes.Add(opcode)
     let raw = ILOpCode.toRawOpCode opcode
     match opcode with
     | Brfalse label | Br label ->
