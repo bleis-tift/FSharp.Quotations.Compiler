@@ -149,3 +149,16 @@ module ControlFlowExprTest =
        f [] + f [1; 2; 3]
     @>
     |> check "empty1:2"
+
+  let run f = try f () with e -> e.GetType().Name
+
+  [<Test>]
+  let ``try with in let body`` () =
+    <@
+      let v = 10
+      try
+        run (fun () -> "1")
+      with
+        _ -> ""
+    @>
+    |> check "1"
