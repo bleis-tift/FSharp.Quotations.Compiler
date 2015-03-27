@@ -43,6 +43,9 @@ module ArithmeticOpTest =
     <@ Char.MaxValue + (char 1) @> |> check (Char.MaxValue + (char 1))
 
   [<Test>]
+  let ``+ float`` () = <@ +(1.0) @> |> check 1.0
+
+  [<Test>]
   let ``string + string`` () =
     <@ "aaa" + "bbb" @> |> check "aaabbb"
 
