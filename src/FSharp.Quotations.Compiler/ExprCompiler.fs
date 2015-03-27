@@ -31,7 +31,7 @@ module ExprCompiler =
   let private tryPopAssumption (stack: CompileStack) =
     if stack.Count <> 0 then
       match stack.Pop() with
-      | Assumption _ as assumption -> Some assumption
+      | Assumption assumption -> Some assumption
       | other -> stack.Push(other); None
     else
       None
@@ -39,10 +39,10 @@ module ExprCompiler =
   let private pushTearDown assumptionOpt f (stack: CompileStack) =
     match assumptionOpt with
     | Some a ->
-        stack.Push(Compiling f)
-        stack.Push(a)
+        stack.Push(Compiling (f a))
+        stack.Push(Assumption a)
     | None ->
-        stack.Push(Compiling f)
+        stack.Push(Compiling (f False))
 
   let compile (expr: Expr<'T>) : 'T =
     let asm =
@@ -88,9 +88,13 @@ module ExprCompiler =
                 let ifEndLabel = gen.DefineLabel()
 
                 let assumptionOpt = tryPopAssumption stack
-                pushTearDown assumptionOpt (fun gen -> gen.MarkLabel(ifEndLabel)) stack
+                pushTearDown assumptionOpt (fun _ gen -> gen.MarkLabel(ifEndLabel)) stack
                 stack.Push(CompileTarget falsePart)
-                pushTearDown assumptionOpt (fun gen -> gen.Emit(Br ifEndLabel); gen.MarkLabel(falseLabel)) stack
+                pushTearDown assumptionOpt (fun a gen ->
+                  match a with
+                  | IfRet -> gen.Emit(Ret)
+                  | _ -> gen.Emit(Br ifEndLabel)
+                  gen.MarkLabel(falseLabel)) stack
                 stack.Push(CompileTarget truePart)
                 stack.Push(Compiling (fun gen ->
                   gen.Emit(Brfalse falseLabel)
@@ -132,7 +136,7 @@ module ExprCompiler =
                 stack.Push(CompileTarget (Expr.Application(Expr.Lambda(Var("unitVar", typeof<unit>), tryFinallyExpr), <@ () @>)))
             | Let (var, expr, body) ->
                 let assumptionOpt = tryPopAssumption stack
-                pushTearDown assumptionOpt (fun _ -> varEnv := (!varEnv).Tail) stack
+                pushTearDown assumptionOpt (fun _ _ -> varEnv := (!varEnv).Tail) stack
                 stack.Push(CompileTarget body)
                 let local = gen.DeclareLocal(var.Name, var.Type)
                 stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc local var.Name)))
@@ -142,7 +146,7 @@ module ExprCompiler =
                 stack.Push(CompileTarget expr)
             | LetRecursive (varAndExprList, body) ->
                 let assumptionOpt = tryPopAssumption stack
-                pushTearDown assumptionOpt (fun _ -> varEnv := !varEnv |> Seq.skip varAndExprList.Length |> Seq.toList) stack
+                pushTearDown assumptionOpt (fun _ _ -> varEnv := !varEnv |> Seq.skip varAndExprList.Length |> Seq.toList) stack
                 stack.Push(CompileTarget body)
                 for var, expr in varAndExprList do
                   let local = gen.DeclareLocal(var.Name, var.Type)

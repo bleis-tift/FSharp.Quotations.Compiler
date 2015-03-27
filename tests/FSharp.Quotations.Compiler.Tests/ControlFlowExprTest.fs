@@ -31,6 +31,14 @@ module ControlFlowExprTest =
     |> check 10
 
   [<Test>]
+  let ``if-then-else with tailcall`` () =
+    <@ let cond () = true
+       let f () = 42
+       let g () = 12
+       if cond () then f () else g () @>
+    |> check 42
+
+  [<Test>]
   let ``try-with`` () =
     <@ try 10 with _e -> -1 @> |> check 10
     <@ try failwith "" with _e -> -1 @> |> check -1
