@@ -97,8 +97,11 @@ module Stringizer =
     elif Double.IsNegativeInfinity(x) then "// -infinity"
     else
       let str = string x
-      if float str = x then "// " + str
-      else "// about " + str
+      try
+        if float str = x then "// " + str
+        else "// about " + str
+      with
+        _ -> "// about " + str
 
   type Double with
     member private this.ToBytesStr() =

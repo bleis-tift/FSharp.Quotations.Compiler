@@ -46,6 +46,11 @@ module ArithmeticOpTest =
   let ``+ float`` () = <@ +(1.0) @> |> check 1.0
 
   [<Test>]
+  let ``- float`` () =
+    <@ -(1.0) @> |> check -1.0
+    <@ - (Double.MinValue) @> |> check Double.MaxValue
+
+  [<Test>]
   let ``string + string`` () =
     <@ "aaa" + "bbb" @> |> check "aaabbb"
 
