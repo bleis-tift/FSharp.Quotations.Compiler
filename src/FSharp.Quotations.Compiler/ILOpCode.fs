@@ -40,8 +40,16 @@ type ILOpCode =
   | Conv_I8
   | Conv_R4
   | Conv_R8
+  | Conv_U
+  | Conv_U1
+  | Conv_U2
+  | Conv_U4
+  | Conv_U8
+  | Conv_Ovf_I
   | Conv_Ovf_I1
   | Conv_Ovf_I2
+  | Conv_Ovf_I4
+  | Conv_Ovf_I8
   | Conv_Ovf_U
   | Conv_Ovf_U1
   | Conv_Ovf_U2
@@ -134,10 +142,18 @@ module ILOpCode =
   | Conv_I2 -> OpCodes.Conv_I2
   | Conv_I4 -> OpCodes.Conv_I4
   | Conv_I8 -> OpCodes.Conv_I8
+  | Conv_U -> OpCodes.Conv_U
+  | Conv_U1 -> OpCodes.Conv_U1
+  | Conv_U2 -> OpCodes.Conv_U2
+  | Conv_U4 -> OpCodes.Conv_U4
+  | Conv_U8 -> OpCodes.Conv_U8
   | Conv_R4 -> OpCodes.Conv_R4
   | Conv_R8 -> OpCodes.Conv_R8
+  | Conv_Ovf_I -> OpCodes.Conv_Ovf_I
   | Conv_Ovf_I1 -> OpCodes.Conv_Ovf_I1
   | Conv_Ovf_I2 -> OpCodes.Conv_Ovf_I2
+  | Conv_Ovf_I4 -> OpCodes.Conv_Ovf_I4
+  | Conv_Ovf_I8 -> OpCodes.Conv_Ovf_I8
   | Conv_Ovf_U -> OpCodes.Conv_Ovf_U
   | Conv_Ovf_U1 -> OpCodes.Conv_Ovf_U1
   | Conv_Ovf_U2 -> OpCodes.Conv_Ovf_U2
