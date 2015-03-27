@@ -80,6 +80,7 @@
     <Compile Include="BoolOpTest.fs" />
     <Compile Include="StringOpTest.fs" />
     <Compile Include="StringFuncTest.fs" />
+    <Compile Include="ArrayOpTest.fs" />
     <Compile Include="ControlFlowExprTest.fs" />
     <Compile Include="LetTest.fs" />
     <Compile Include="FSharpTypeTest.fs" />
