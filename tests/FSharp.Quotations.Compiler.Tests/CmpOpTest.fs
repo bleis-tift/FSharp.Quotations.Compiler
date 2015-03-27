@@ -105,3 +105,47 @@ module CmpOpTest =
     <@ "aaa" >= "bbb" @> |> check false
     <@ "aaa" >= "aaa" @> |> check true
     <@ "bbb" >= "aaa" @> |> check true
+
+  [<Test>]
+  let ``int[] = int[]`` () =
+    <@ [|1|] = [|1|] @> |> check true
+    <@ [|1|] = [|2|] @> |> check false
+    <@ [|1|] = [|1; 1|] @> |> check false
+
+  [<Test>]
+  let ``int[] <> int[]`` () =
+    <@ [|1|] <> [|1|] @> |> check false
+    <@ [|1|] <> [|2|] @> |> check true
+    <@ [|1|] <> [|1; 1|] @> |> check true
+
+  [<Test>]
+  let ``int[] < int[]`` () =
+    <@ [|1|] < [||] @> |> check false
+    <@ [|1|] < [|1|] @> |> check false
+    <@ [|1|] < [|2|] @> |> check true
+    <@ [|1|] < [|1; 1|] @> |> check true
+    <@ [|2|] < [|1; 1|] @> |> check true
+
+  [<Test>]
+  let ``int[] <= int[]`` () =
+    <@ [|1|] <= [||] @> |> check false
+    <@ [|1|] <= [|1|] @> |> check true
+    <@ [|1|] <= [|2|] @> |> check true
+    <@ [|1|] <= [|1; 1|] @> |> check true
+    <@ [|2|] <= [|1; 1|] @> |> check true
+
+  [<Test>]
+  let ``int[] > int[]`` () =
+    <@ [|1|] > [||] @> |> check true
+    <@ [|1|] > [|1|] @> |> check false
+    <@ [|1|] > [|2|] @> |> check false
+    <@ [|1|] > [|1; 1|] @> |> check false
+    <@ [|2|] > [|1; 1|] @> |> check false
+
+  [<Test>]
+  let ``int[] >= int[]`` () =
+    <@ [|1|] >= [||] @> |> check true
+    <@ [|1|] >= [|1|] @> |> check true
+    <@ [|1|] >= [|2|] @> |> check false
+    <@ [|1|] >= [|1; 1|] @> |> check false
+    <@ [|2|] >= [|1; 1|] @> |> check false
