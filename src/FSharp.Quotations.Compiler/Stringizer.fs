@@ -89,3 +89,21 @@ module Stringizer =
       let selfType = this.DeclaringType.ToReadableText()
       let paramsType = this.GetIndexParameters() |> Array.map (fun p -> p.ParameterType.ToReadableText()) |> String.concat ", "
       retType + " " + selfType + "." + this.Name + "[" + paramsType + "]"
+
+  let private b2s (b: byte) = b.ToString("X").PadLeft(2, '0')
+  let private richInfoStr (x: float) =
+    if Double.IsNaN(x) then "// NaN"
+    elif Double.IsPositiveInfinity(x) then "// infinity"
+    elif Double.IsNegativeInfinity(x) then "// -infinity"
+    else
+      let str = string x
+      if float str = x then "// " + str
+      else "// about " + str
+
+  type Double with
+    member private this.ToBytesStr() =
+      "(" + (BitConverter.GetBytes(this) |> Array.map b2s |> String.concat " ") + ")"
+
+    member this.ToStringWithRichInfo() =
+      let bytesStr = this.ToBytesStr()
+      bytesStr + " " + richInfoStr this

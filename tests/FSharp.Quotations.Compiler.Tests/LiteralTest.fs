@@ -15,6 +15,9 @@ module LiteralTest =
   [<TestCase(false)>]
   let bool (b: bool) = <@ b @> |> check b
 
+  [<Test>]
+  let float () = <@ 42.0 @> |> check 42.0
+
   [<TestCase("test string")>]
   [<TestCase(null: string)>]
   let string (str: string) = <@ str @> |> check str
