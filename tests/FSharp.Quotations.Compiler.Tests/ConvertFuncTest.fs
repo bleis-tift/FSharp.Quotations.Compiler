@@ -202,6 +202,12 @@ module ConvertFuncTest =
     <@ string "str" @> |> check "str"
     <@ string (null: string) @> |> check ""
 
+  [<Test>]
+  let ``string int[]`` () =
+    <@ string [|10|] @> |> check "System.Int32[]"
+    <@ string [||] @> |> check "System.Object[]"
+    <@ string (null: int[]) @> |> check ""
+
   type MyClass() =
     override __.ToString() = "hello"
 
