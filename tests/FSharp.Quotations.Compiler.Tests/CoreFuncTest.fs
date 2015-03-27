@@ -15,6 +15,9 @@ module CoreFuncTest =
   let ``box string`` () = <@ box "str" @> |> check (box "str")
 
   [<Test>]
+  let ``box int[]`` () = <@ box [|10|] @> |> check (box [|10|])
+
+  [<Test>]
   let ``failwith string`` () = <@ failwith "str" @> |> checkExnType typeof<exn>
 
   [<Test>]
@@ -25,6 +28,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``compare string string`` () = <@ compare "str" "str" @> |> check 0
+
+  [<Test>]
+  let ``compare int[] int[]`` () = <@ compare [|10|] [|10|] @> |> check 0
 
   [<Test>]
   let ``defaultArg (string option) string`` () =
@@ -46,6 +52,9 @@ module CoreFuncTest =
   let ``hash string`` () = <@ hash "str" @> |> check (hash "str")
 
   [<Test>]
+  let ``hash int[]`` () = <@ hash [|10|] @> |> check (hash [|10|])
+
+  [<Test>]
   let ``limitedHash int int`` () = <@ limitedHash 1 1 @> |> check 1
 
   [<Test>]
@@ -53,6 +62,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``limitedHash int string`` () = <@ limitedHash 1 "str" @> |> check (limitedHash 1 "str")
+
+  [<Test>]
+  let ``limitedHash int int[]`` () = <@ limitedHash 1 [|10|] @> |> check (limitedHash 1 [|10|])
 
   [<Test>]
   let ``id int`` () = <@ id 1 @> |> check 1
@@ -64,6 +76,9 @@ module CoreFuncTest =
   let ``id string`` () = <@ id "str" @> |> check "str"
 
   [<Test>]
+  let ``id int[]`` () = <@ id [|10|] @> |> check [|10|]
+
+  [<Test>]
   let ``ignore int`` () = <@ ignore 1 @> |> check ()
 
   [<Test>]
@@ -71,6 +86,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``ignore string`` () = <@ ignore "str" @> |> check ()
+
+  [<Test>]
+  let ``ignore int[]`` () = <@ ignore [|10|] @> |> check ()
 
   [<Test>]
   let ``invalidArg string string`` () =
@@ -90,6 +108,9 @@ module CoreFuncTest =
   let ``max string string`` () = <@ max "aaa" "bbb" @> |> check "bbb"
 
   [<Test>]
+  let ``max int[] int[]`` () = <@ max [|10|] [|20|] @> |> check [|20|]
+
+  [<Test>]
   let ``min int int`` () = <@ min 10 20 @> |> check 10
 
   [<Test>]
@@ -97,6 +118,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``min string string`` () = <@ min "aaa" "bbb" @> |> check "aaa"
+
+  [<Test>]
+  let ``min int[] int[]`` () = <@ min [|10|] [|20|] @> |> check [|10|]
 
   [<Test>]
   let ``not bool`` () = <@ not true @> |> check false
