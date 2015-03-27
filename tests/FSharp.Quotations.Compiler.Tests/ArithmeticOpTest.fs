@@ -44,6 +44,7 @@ module ArithmeticOpTest =
   [<Test>]
   let ``char + char`` () =
     <@ 'a' + 'a' @> |> check ('a' + 'a')
+    <@ Char.MaxValue + (char 1) @> |> check (Char.MaxValue + (char 1))
 
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
@@ -75,3 +76,4 @@ module ArithmeticOpTest =
     [<Test>]
     let ``char + char`` () =
       <@ 'a' + 'a' @> |> check ('a' + 'a')
+      <@ Char.MaxValue + (char 1) @> |> checkExn<_, OverflowException>
