@@ -58,6 +58,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ -(1.0) @>, emitOpCode Neg)
     dict.Add(getMethod <@ 'a' + 'a' @>, emitOpCode Add)
     dict.Add(getMethod <@ 1 - 1 @>, emitOpCode Sub)
+    dict.Add(getMethod <@ 1.0 - 1.0 @>, emitOpCode Sub)
     dict.Add(getMethod <@ 1 / 1 @>, emitOpCode Div)
     dict.Add(getMethod <@ 1 % 1 @>, emitOpCode Rem)
     dict.Add(getMethod <@ 1 &&& 1 @>, emitOpCode And)
