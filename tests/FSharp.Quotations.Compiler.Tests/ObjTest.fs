@@ -58,3 +58,7 @@ module ObjTest =
     <@ (1).ToString() @> |> check "1"
     <@ (true).ToString() @> |> check "True"
     <@ "aaa".ToString() @> |> check "aaa"
+
+  [<Test>]
+  let ``value type getType`` () =
+    <@ (1).GetType() @> |> check typeof<int>

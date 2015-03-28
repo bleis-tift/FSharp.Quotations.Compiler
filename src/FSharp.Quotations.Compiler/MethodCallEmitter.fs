@@ -222,12 +222,18 @@ module internal MethodCallEmitter =
       Compiling (fun (gen: ILGeneratorWrapper) -> let loc = gen.DeclareLocal(r.Type) in gen.Emit(Stloc (loc, None)); gen.Emit(Ldloca (loc, None)))
     ]
 
-  let private altEmitterTableReceiver (recv: Expr option) =
+  let private altEmitterTableReceiver (recv: Expr option, mi: MethodInfo) =
     let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
     match recv with
     | Some r ->
         if r.Type.IsValueType then
-          let mi = getMethod <@ (1).ToString() @> in dict.Add(mi, loadVariableInLocalScope r |>> emitOpCode (Constrainted r.Type) |>> emitCallMethod mi)
+          let assumed =
+            [
+              Assumed (function
+                        | IfRet, gen -> gen.Emit(Tailcall); gen.Emit(Callvirt (Method mi))
+                        | _, gen -> gen.Emit(Callvirt (Method mi)))
+            ]
+          dict.Add(mi, loadVariableInLocalScope r |>> emitOpCode (Constrainted r.Type) |>> assumed)
         dict
     | _ -> dict
     :> IReadOnlyDictionary<_, _>
@@ -239,7 +245,7 @@ module internal MethodCallEmitter =
         match altEmitterTableChecked.TryGetValue(mi) with
         | true, emitter -> emitter
         | _ ->
-            match altEmitterTableReceiver(recv).TryGetValue(mi) with
+            match altEmitterTableReceiver(recv, mi).TryGetValue(mi) with
             | true, emitter -> emitter
             | _ ->
                 let emitCall (gen: ILGeneratorWrapper) =
