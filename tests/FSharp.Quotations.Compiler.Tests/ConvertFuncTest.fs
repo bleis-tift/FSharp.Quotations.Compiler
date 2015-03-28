@@ -295,6 +295,9 @@ module ConvertFuncTest =
   let ``unativeint char`` () = testUNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
+  let ``unativeint float`` () = testUNativeIntFrom<float> [1.0; nan; infinity; -infinity]
+
+  [<Test>]
   let ``enum int`` () =
     <@ enum 0 @> |> check StringSplitOptions.None
     <@ enum 1 @> |> check StringSplitOptions.RemoveEmptyEntries
