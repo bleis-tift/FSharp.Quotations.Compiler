@@ -131,6 +131,9 @@ module ConvertFuncTest =
   let ``float32 char`` () = testFloat32From ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
+  let ``float32 float`` () = testFloat32From<float> [0.0; nan; infinity; -infinity]
+
+  [<Test>]
   let ``float32 string`` () =
     testFloat32From<string> [
       "1"; "NaN"; "Infinity"; "-Infinity";
