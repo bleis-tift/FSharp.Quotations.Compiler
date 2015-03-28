@@ -136,7 +136,7 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string,
         | PropGet pi ->
             this.WriteLineAndMark(raw.Name + " " + pi.ToReadableText())
             gen.Emit(raw, pi.GetMethod)
-    | Newarr typ | Stelem typ | Initobj typ | Box typ | Unbox_Any typ | Isinst typ ->
+    | Newarr typ | Stelem typ | Initobj typ | Box typ | Unbox_Any typ | Isinst typ | Constrainted typ ->
         this.WriteLineAndMark(raw.Name + " " + typ.ToReadableText())
         gen.Emit(raw, typ)
     | Newobj ci ->

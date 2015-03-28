@@ -90,6 +90,7 @@ type ILOpCode =
   | Stelem of Type
   | Ldtoken of Token
   | Tailcall
+  | Constrainted of Type
   | Call of CallTarget
   | Callvirt of CallTarget
   | Newarr of Type
@@ -198,6 +199,7 @@ module ILOpCode =
   | Stelem _ -> OpCodes.Stelem
   | Ldtoken _ -> OpCodes.Ldtoken
   | Tailcall -> OpCodes.Tailcall
+  | Constrainted _ -> OpCodes.Constrained
   | Call _ -> OpCodes.Call
   | Callvirt _ -> OpCodes.Callvirt
   | Newarr _ -> OpCodes.Newarr
