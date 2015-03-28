@@ -45,10 +45,13 @@ module internal MethodCallEmitter =
     | [Compiling e1], [Assumed e2] -> [ Assumed e2; Compiling e1 ]
     | _ -> failwith "oops!"
 
-  let emitCallMethod mi =
+  let private emitCallPrim call =
     [ Assumed (function
-               | IfRet, gen -> gen.Emit(Tailcall); emitCall mi gen
-               | _, gen -> emitCall mi gen) ]
+               | IfRet, gen -> gen.Emit(Tailcall); call gen
+               | _, gen -> call gen) ]
+
+  let emitCallMethod mi = emitCallPrim (fun gen -> emitCall mi gen)
+  let emitCallMethodPrim mi call = emitCallPrim (fun gen -> gen.Emit(call (Method mi)))
 
   let emitCallVoidMethod mi =
     [ Assumed (function
@@ -228,13 +231,7 @@ module internal MethodCallEmitter =
     | Some r ->
         if r.Type.IsValueType then
           if mi.DeclaringType = typeof<obj> then
-            let assumed =
-              [
-                Assumed (function
-                          | IfRet, gen -> gen.Emit(Tailcall); gen.Emit(Callvirt (Method mi))
-                          | _, gen -> gen.Emit(Callvirt (Method mi)))
-              ]
-            dict.Add(mi, emitOpCode (Constrainted r.Type) |>> assumed)
+            dict.Add(mi, emitOpCode (Constrainted r.Type) |>> emitCallMethodPrim mi Callvirt)
           else
             dict.Add(mi, emitCallMethod mi)
         dict
