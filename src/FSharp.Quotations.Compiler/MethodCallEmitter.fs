@@ -227,48 +227,60 @@ module internal MethodCallEmitter =
     match recv with
     | Some r ->
         if r.Type.IsValueType then
-          let assumed =
-            [
-              Assumed (function
-                        | IfRet, gen -> gen.Emit(Tailcall); gen.Emit(Callvirt (Method mi))
-                        | _, gen -> gen.Emit(Callvirt (Method mi)))
-            ]
-          dict.Add(mi, loadVariableInLocalScope r |>> emitOpCode (Constrainted r.Type) |>> assumed)
+          if mi.DeclaringType = typeof<obj> then
+            let assumed =
+              [
+                Assumed (function
+                          | IfRet, gen -> gen.Emit(Tailcall); gen.Emit(Callvirt (Method mi))
+                          | _, gen -> gen.Emit(Callvirt (Method mi)))
+              ]
+            dict.Add(mi, emitOpCode (Constrainted r.Type) |>> assumed)
+          else
+            dict.Add(mi, emitCallMethod mi)
         dict
     | _ -> dict
     :> IReadOnlyDictionary<_, _>
 
   let private getPushingCompileStackInfos (recv: Expr option) (mi: MethodInfo) =
     match altEmitterTableUnchecked.TryGetValue(mi) with
-    | true, emitter -> emitter
+    | true, emitter -> (emitter, None)
     | _ ->
         match altEmitterTableChecked.TryGetValue(mi) with
-        | true, emitter -> emitter
+        | true, emitter -> (emitter, None)
         | _ ->
             match altEmitterTableReceiver(recv, mi).TryGetValue(mi) with
-            | true, emitter -> emitter
+            | true, emitter -> (emitter, Some (fun (r: Expr) -> loadVariableInLocalScope r))
             | _ ->
                 let emitCall (gen: ILGeneratorWrapper) =
                   if mi.IsVirtual then gen.Emit(Callvirt (Method mi))
                   else gen.Emit(Call (Method mi))
 
                 let isReturnVoid = mi.ReturnType = typeof<Void>
-                if isReturnVoid then
-                  [ Assumed (function
-                             | IfSequential, _ -> ()
-                             | _, gen -> gen.Emit(Ldnull))
-                    Compiling emitCall ]
-                elif mi.ReturnType = typeof<unit> then
-                  [ Assumed (function
-                             | IfSequential, gen -> emitCall gen; gen.Emit(Pop)
-                             | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
-                             | _, gen -> emitCall gen; gen.Emit(Ldnull)) ]
-                else
-                  [ Assumed (function
-                             | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
-                             | _, gen -> emitCall gen) ]
+                let assumed = 
+                  if isReturnVoid then
+                    [ Assumed (function
+                               | IfSequential, _ -> ()
+                               | _, gen -> gen.Emit(Ldnull))
+                      Compiling emitCall ]
+                  elif mi.ReturnType = typeof<unit> then
+                    [ Assumed (function
+                               | IfSequential, gen -> emitCall gen; gen.Emit(Pop)
+                               | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
+                               | _, gen -> emitCall gen; gen.Emit(Ldnull)) ]
+                  else
+                    [ Assumed (function
+                               | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
+                               | _, gen -> emitCall gen) ]
+                (assumed, None)
 
   let emit (recv: Expr option, mi: MethodInfo, argsExprs: Expr list) (stack: CompileStack) =
-    let args = match recv with | Some r -> r::argsExprs | _ -> argsExprs
-    getPushingCompileStackInfos recv mi |> List.iter stack.Push
-    args |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))
+    let (emitter, recvEmitter) = getPushingCompileStackInfos recv mi
+    emitter |> List.iter stack.Push
+    argsExprs |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))
+    match recv, recvEmitter with
+    | Some r, Some re ->
+        re r |> List.iter stack.Push
+        stack.Push(CompileTarget r)
+    | Some r, _ ->
+        stack.Push(CompileTarget r)
+    | _, _ -> ()
