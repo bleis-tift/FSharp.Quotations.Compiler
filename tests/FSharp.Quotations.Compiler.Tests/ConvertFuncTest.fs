@@ -89,6 +89,9 @@ module ConvertFuncTest =
   let ``decimal int`` () = testDecimalFrom<int> [1]
 
   [<Test>]
+  let ``decimal float`` () = testDecimalFrom<float> [1.0; Double.MaxValue; Double.MinValue; nan; infinity; -infinity]
+
+  [<Test>]
   let ``decimal string`` () =
     testDecimalFrom<string> [
       "1"
