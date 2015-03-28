@@ -107,6 +107,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ int 'a' @>, emitOpCode Conv_I4)
     dict.Add(getMethod <@ int16 'a' @>, emitOpCode Conv_I2)
     dict.Add(getMethod <@ uint16 'a' @>, emitOpCode Conv_U2)
+    dict.Add(getMethod <@ int32 'a' @>, emitOpCode Conv_I4)
     dict.Add(getMethod <@ uint32 'a' @>, emitOpCode Conv_U4)
     dict.Add(getMethod <@ int64 'a' @>, emitOpCode Conv_I8)
     dict.Add(getMethod <@ uint64 'a' @>, emitOpCode Conv_U8)
