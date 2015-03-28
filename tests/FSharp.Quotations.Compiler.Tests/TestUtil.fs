@@ -15,6 +15,10 @@ module TestUtil =
   type Test () =
     inherit TestAttribute()
 
+  [<AttributeUsage(AttributeTargets.Parameter, AllowMultiple=true)>]
+  type Values ([<ParamArray>] arguments: obj []) =
+    inherit ValuesAttribute(arguments)
+
   [<AttributeUsage(AttributeTargets.Method, AllowMultiple=true)>]
   type TestCase ([<ParamArray>] arguments: obj []) =
     inherit TestCaseAttribute(arguments)
