@@ -332,9 +332,6 @@ module ConvertFuncTest =
     <@ string [||] @> |> check "System.Object[]"
     <@ string (null: int[]) @> |> check ""
 
-  type MyClass() =
-    override __.ToString() = "hello"
-
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
