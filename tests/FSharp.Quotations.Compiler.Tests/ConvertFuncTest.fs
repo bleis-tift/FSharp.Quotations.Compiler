@@ -37,6 +37,11 @@ module ConvertFuncTest =
   let ``byte char`` () = testByteFrom ['a'; char (Byte.MaxValue + byte 1); char (Byte.MinValue - byte 1)]
 
   [<Test>]
+  let ``byte float`` () =
+    let max, min = float Byte.MaxValue, float Byte.MinValue
+    testByteFrom<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+  [<Test>]
   let ``byte string`` () = testByteFrom<string> ["1"; "256"; "-1"; "str"; null]
 
   let inline testSByteFrom< ^T when ^T : (static member op_Explicit: ^T -> sbyte) > data =
