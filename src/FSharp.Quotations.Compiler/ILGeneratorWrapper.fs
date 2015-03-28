@@ -8,6 +8,7 @@ open System.IO
 type ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string, gen: ILGenerator, name: string, doc: ISymbolDocumentWriter option) =
   let mutable lineNumber = 2
   let mutable indentCount = 0
+  let mutable localVariableNumber = 0
   let writer = doc |> Option.map (fun _ -> let w = File.CreateText(name + ".il") in w.WriteLine("// " + signature); w)
 
   let pushIndent () = indentCount <- indentCount + 2
@@ -54,6 +55,11 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string,
     loc.SetLocalSymInfo(_name)
     this.WriteLine("// declare local: { val " + _name + ": " + typ.ToReadableText() + " }")
     #endif
+    loc
+
+  member this.DeclareLocal(typ: Type) =
+    let loc = this.DeclareLocal(sprintf "$loc_%d" localVariableNumber, typ)
+    localVariableNumber <- localVariableNumber + 1
     loc
 
   member this.BeginExceptionBlock() =

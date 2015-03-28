@@ -14,6 +14,7 @@ open System.Runtime.CompilerServices
 module internal MethodCallEmitter =
 
   let private getMethod = function
+  | Let (_, _, Call(_, mi, _)) -> mi
   | Call (_, mi, _) -> mi
   | expr -> failwithf "expr is not Method call: %A" expr
 
@@ -216,34 +217,52 @@ module internal MethodCallEmitter =
   // shadowing the functions of the Microsoft.FSharp.Core.Operators.Checked module
   open Microsoft.FSharp.Core.Operators
 
-  let private getPushingCompileStackInfos (mi: MethodInfo) =
+  let loadVariableInLocalScope (r: Expr) =
+    [
+      Compiling (fun (gen: ILGeneratorWrapper) -> let loc = gen.DeclareLocal(r.Type) in gen.Emit(Stloc (loc, None)); gen.Emit(Ldloca (loc, None)))
+    ]
+
+  let private altEmitterTableReceiver (recv: Expr option) =
+    let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
+    match recv with
+    | Some r ->
+      if r.Type.IsValueType then
+        let mi = getMethod <@ (1).ToString() @> in dict.Add(mi, loadVariableInLocalScope r |>> emitOpCode (Constrainted r.Type) |>> emitCallMethod mi)
+      dict
+    | _ -> dict
+    :> IReadOnlyDictionary<_, _>
+
+  let private getPushingCompileStackInfos (recv: Expr option) (mi: MethodInfo) =
     match altEmitterTableUnchecked.TryGetValue(mi) with
     | true, emitter -> emitter
     | _ ->
         match altEmitterTableChecked.TryGetValue(mi) with
         | true, emitter -> emitter
         | _ ->
-            let emitCall (gen: ILGeneratorWrapper) =
-              if mi.IsVirtual then gen.Emit(Callvirt (Method mi))
-              else gen.Emit(Call (Method mi))
+            match altEmitterTableReceiver(recv).TryGetValue(mi) with
+            | true, emitter -> emitter
+            | _ ->
+                let emitCall (gen: ILGeneratorWrapper) =
+                  if mi.IsVirtual then gen.Emit(Callvirt (Method mi))
+                  else gen.Emit(Call (Method mi))
 
-            let isReturnVoid = mi.ReturnType = typeof<Void>
-            if isReturnVoid then
-              [ Assumed (function
-                         | IfSequential, _ -> ()
-                         | _, gen -> gen.Emit(Ldnull))
-                Compiling emitCall ]
-            elif mi.ReturnType = typeof<unit> then
-              [ Assumed (function
-                         | IfSequential, gen -> emitCall gen; gen.Emit(Pop)
-                         | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
-                         | _, gen -> emitCall gen; gen.Emit(Ldnull)) ]
-            else
-              [ Assumed (function
-                         | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
-                         | _, gen -> emitCall gen) ]
+                let isReturnVoid = mi.ReturnType = typeof<Void>
+                if isReturnVoid then
+                  [ Assumed (function
+                             | IfSequential, _ -> ()
+                             | _, gen -> gen.Emit(Ldnull))
+                    Compiling emitCall ]
+                elif mi.ReturnType = typeof<unit> then
+                  [ Assumed (function
+                             | IfSequential, gen -> emitCall gen; gen.Emit(Pop)
+                             | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
+                             | _, gen -> emitCall gen; gen.Emit(Ldnull)) ]
+                else
+                  [ Assumed (function
+                             | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
+                             | _, gen -> emitCall gen) ]
 
   let emit (recv: Expr option, mi: MethodInfo, argsExprs: Expr list) (stack: CompileStack) =
     let args = match recv with | Some r -> r::argsExprs | _ -> argsExprs
-    getPushingCompileStackInfos mi |> List.iter stack.Push
+    getPushingCompileStackInfos recv mi |> List.iter stack.Push
     args |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))
