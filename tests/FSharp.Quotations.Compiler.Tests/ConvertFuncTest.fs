@@ -311,6 +311,14 @@ module ConvertFuncTest =
   let ``string char`` () = <@ string 'a' @> |> check "a"
 
   [<Test>]
+  let ``string float`` () =
+    <@ string 1.0 @> |> check "1"
+    <@ string 1.5 @> |> check "1.5"
+    <@ string nan @> |> check (string nan)
+    <@ string infinity @> |> check (string infinity)
+    <@ string -infinity @> |> check (string -infinity)
+
+  [<Test>]
   let ``string bool`` () = <@ string true @> |> check "True"
 
   [<Test>]
