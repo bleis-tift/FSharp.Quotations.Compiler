@@ -30,12 +30,14 @@ module ArithmeticOpTest =
   [<Test>]
   let ``int / int`` () =
     <@ 5 / 2 @> |> check 2
-    <@ Int32.MinValue / -1 @> |> checkExn<int, OverflowException>
+    <@ Int32.MinValue / -1 @> |> checkExn<_, OverflowException>
+    <@ 1 / 0 @> |> checkExn<_, DivideByZeroException>
 
   [<Test>]
   let ``int % int``() =
     <@ 5 % 2 @> |> check 1
-    <@ Int32.MinValue % -1 @> |> checkExn<int, OverflowException>
+    <@ Int32.MinValue % -1 @> |> checkExn<_, OverflowException>
+    <@ 1 % 0 @> |> checkExn<_, DivideByZeroException>
 
   [<Test>]
   let ``char + char`` () =
