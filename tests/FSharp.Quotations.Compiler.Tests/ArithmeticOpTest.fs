@@ -125,5 +125,10 @@ module ArithmeticOpTest =
       <@ Double.MinValue - Double.MaxValue @> |> check -infinity
 
     [<Test>]
+    let ``float * float`` () =
+      <@ 2.0 * 3.0 @> |> check 6.0
+      <@ Double.MinValue * -1.0 @> |> check Double.MaxValue
+
+    [<Test>]
     let ``string + string`` () =
       <@ "aaa" + "bbb" @> |> check "aaabbb"

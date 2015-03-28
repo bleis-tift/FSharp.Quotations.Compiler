@@ -22,6 +22,7 @@ type ILOpCode =
   | Shl
   | Shr
   | Div
+  | Mul
   | Mul_Ovf
   | Neg
   | Rem
@@ -127,6 +128,7 @@ module ILOpCode =
   | Shl -> OpCodes.Shl
   | Shr -> OpCodes.Shr
   | Div -> OpCodes.Div
+  | Mul -> OpCodes.Mul
   | Mul_Ovf -> OpCodes.Mul_Ovf
   | Neg -> OpCodes.Neg
   | Rem -> OpCodes.Rem

@@ -136,7 +136,7 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string,
     | Newobj ci ->
         this.WriteLineAndMark(raw.Name + " " + ci.ToReadableText())
         gen.Emit(raw, ci)
-    | And | Or | Xor | Not | Shl | Shr | Div | Mul_Ovf | Neg | Rem | Add | Sub | Sub_Ovf
+    | And | Or | Xor | Not | Shl | Shr | Div | Mul | Mul_Ovf | Neg | Rem | Add | Sub | Sub_Ovf
     | Conv_I | Conv_I1 | Conv_I2 | Conv_I4 | Conv_I8
     | Conv_U | Conv_U1 | Conv_U2 | Conv_U4 | Conv_U8
     | Conv_R4 | Conv_R8
