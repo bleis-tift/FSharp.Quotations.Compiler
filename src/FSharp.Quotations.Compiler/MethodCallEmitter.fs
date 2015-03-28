@@ -191,6 +191,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ sbyte 1.0 @>, emitOpCode Conv_Ovf_I1)
     dict.Add(getMethod <@ char 1.0 @>, emitOpCode Conv_Ovf_U2)
     dict.Add(getMethod <@ int 1.0 @>, emitOpCode Conv_Ovf_I4)
+    dict.Add(getMethod <@ int16 1.0 @>, emitOpCode Conv_Ovf_I2)
 
     dict :> IReadOnlyDictionary<_, _>
 

@@ -421,6 +421,11 @@ module ConvertFuncTest =
     let ``int16 char`` () = testInt16From ['a'; Char.MinValue; char Int16.MaxValue + char 1]
 
     [<Test>]
+    let ``int16 float`` () =
+      let max, min = float Int16.MaxValue, float Int16.MinValue
+      testInt16From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+    [<Test>]
     let ``int16 string`` () = testInt16From<string> ["1"; "32768"; "-32769"; "str"; null]
 
     let inline testUInt16From< ^T when ^T : (static member op_Explicit: ^T -> uint16) > data =
