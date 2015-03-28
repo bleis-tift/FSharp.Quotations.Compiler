@@ -72,6 +72,40 @@ module CmpOpTest =
     <@ 'b' >= 'a' @> |> check true
 
   [<Test>]
+  let ``float = float`` () =
+    <@ 1.0 = 1.0 @> |> check true
+    <@ 0.0 = 1.0 @> |> check false
+
+  [<Test>]
+  let ``float <> float`` () =
+    <@ 1.0 <> 1.0 @> |> check false
+    <@ 0.0 <> 1.0 @> |> check true
+
+  [<Test>]
+  let ``float < float`` () =
+    <@ 1.0 < 0.0 @> |> check false
+    <@ 1.0 < 1.0 @> |> check false
+    <@ 0.0 < 1.0 @> |> check true
+
+  [<Test>]
+  let ``float <= float`` () =
+    <@ 1.0 <= 0.0 @> |> check false
+    <@ 1.0 <= 1.0 @> |> check true
+    <@ 0.0 <= 1.0 @> |> check true
+
+  [<Test>]
+  let ``float > float`` () =
+    <@ 1.0 > 0.0 @> |> check true
+    <@ 1.0 > 1.0 @> |> check false
+    <@ 0.0 > 1.0 @> |> check false
+
+  [<Test>]
+  let ``float >= float`` () =
+    <@ 1.0 >= 0.0 @> |> check true
+    <@ 1.0 >= 1.0 @> |> check true
+    <@ 0.0 >= 1.0 @> |> check false
+
+  [<Test>]
   let ``bool = bool`` () =
     <@ true = true @> |> check true
     <@ false = true @> |> check false
