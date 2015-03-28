@@ -110,6 +110,9 @@ module ConvertFuncTest =
   let ``float char`` () = testFloatFrom ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
+  let ``float float`` () = testFloatFrom<float> [1.0; nan; infinity; -infinity]
+
+  [<Test>]
   let ``float string`` () =
     testFloatFrom<string> [
       "1"; "NaN"; "Infinity"; "-Infinity";
