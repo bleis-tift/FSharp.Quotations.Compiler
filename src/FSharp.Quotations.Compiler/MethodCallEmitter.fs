@@ -127,6 +127,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ -(1) @>, emitOpCode Ldc_I4_M1 |>> emitOpCode Mul_Ovf)
     dict.Add(getMethod <@ -(1.0) @>, emitOpCode Neg)
     dict.Add(getMethod <@ 1 - 1 @>, emitOpCode Sub_Ovf)
+    dict.Add(getMethod <@ 1.0 - 1.0 @>, emitOpCode Sub)
     dict.Add(getMethod <@ 1 * 1 @>, emitOpCode Mul_Ovf)
 
     dict.Add(getMethod <@ byte 1 @>, emitOpCode Conv_Ovf_U1)
