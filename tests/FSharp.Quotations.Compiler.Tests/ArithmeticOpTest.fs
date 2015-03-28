@@ -71,6 +71,13 @@ module ArithmeticOpTest =
   let ``float ** float`` () = <@ 3.0 ** 2.0 @> |> check 9.0
 
   [<Test>]
+  let ``float / float`` () =
+    <@ 5.0 / 2.0 @> |> check 2.5
+    <@ 1.0 / 0.0 @> |> check infinity
+    <@ 1.0 / -0.0 @> |> check -infinity
+    <@ 0.0 / 0.0 @> |> check nan
+
+  [<Test>]
   let ``string + string`` () =
     <@ "aaa" + "bbb" @> |> check "aaabbb"
 
