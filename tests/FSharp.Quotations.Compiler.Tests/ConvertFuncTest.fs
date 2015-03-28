@@ -280,6 +280,9 @@ module ConvertFuncTest =
   [<Test>]
   let ``nativeint char`` () = testNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]
 
+  [<Test>]
+  let ``nativeint float`` () = testNativeIntFrom<float> [1.0; nan; infinity; -infinity]
+
   let inline testUNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> unativeint) > data =
     test { Data = data; ExprFun = (fun (x: ^T) -> <@ unativeint x @>); Fun = unativeint }
 
