@@ -457,6 +457,11 @@ module ConvertFuncTest =
     let ``int32 char`` () = testInt32From ['a'; Char.MaxValue; Char.MinValue]
 
     [<Test>]
+    let ``int32 float`` () =
+      let max, min = float Int32.MaxValue, float Int32.MinValue
+      testInt32From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+    [<Test>]
     let ``int32 string`` () = testInt32From<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
 
     let inline testUInt32From< ^T when ^T : (static member op_Explicit: ^T -> uint32) > data =
