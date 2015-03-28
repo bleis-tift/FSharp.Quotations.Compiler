@@ -38,13 +38,13 @@ module ArithmeticOpTest =
     <@ Int32.MinValue % -1 @> |> checkExn<int, OverflowException>
 
   [<Test>]
-  let ``string + string`` () =
-    <@ "aaa" + "bbb" @> |> check "aaabbb"
-
-  [<Test>]
   let ``char + char`` () =
     <@ 'a' + 'a' @> |> check ('a' + 'a')
     <@ Char.MaxValue + (char 1) @> |> check (Char.MaxValue + (char 1))
+
+  [<Test>]
+  let ``string + string`` () =
+    <@ "aaa" + "bbb" @> |> check "aaabbb"
 
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
@@ -70,10 +70,10 @@ module ArithmeticOpTest =
       <@ Int32.MinValue * -1 @> |> checkExn<_, OverflowException>
 
     [<Test>]
-    let ``string + string`` () =
-      <@ "aaa" + "bbb" @> |> check "aaabbb"
-
-    [<Test>]
     let ``char + char`` () =
       <@ 'a' + 'a' @> |> check ('a' + 'a')
       <@ Char.MaxValue + (char 1) @> |> checkExn<_, OverflowException>
+
+    [<Test>]
+    let ``string + string`` () =
+      <@ "aaa" + "bbb" @> |> check "aaabbb"

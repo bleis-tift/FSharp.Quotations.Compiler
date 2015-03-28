@@ -34,6 +34,9 @@ module ConvertFuncTest =
     testByteFrom<int> [1; max + 1; min - 1]
 
   [<Test>]
+  let ``byte char`` () = testByteFrom ['a'; char (Byte.MaxValue + byte 1); char (Byte.MinValue - byte 1)]
+
+  [<Test>]
   let ``byte string`` () = testByteFrom<string> ["1"; "256"; "-1"; "str"; null]
 
   let inline testSByteFrom< ^T when ^T : (static member op_Explicit: ^T -> sbyte) > data =
@@ -45,6 +48,9 @@ module ConvertFuncTest =
     testSByteFrom<int> [1; max + 1; min - 1]
 
   [<Test>]
+  let ``sbyte char`` () = testSByteFrom ['a'; char (SByte.MaxValue + sbyte 1); char (SByte.MinValue - sbyte 1)]
+
+  [<Test>]
   let ``sbyte string`` () = testSByteFrom<string> ["1"; "128"; "-129"; "str"; null]
 
   let inline testCharFrom< ^T when ^T : (static member op_Explicit: ^T -> char) > data =
@@ -54,6 +60,9 @@ module ConvertFuncTest =
   let ``char int`` () =
     let max, min = int Char.MaxValue, int Char.MinValue
     testCharFrom<int> [97; max + 1; min - 1]
+
+  [<Test>]
+  let ``char char`` () = testCharFrom ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
   let ``char string`` () = testCharFrom<string> ["a"; "aa"; null]
@@ -80,6 +89,9 @@ module ConvertFuncTest =
   let ``float int`` () = testFloatFrom<int> [1]
 
   [<Test>]
+  let ``float char`` () = testFloatFrom ['a'; Char.MaxValue; Char.MinValue]
+
+  [<Test>]
   let ``float string`` () =
     testFloatFrom<string> [
       "1"; "NaN"; "Infinity"; "-Infinity";
@@ -93,6 +105,9 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``float32 int`` () = testFloat32From<int> [1]
+
+  [<Test>]
+  let ``float32 char`` () = testFloat32From ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
   let ``float32 string`` () =
@@ -110,6 +125,9 @@ module ConvertFuncTest =
   let ``int int`` () = testIntFrom<int> [1]
 
   [<Test>]
+  let ``int char`` () = testIntFrom ['a'; Char.MaxValue; Char.MinValue]
+
+  [<Test>]
   let ``int string`` () = testIntFrom<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
 
   let inline testInt16From< ^T when ^T : (static member op_Explicit: ^T -> int16) > data =
@@ -121,6 +139,9 @@ module ConvertFuncTest =
     testInt16From<int> [1; max + 1; min - 1]
 
   [<Test>]
+  let ``int16 char`` () = testInt16From ['a'; char (Int16.MaxValue + int16 1); Char.MinValue]
+
+  [<Test>]
   let ``int16 string`` () = testInt16From<string> ["1"; "32768"; "-32769"; "str"; null]
 
   let inline testUInt16From< ^T when ^T : (static member op_Explicit: ^T -> uint16) > data =
@@ -130,6 +151,9 @@ module ConvertFuncTest =
   let ``uint16 int`` () =
     let max, min = int UInt16.MaxValue, int UInt16.MinValue
     testUInt16From<int> [1; max + 1; min - 1]
+
+  [<Test>]
+  let ``uint16 char`` () = testUInt16From ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
   let ``uint16 string`` () = testUInt16From<string> ["1"; "65536"; "-1"; "str"; null]
@@ -152,6 +176,9 @@ module ConvertFuncTest =
     testUInt32From<int> [1; min - 1]
 
   [<Test>]
+  let ``uint32 char`` () = testUInt32From ['a'; Char.MaxValue; Char.MinValue]
+
+  [<Test>]
   let ``uint32 string`` () = testUInt32From<string> ["1"; "4294967296"; "-1"; "str"; null]
 
   let inline testInt64From< ^T when ^T : (static member op_Explicit: ^T -> int64) > data =
@@ -159,6 +186,9 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``int64 int`` () = testInt64From<int> [1]
+
+  [<Test>]
+  let ``int64 char`` () = testInt64From ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
   let ``int64 string`` () =
@@ -173,16 +203,31 @@ module ConvertFuncTest =
     testUInt64From<int> [1; min - 1]
 
   [<Test>]
+  let ``uint64 char`` () = testUInt64From ['a'; Char.MaxValue; Char.MinValue]
+
+  [<Test>]
   let ``uint64 string`` () =
     testUInt64From<string> ["1"; "18446744073709551616"; "-18446744073709551617"; "str"; null]
+
+  let inline testNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> nativeint) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ nativeint x @>); Fun = nativeint }
 
   [<Test>]
   let ``nativeint int`` () = <@ nativeint 0 @> |> check 0n
 
   [<Test>]
+  let ``nativeint char`` () = testNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]
+
+  let inline testUNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> unativeint) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ unativeint x @>); Fun = unativeint }
+
+  [<Test>]
   let ``unativeint int`` () =
     <@ unativeint 0 @> |> check 0un
     <@ unativeint -1 @> |> check (unativeint -1)
+
+  [<Test>]
+  let ``unativeint char`` () = testUNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
   let ``enum int`` () =
@@ -202,69 +247,11 @@ module ConvertFuncTest =
     <@ string "str" @> |> check "str"
     <@ string (null: string) @> |> check ""
 
-  let inline testNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> nativeint) > data =
-    test { Data = data; ExprFun = (fun (x: ^T) -> <@ nativeint x @>); Fun = nativeint }
-
-  let inline testUNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> unativeint) > data =
-    test { Data = data; ExprFun = (fun (x: ^T) -> <@ unativeint x @>); Fun = unativeint }
-
   [<Test>]
   let ``string int[]`` () =
     <@ string [|10|] @> |> check "System.Int32[]"
     <@ string [||] @> |> check "System.Object[]"
     <@ string (null: int[]) @> |> check ""
-
-  [<Test>]
-  let ``int16 char`` () =
-    testInt16From ['a'; char (Int16.MaxValue + int16 1); Char.MinValue]
-
-  [<Test>]
-  let ``uint16 char`` () =
-    testUInt16From ['a'; Char.MaxValue; Char.MinValue]
-
-  [<Test>]
-  let ``int char`` () =
-    testIntFrom ['a'; Char.MaxValue; Char.MinValue]
-
-  [<Test>]
-  let ``uint32 char`` () =
-    testUInt32From ['a'; Char.MaxValue; Char.MinValue]
-
-  [<Test>]
-  let ``int64 char`` () =
-    testInt64From ['a'; Char.MaxValue; Char.MinValue]
-
-  [<Test>]
-  let ``uint64 char`` () =
-    testUInt64From ['a'; Char.MaxValue; Char.MinValue]
-
-  [<Test>]
-  let ``nativeint char`` () =
-    testNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]
-
-  [<Test>]
-  let ``unativeint char`` () =
-    testUNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]
-
-  [<Test>]
-  let ``byte char`` () =
-    testByteFrom ['a'; char (Byte.MaxValue + byte 1); char (Byte.MinValue - byte 1)]
-
-  [<Test>]
-  let ``sbyte char`` () =
-    testSByteFrom ['a'; char (SByte.MaxValue + sbyte 1); char (SByte.MinValue - sbyte 1)]
-
-  [<Test>]
-  let ``char char`` () =
-    testCharFrom ['a'; Char.MaxValue; Char.MinValue]
-
-  [<Test>]
-  let ``float char`` () =
-    testFloatFrom ['a'; Char.MaxValue; Char.MinValue]
-
-  [<Test>]
-  let ``float32 char`` () =
-    testFloat32From ['a'; Char.MaxValue; Char.MinValue]
 
   type MyClass() =
     override __.ToString() = "hello"
@@ -281,6 +268,9 @@ module ConvertFuncTest =
       testByteFrom<int> [1; max + 1; min - 1]
 
     [<Test>]
+    let ``byte char`` () = testByteFrom ['a'; Char.MinValue; char Byte.MaxValue + char 1]
+
+    [<Test>]
     let ``byte string`` () = testByteFrom<string> ["1"; "256"; "-1"; "str"; null]
 
     let inline testSByteFrom< ^T when ^T : (static member op_Explicit: ^T -> sbyte) > data =
@@ -290,6 +280,9 @@ module ConvertFuncTest =
     let ``sbyte int`` () =
       let max, min = int SByte.MaxValue, int SByte.MinValue
       testSByteFrom<int> [1; max + 1; min - 1]
+
+    [<Test>]
+    let ``sbyte char`` () = testSByteFrom ['a'; Char.MinValue; char SByte.MaxValue + char 1]
 
     [<Test>]
     let ``sbyte string`` () = testSByteFrom<string> ["1"; "128"; "-129"; "str"; null]
@@ -303,6 +296,9 @@ module ConvertFuncTest =
       testCharFrom<int> [97; max + 1; min - 1]
 
     [<Test>]
+    let ``char char`` () = testCharFrom ['a'; Char.MaxValue; Char.MinValue]
+
+    [<Test>]
     let ``char string`` () = testCharFrom<string> ["a"; "aa"; null]
 
     let inline testIntFrom< ^T when ^T : (static member op_Explicit: ^T -> int) > data =
@@ -310,6 +306,9 @@ module ConvertFuncTest =
 
     [<Test>]
     let ``int int`` () = testIntFrom<int> [1]
+
+    [<Test>]
+    let ``int char`` () = testIntFrom ['a'; Char.MaxValue; Char.MinValue]
 
     [<Test>]
     let ``int string`` () = testIntFrom<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
@@ -323,6 +322,9 @@ module ConvertFuncTest =
       testInt16From<int> [1; max + 1; min - 1]
 
     [<Test>]
+    let ``int16 char`` () = testInt16From ['a'; Char.MinValue; char Int16.MaxValue + char 1]
+
+    [<Test>]
     let ``int16 string`` () = testInt16From<string> ["1"; "32768"; "-32769"; "str"; null]
 
     let inline testUInt16From< ^T when ^T : (static member op_Explicit: ^T -> uint16) > data =
@@ -332,6 +334,9 @@ module ConvertFuncTest =
     let ``uint16 int`` () =
       let max, min = int UInt16.MaxValue, int UInt16.MinValue
       testUInt16From<int> [1; max + 1; min - 1]
+
+    [<Test>]
+    let ``uint16 char`` () = testUInt16From ['a'; Char.MaxValue; Char.MinValue]
 
     [<Test>]
     let ``uint16 string`` () = testUInt16From<string> ["1"; "65536"; "-1"; "str"; null]
@@ -354,6 +359,9 @@ module ConvertFuncTest =
       testUInt32From<int> [1; min - 1]
 
     [<Test>]
+    let ``uint32 char`` () = testUInt32From ['a'; Char.MaxValue; Char.MinValue]
+
+    [<Test>]
     let ``uint32 string`` () = testUInt32From<string> ["1"; "4294967296"; "-1"; "str"; null]
 
     let inline testInt64From< ^T when ^T : (static member op_Explicit: ^T -> int64) > data =
@@ -361,6 +369,9 @@ module ConvertFuncTest =
 
     [<Test>]
     let ``int64 int`` () = testInt64From<int> [1]
+
+    [<Test>]
+    let ``int64 char`` () = testInt64From ['a'; Char.MaxValue; Char.MinValue]
 
     [<Test>]
     let ``int64 string`` () =
@@ -375,92 +386,28 @@ module ConvertFuncTest =
       testUInt64From<int> [1; min - 1]
 
     [<Test>]
+    let ``uint64 char`` () = testUInt64From ['a'; Char.MaxValue; Char.MinValue]
+
+    [<Test>]
     let ``uint64 string`` () =
       testUInt64From<string> ["1"; "18446744073709551616"; "-18446744073709551617"; "str"; null]
 
+    let inline testNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> nativeint) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ nativeint x @>); Fun = nativeint }
+
     [<Test>]
     let ``nativeint int`` () = <@ nativeint 0 @> |> check 0n
+
+    [<Test>]
+    let ``nativeint char`` () = testNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]
+
+    let inline testUNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> unativeint) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ unativeint x @>); Fun = unativeint }
 
     [<Test>]
     let ``unativeint int`` () =
       <@ unativeint 0 @> |> check 0un
       <@ unativeint -1 @> |> checkExn<_, OverflowException>
 
-    let inline testNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> nativeint) > data =
-      test { Data = data; ExprFun = (fun (x: ^T) -> <@ nativeint x @>); Fun = nativeint }
-
-    let inline testUNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> unativeint) > data =
-      test { Data = data; ExprFun = (fun (x: ^T) -> <@ unativeint x @>); Fun = unativeint }
-
-    let inline testFloatFrom< ^T when ^T : (static member op_Explicit: ^T -> float) > data =
-      test { Data = data; ExprFun = (fun (x: ^T) -> <@ float x @>); Fun = float }
-
-    let inline testFloat32From< ^T when ^T : (static member op_Explicit: ^T -> float32) > data =
-      test { Data = data; ExprFun = (fun (x: ^T) -> <@ float32 x @>); Fun = float32 }
-
     [<Test>]
-    let ``int16 char`` () =
-      testInt16From ['a'; Char.MinValue]
-
-    [<Test>]
-    let ``int16 char overflow`` () =
-      let max = (char Int16.MaxValue + char 1)
-      <@ int16 max @> |> checkExn<_, OverflowException>
-
-    [<Test>]
-    let ``uint16 char`` () =
-      testUInt16From ['a'; Char.MaxValue; Char.MinValue]
-
-    [<Test>]
-    let ``int char`` () =
-      testIntFrom ['a'; Char.MaxValue; Char.MinValue]
-
-    [<Test>]
-    let ``uint char`` () =
-      testUInt32From ['a'; Char.MaxValue; Char.MinValue]
-
-    [<Test>]
-    let ``int64 char`` () =
-      testInt64From ['a'; Char.MaxValue; Char.MinValue]
-
-    [<Test>]
-    let ``uint64 char`` () =
-      testUInt64From ['a'; Char.MaxValue; Char.MinValue]
-
-    [<Test>]
-    let ``nativeint char`` () =
-      testNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]
-
-    [<Test>]
-    let ``unativeint char`` () =
-      testUNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]
-
-    [<Test>]
-    let ``byte char`` () =
-      testByteFrom ['a'; Char.MinValue]
-
-    [<Test>]
-    let ``byte char overflow`` () =
-      let max = (char Byte.MaxValue + char 1)
-      <@ byte max @> |> checkExn<_, OverflowException>
-
-    [<Test>]
-    let ``sbyte char`` () =
-      testSByteFrom ['a'; Char.MinValue]
-
-    [<Test>]
-    let ``sbyte char overflow`` () =
-      let max = (char SByte.MaxValue + char 1)
-      <@ sbyte max @> |> checkExn<_, OverflowException>
-
-    [<Test>]
-    let ``char char`` () =
-      testCharFrom ['a'; Char.MaxValue; Char.MinValue]
-
-    [<Test>]
-    let ``float char`` () =
-      testFloatFrom ['a'; Char.MaxValue; Char.MinValue]
-
-    [<Test>]
-    let ``float32 char`` () =
-      testFloat32From ['a'; Char.MaxValue; Char.MinValue]
+    let ``unativeint char`` () = testUNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]

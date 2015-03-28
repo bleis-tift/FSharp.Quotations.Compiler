@@ -8,6 +8,9 @@ module LiteralTest =
   [<Test>]
   let int ([<IntRange(-2, 128)>] i: int) = <@ i @> |> check i
 
+  [<Test>]
+  let char ([<CharRange('\000', '\128')>] c: char) = <@ c @> |> check c
+
   [<TestCase(true)>]
   [<TestCase(false)>]
   let bool (b: bool) = <@ b @> |> check b
@@ -15,9 +18,6 @@ module LiteralTest =
   [<TestCase("test string")>]
   [<TestCase(null: string)>]
   let string (str: string) = <@ str @> |> check str
-
-  [<Test>]
-  let char ([<CharRange('\000', '\128')>] c: char) = <@ c @> |> check c
 
   [<Test>]
   let array () =

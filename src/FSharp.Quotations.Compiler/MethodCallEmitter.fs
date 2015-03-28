@@ -54,6 +54,7 @@ module internal MethodCallEmitter =
     let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
     dict.Add(getMethod <@ +(1) @>, doNothing)
     dict.Add(getMethod <@ -(1) @>, emitOpCode Neg)
+    dict.Add(getMethod <@ 'a' + 'a' @>, emitOpCode Add)
     dict.Add(getMethod <@ 1 - 1 @>, emitOpCode Sub)
     dict.Add(getMethod <@ 1 / 1 @>, emitOpCode Div)
     dict.Add(getMethod <@ 1 % 1 @>, emitOpCode Rem)
@@ -63,6 +64,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ 1 >>> 1 @>, emitOpCode Shr)
     dict.Add(getMethod <@ 1 <<< 1 @>, emitOpCode Shl)
     dict.Add(getMethod <@ ~~~1 @>, emitOpCode Not)
+
     dict.Add(getMethod <@ byte 1 @>, doNothing)
     dict.Add(getMethod <@ sbyte 1 @>, doNothing)
     dict.Add(getMethod <@ char 1 @>, doNothing)
@@ -78,6 +80,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ uint64 1 @>, emitOpCode Conv_I8)
     dict.Add(getMethod <@ nativeint 1 @>, emitOpCode Conv_I)
     dict.Add(getMethod <@ unativeint 1 @>, emitOpCode Conv_I)
+
     dict.Add(getMethod <@ byte "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseUInt32("") @>)))
                                       |>> emitOpCode Conv_Ovf_U1)
     dict.Add(getMethod <@ sbyte "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt32("") @>)))
@@ -96,20 +99,19 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ int64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseInt64("") @>))
     dict.Add(getMethod <@ uint64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseUInt64("") @>))
 
-    dict.Add(getMethod <@ 'a' + 'a' @>, emitOpCode Add)
-    dict.Add(getMethod <@ int16 'a' @>, emitOpCode Conv_I2)
-    dict.Add(getMethod <@ uint16 'a' @>, emitOpCode Conv_U2)
-    dict.Add(getMethod <@ int 'a' @>, emitOpCode Conv_I4)
-    dict.Add(getMethod <@ uint32 'a' @>, emitOpCode Conv_U4)
-    dict.Add(getMethod <@ int64 'a' @>, emitOpCode Conv_I8)
-    dict.Add(getMethod <@ uint64 'a' @>, emitOpCode Conv_U8)
-    dict.Add(getMethod <@ nativeint 'a' @>, emitOpCode Conv_I)
-    dict.Add(getMethod <@ unativeint 'a' @>, emitOpCode Conv_U)
     dict.Add(getMethod <@ byte 'a' @>, emitOpCode Conv_U1)
     dict.Add(getMethod <@ sbyte 'a' @>, emitOpCode Conv_I1)
     dict.Add(getMethod <@ char 'a' @>, doNothing)
     dict.Add(getMethod <@ float 'a' @>, emitOpCode Conv_R8)
     dict.Add(getMethod <@ float32 'a' @>, emitOpCode Conv_R4)
+    dict.Add(getMethod <@ int 'a' @>, emitOpCode Conv_I4)
+    dict.Add(getMethod <@ int16 'a' @>, emitOpCode Conv_I2)
+    dict.Add(getMethod <@ uint16 'a' @>, emitOpCode Conv_U2)
+    dict.Add(getMethod <@ uint32 'a' @>, emitOpCode Conv_U4)
+    dict.Add(getMethod <@ int64 'a' @>, emitOpCode Conv_I8)
+    dict.Add(getMethod <@ uint64 'a' @>, emitOpCode Conv_U8)
+    dict.Add(getMethod <@ nativeint 'a' @>, emitOpCode Conv_I)
+    dict.Add(getMethod <@ unativeint 'a' @>, emitOpCode Conv_U)
 
     dict :> IReadOnlyDictionary<_, _>
 
@@ -120,6 +122,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ -(1) @>, emitOpCode Ldc_I4_M1 |>> emitOpCode Mul_Ovf)
     dict.Add(getMethod <@ 1 - 1 @>, emitOpCode Sub_Ovf)
     dict.Add(getMethod <@ 1 * 1 @>, emitOpCode Mul_Ovf)
+
     dict.Add(getMethod <@ byte 1 @>, emitOpCode Conv_Ovf_U1)
     dict.Add(getMethod <@ sbyte 1 @>, emitOpCode Conv_Ovf_I1)
     dict.Add(getMethod <@ char 1 @>, emitOpCode Conv_Ovf_U2)
@@ -132,6 +135,7 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ uint64 1 @>, emitOpCode Conv_Ovf_U8)
     dict.Add(getMethod <@ nativeint 1 @>, emitOpCode Conv_I)
     dict.Add(getMethod <@ unativeint 1 @>, emitOpCode Conv_Ovf_U)
+
     dict.Add(getMethod <@ byte "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseUInt32("") @>)))
                                       |>> emitOpCode Conv_Ovf_U1)
     dict.Add(getMethod <@ sbyte "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt32("") @>)))
@@ -147,19 +151,17 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ int64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseInt64("") @>))
     dict.Add(getMethod <@ uint64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseUInt64("") @>))
 
+    dict.Add(getMethod <@ byte 'a' @>, emitOpCode Conv_Ovf_U1)
+    dict.Add(getMethod <@ sbyte 'a' @>, emitOpCode Conv_Ovf_I1)
+    dict.Add(getMethod <@ char 'a' @>, doNothing)
+    dict.Add(getMethod <@ int 'a' @>, emitOpCode Conv_Ovf_I4)
     dict.Add(getMethod <@ int16 'a' @>, emitOpCode Conv_Ovf_I2)
     dict.Add(getMethod <@ uint16 'a' @>, emitOpCode Conv_Ovf_U2)
-    dict.Add(getMethod <@ int 'a' @>, emitOpCode Conv_Ovf_I4)
     dict.Add(getMethod <@ uint32 'a' @>, emitOpCode Conv_Ovf_U4)
     dict.Add(getMethod <@ int64 'a' @>, emitOpCode Conv_Ovf_I8)
     dict.Add(getMethod <@ uint64 'a' @>, emitOpCode Conv_Ovf_U8)
     dict.Add(getMethod <@ nativeint 'a' @>, emitOpCode Conv_Ovf_I)
     dict.Add(getMethod <@ unativeint 'a' @>, emitOpCode Conv_Ovf_U)
-    dict.Add(getMethod <@ byte 'a' @>, emitOpCode Conv_Ovf_U1)
-    dict.Add(getMethod <@ sbyte 'a' @>, emitOpCode Conv_Ovf_I1)
-    dict.Add(getMethod <@ char 'a' @>, doNothing)
-    dict.Add(getMethod <@ float 'a' @>, emitOpCode Conv_R8)
-    dict.Add(getMethod <@ float32 'a' @>, emitOpCode Conv_R4)
 
     dict :> IReadOnlyDictionary<_, _>
 
