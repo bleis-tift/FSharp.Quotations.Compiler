@@ -12,6 +12,9 @@ module CoreFuncTest =
   let ``box char`` () = <@ box 'a' @> |> check (box 'a')
 
   [<Test>]
+  let ``box float`` () = <@ box 1.0 @> |> check (box 1.0)
+
+  [<Test>]
   let ``box bool`` () = <@ box true @> |> check (box true)
 
   [<Test>]
@@ -28,6 +31,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``compare char char`` () = <@ compare 'a' 'a' @> |> check 0
+
+  [<Test>]
+  let ``compare float float`` () = <@ compare 1.0 1.0 @> |> check 0
 
   [<Test>]
   let ``compare bool bool`` () = <@ compare true true @> |> check 0
@@ -60,6 +66,9 @@ module CoreFuncTest =
   let ``hash char`` () = <@ hash 'c' @> |> check (hash 'c')
 
   [<Test>]
+  let ``hash float`` () = <@ hash 1.0 @> |> check (hash 1.0)
+
+  [<Test>]
   let ``hash bool`` () = <@ hash true @> |> check 1
 
   [<Test>]
@@ -73,6 +82,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``limitedHash int char`` () = <@ limitedHash 1 'c' @> |> check (limitedHash 1 'c')
+
+  [<Test>]
+  let ``limitedHash int float`` () = <@ limitedHash 1 1.0 @> |> check (limitedHash 1 1.0)
 
   [<Test>]
   let ``limitedHash int bool`` () = <@ limitedHash 1 true @> |> check 1
@@ -90,6 +102,9 @@ module CoreFuncTest =
   let ``id char`` () = <@ id 'c' @> |> check 'c'
 
   [<Test>]
+  let ``id float`` () = <@ id 1.0 @> |> check 1.0
+
+  [<Test>]
   let ``id bool`` () = <@ id true @> |> check true
 
   [<Test>]
@@ -103,6 +118,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``ignore char`` () = <@ ignore 'c' @> |> check ()
+
+  [<Test>]
+  let ``ignore float`` () = <@ ignore 1.0 @> |> check ()
 
   [<Test>]
   let ``ignore bool`` () = <@ ignore true @> |> check ()
@@ -128,6 +146,9 @@ module CoreFuncTest =
   let ``max char char`` () = <@ max 'a' 'b' @> |> check 'b'
 
   [<Test>]
+  let ``max float float`` () = <@ max 1.0 2.0 @> |> check 2.0
+
+  [<Test>]
   let ``max bool bool`` () = <@ max false true @> |> check true
 
   [<Test>]
@@ -141,6 +162,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``min char char`` () = <@ min 'a' 'b' @> |> check 'a'
+
+  [<Test>]
+  let ``min float float`` () = <@ min 1.0 2.0 @> |> check 1.0
 
   [<Test>]
   let ``min bool bool`` () = <@ min false true @> |> check false
@@ -177,16 +201,25 @@ module CoreFuncTest =
     let ``Unchecked.compare char char`` () = <@ compare 'a' 'a' @> |> check 0
 
     [<Test>]
+    let ``Unchecked.compare float float`` () = <@ compare 1.0 1.0 @> |> check 0
+
+    [<Test>]
     let ``Unchecked.hash int`` () = <@ hash 1 @> |> check 1
 
     [<Test>]
-    let ``Unchecked.hash char char`` () = <@ hash 'c' @> |> check (hash 'c')
+    let ``Unchecked.hash char`` () = <@ hash 'c' @> |> check (hash 'c')
+
+    [<Test>]
+    let ``Unchecked.hash float`` () = <@ hash 1.0 @> |> check (hash 1.0)
 
     [<Test>]
     let ``Unchecked.equals int int`` () = <@ equals 1 1 @> |> check true
 
     [<Test>]
     let ``Unchecked.equals char char`` () = <@ equals 'c' 'c' @> |> check true
+
+    [<Test>]
+    let ``Unchecked.equals float flaot`` () = <@ equals 1.0 1.0 @> |> check true
 
     [<Test>]
     let ``Unchecked.defaultof char`` () = <@ defaultof<char> @> |> check defaultof<char>
