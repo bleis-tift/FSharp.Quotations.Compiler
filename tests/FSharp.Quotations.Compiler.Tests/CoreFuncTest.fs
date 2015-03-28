@@ -3,9 +3,6 @@
 [<TestModule>]
 module CoreFuncTest =
   [<Test>]
-  let ``abs int`` () = <@ abs -1 @> |> check 1
-
-  [<Test>]
   let ``box int`` () = <@ box 1 @> |> check (box 1)
 
   [<Test>]
@@ -181,9 +178,6 @@ module CoreFuncTest =
   [<Test>]
   let ``nullArg string`` () =
     <@ nullArg "a" @> |> checkExnType typeof<System.ArgumentNullException>
-
-  [<Test>]
-  let ``sign int`` () = <@ sign -10 @> |> check -1
 
   [<Test>]
   let ``fst int * string`` () = <@ fst (1, "str") @> |> check 1

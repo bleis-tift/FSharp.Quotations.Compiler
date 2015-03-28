@@ -90,6 +90,7 @@
     <Compile Include="TypeOpTest.fs" />
     <Compile Include="ConvertFuncTest.fs" />
     <Compile Include="CoreFuncTest.fs" />
+    <Compile Include="MathFuncTest.fs" />
     <Compile Include="BoolOpTest.fs" />
     <Compile Include="StringOpTest.fs" />
     <Compile Include="StringFuncTest.fs" />
