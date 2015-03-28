@@ -62,3 +62,9 @@ module ObjTest =
   [<Test>]
   let ``value type getType`` () =
     <@ (1).GetType() @> |> check typeof<int>
+
+  [<Test>]
+  let ``value type compare to`` () =
+    <@ (1).CompareTo(1) @> |> check ((1).CompareTo(1))
+    <@ (2).CompareTo(1) @> |> check ((2).CompareTo(1))
+    <@ (1).CompareTo(2) @> |> check ((1).CompareTo(2))
