@@ -159,19 +159,13 @@ module ExprCompiler =
             | Lambda (var, body) ->
                 gen <- LambdaEmitter.emit parentMod (gen, varEnv, var, body.Type) (CompileTarget body) stack
             | Application (fExpr, argExpr) ->
-                MethodCallEmitter.emit (fExpr.Type.GetMethod("Invoke"), [fExpr; argExpr]) stack
-            | Call (None, mi, argsExprs) ->
-                MethodCallEmitter.emit (mi, argsExprs) stack
-            | Call (Some recv, mi, argsExprs) ->
-                MethodCallEmitter.emit (mi, recv::argsExprs) stack
-            | PropertyGet (None, pi, argsExprs) ->
-                MethodCallEmitter.emit (pi.GetMethod, argsExprs) stack
-            | PropertyGet (Some recv, pi, argsExprs) ->
-                MethodCallEmitter.emit (pi.GetMethod, recv::argsExprs) stack
-            | PropertySet (None, pi, argsExprs, expr) ->
-                MethodCallEmitter.emit (pi.SetMethod, (argsExprs @ [expr])) stack
-            | PropertySet (Some recv, pi, argsExprs, expr) ->
-                MethodCallEmitter.emit (pi.SetMethod, recv::(argsExprs @ [expr])) stack
+                MethodCallEmitter.emit (None, fExpr.Type.GetMethod("Invoke"), [fExpr; argExpr]) stack
+            | Call (recv, mi, argsExprs) ->
+                MethodCallEmitter.emit (recv, mi, argsExprs) stack
+            | PropertyGet (recv, pi, argsExprs) ->
+                MethodCallEmitter.emit (recv, pi.GetMethod, argsExprs) stack
+            | PropertySet (recv, pi, argsExprs, expr) ->
+                MethodCallEmitter.emit (recv, pi.SetMethod, (argsExprs @ [expr])) stack
             | FieldSet (None, fi, expr) ->
                 stack.Push(Compiling (fun gen ->
                   gen.Emit(Stfld fi)
@@ -192,7 +186,7 @@ module ExprCompiler =
                 stack.Push(CompileTarget recv)
             | TupleGet (expr, idx) when idx < 7 ->
                 let pi = expr.Type.GetProperty("Item" + string (idx + 1))
-                MethodCallEmitter.emit (pi.GetMethod, [expr]) stack
+                MethodCallEmitter.emit (None, pi.GetMethod, [expr]) stack
             | TupleGet (expr, idx) ->
                 let restCount = idx / 7 - 1
                 let itemN = idx % 7 + 1
@@ -218,13 +212,13 @@ module ExprCompiler =
                 match case.GetFields() with
                 | [||] ->
                     let pi = typ.GetProperty(case.Name, typ)
-                    MethodCallEmitter.emit (pi.GetMethod, argsExprs) stack
+                    MethodCallEmitter.emit (None, pi.GetMethod, argsExprs) stack
                 | _fields ->
                     let mi =
                       match typ.GetMethod(case.Name) with
                       | null -> typ.GetMethod("New" + case.Name)
                       | other -> other
-                    MethodCallEmitter.emit (mi, argsExprs) stack
+                    MethodCallEmitter.emit (None, mi, argsExprs) stack
             | NewRecord (typ, argsExprs) ->
                 let ctor = typ.GetConstructor(argsExprs |> List.map (fun e -> e.Type) |> List.toArray)
                 stack.Push(Compiling (fun gen ->
@@ -304,7 +298,7 @@ module ExprCompiler =
             | UnionCaseTest (expr, case) ->
                 let typ = case.DeclaringType
                 let prop = typ.GetProperty("Is" + case.Name)
-                MethodCallEmitter.emit (prop.GetMethod, [expr]) stack
+                MethodCallEmitter.emit (None, prop.GetMethod, [expr]) stack
             | TypeTest (expr, typ) ->
                 if typ = typeof<int> then
                   stack.Push(Compiling (fun gen ->

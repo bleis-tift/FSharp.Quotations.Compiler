@@ -32,6 +32,11 @@ module internal MethodCallEmitter =
   let doNothing = []
 
   let emitOpCode opcode = [ Compiling (fun (gen: ILGeneratorWrapper) -> gen.Emit(opcode)) ]
+  let emitCall (mi: MethodInfo) (gen: ILGeneratorWrapper) =
+    if mi.IsVirtual then
+      gen.Emit(Callvirt (Method mi))
+    else
+      gen.Emit(Call (Method mi))
 
   let private (|>>) emit1 emit2 =
     match emit1, emit2 with
@@ -41,8 +46,14 @@ module internal MethodCallEmitter =
 
   let emitCallMethod mi =
     [ Assumed (function
-               | IfRet, gen -> gen.Emit(Tailcall); gen.Emit(Call (Method mi))
-               | _, gen -> gen.Emit(Call (Method mi))) ]
+               | IfRet, gen -> gen.Emit(Tailcall); emitCall mi gen
+               | _, gen -> emitCall mi gen) ]
+
+  let emitCallVoidMethod mi =
+    [ Assumed (function
+               | IfSequential, _ -> ()
+               | _, gen -> gen.Emit(Ldnull))
+      Compiling (emitCall mi) ]
 
   let emitStrToFloat (mi: MethodInfo) =
     emitOpCode (Ldc_I4 (int NumberStyles.Float))
@@ -50,7 +61,7 @@ module internal MethodCallEmitter =
     |>> emitOpCode (Unbox_Any typeof<IFormatProvider>)
     |>> emitCallMethod mi
 
-  let private altEmitterTable1 =
+  let private altEmitterTableUnchecked =
     let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
     dict.Add(getMethod <@ +(1) @>, doNothing)
     dict.Add(getMethod <@ +(1.0) @>, doNothing)
@@ -138,7 +149,7 @@ module internal MethodCallEmitter =
 
   open Microsoft.FSharp.Core.Operators.Checked
 
-  let private altEmitterTable2 =
+  let private altEmitterTableChecked =
     let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
     dict.Add(getMethod <@ -(1) @>, emitOpCode Ldc_I4_M1 |>> emitOpCode Mul_Ovf)
     dict.Add(getMethod <@ -(1.0) @>, emitOpCode Neg)
@@ -206,10 +217,10 @@ module internal MethodCallEmitter =
   open Microsoft.FSharp.Core.Operators
 
   let private getPushingCompileStackInfos (mi: MethodInfo) =
-    match altEmitterTable1.TryGetValue(mi) with
+    match altEmitterTableUnchecked.TryGetValue(mi) with
     | true, emitter -> emitter
     | _ ->
-        match altEmitterTable2.TryGetValue(mi) with
+        match altEmitterTableChecked.TryGetValue(mi) with
         | true, emitter -> emitter
         | _ ->
             let emitCall (gen: ILGeneratorWrapper) =
@@ -232,6 +243,7 @@ module internal MethodCallEmitter =
                          | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
                          | _, gen -> emitCall gen) ]
 
-  let emit (mi: MethodInfo, argsExprs: Expr list) (stack: CompileStack) =
+  let emit (recv: Expr option, mi: MethodInfo, argsExprs: Expr list) (stack: CompileStack) =
+    let args = match recv with | Some r -> r::argsExprs | _ -> argsExprs
     getPushingCompileStackInfos mi |> List.iter stack.Push
-    argsExprs |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))
+    args |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))
