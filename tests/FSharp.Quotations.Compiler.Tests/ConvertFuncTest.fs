@@ -243,6 +243,9 @@ module ConvertFuncTest =
   let ``string int`` () = <@ string 42 @> |> check "42"
 
   [<Test>]
+  let ``string char`` () = <@ string 'a' @> |> check "a"
+
+  [<Test>]
   let ``string bool`` () = <@ string true @> |> check "True"
 
   [<Test>]
