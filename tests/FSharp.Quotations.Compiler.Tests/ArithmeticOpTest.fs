@@ -110,5 +110,10 @@ module ArithmeticOpTest =
       <@ Char.MaxValue + (char 1) @> |> checkExn<_, OverflowException>
 
     [<Test>]
+    let ``- float`` () =
+      <@ -(1.0) @> |> check -1.0
+      <@ - (Double.MinValue) @> |> check Double.MaxValue
+
+    [<Test>]
     let ``string + string`` () =
       <@ "aaa" + "bbb" @> |> check "aaabbb"

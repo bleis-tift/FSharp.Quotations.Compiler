@@ -125,6 +125,7 @@ module internal MethodCallEmitter =
   let private altEmitterTable2 =
     let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
     dict.Add(getMethod <@ -(1) @>, emitOpCode Ldc_I4_M1 |>> emitOpCode Mul_Ovf)
+    dict.Add(getMethod <@ -(1.0) @>, emitOpCode Neg)
     dict.Add(getMethod <@ 1 - 1 @>, emitOpCode Sub_Ovf)
     dict.Add(getMethod <@ 1 * 1 @>, emitOpCode Mul_Ovf)
 
