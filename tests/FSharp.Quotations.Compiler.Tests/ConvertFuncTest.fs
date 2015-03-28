@@ -513,6 +513,11 @@ module ConvertFuncTest =
     let ``uint64 char`` () = testUInt64From ['a'; Char.MaxValue; Char.MinValue]
 
     [<Test>]
+    let ``uint64 float`` () =
+      let max, min = float UInt64.MaxValue, float UInt64.MinValue
+      testUInt64From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+    [<Test>]
     let ``uint64 string`` () =
       testUInt64From<string> ["1"; "18446744073709551616"; "-18446744073709551617"; "str"; null]
 
