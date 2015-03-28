@@ -11,8 +11,9 @@ module Stringizer =
     elif typ = typeof<unit> then "unit"
     elif typ = typeof<Void> then "unit"
     elif typ = typeof<int> then "int"
-    elif typ = typeof<bool> then "bool"
     elif typ = typeof<char> then "char"
+    elif typ = typeof<float> then "float"
+    elif typ = typeof<bool> then "bool"
     elif typ = typeof<string> then "string"
     elif typ = typeof<exn> then "exn"
     else
