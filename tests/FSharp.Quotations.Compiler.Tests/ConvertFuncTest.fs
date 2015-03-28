@@ -75,6 +75,11 @@ module ConvertFuncTest =
   let ``char char`` () = testCharFrom ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
+  let ``char float`` () =
+    let max, min = float Char.MaxValue, float Char.MinValue
+    testCharFrom<float> [97.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+  [<Test>]
   let ``char string`` () = testCharFrom<string> ["a"; "aa"; null]
 
   let inline testDecimalFrom< ^T when ^T : (static member op_Explicit: ^T -> decimal) > data =
