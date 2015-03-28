@@ -543,3 +543,6 @@ module ConvertFuncTest =
 
     [<Test>]
     let ``unativeint char`` () = testUNativeIntFrom ['a'; Char.MaxValue; Char.MinValue]
+
+    [<Test>]
+    let ``unativeint float`` () = testUNativeIntFrom<float> [1.0; nan; infinity; -infinity]
