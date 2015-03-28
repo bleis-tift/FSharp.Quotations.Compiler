@@ -259,6 +259,8 @@ module ExprCompiler =
                   emitLoadInteger<char> value gen
                 elif typ = typeof<bool> then
                   emitLoadInteger<int> (if unbox<bool> value then 1 else 0) gen
+                elif typ = typeof<int64> then
+                  gen.Emit(Ldc_I8 (unbox<int64> value))
                 elif typ = typeof<float> then
                   gen.Emit(Ldc_R8 (unbox<float> value))
                 elif typ = typeof<string> then

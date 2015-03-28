@@ -15,6 +15,11 @@ module LiteralTest =
   [<TestCase(false)>]
   let bool (b: bool) = <@ b @> |> check b
 
+  [<TestCase(0L)>]
+  [<TestCase(System.Int64.MaxValue)>]
+  [<TestCase(System.Int64.MinValue)>]
+  let int64 (i: int64) = <@ i @> |> check i
+
   [<Test>]
   let float () = <@ 42.0 @> |> check 42.0
 

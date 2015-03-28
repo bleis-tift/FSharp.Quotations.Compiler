@@ -105,6 +105,9 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string,
     | Ldc_I4_S i | Ldc_I4 i | Ldarg i | Starg i ->
         this.WriteLineAndMark(raw.Name + " " + string i)
         gen.Emit(raw, i)
+    | Ldc_I8 i ->
+        this.WriteLineAndMark(raw.Name + " " + string i)
+        gen.Emit(raw, i)
     | Ldc_R8 x ->
         this.WriteLineAndMark(raw.Name + " " + x.ToStringWithRichInfo())
         gen.Emit(raw, x)
