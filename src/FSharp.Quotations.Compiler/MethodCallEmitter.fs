@@ -226,9 +226,9 @@ module internal MethodCallEmitter =
     let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
     match recv with
     | Some r ->
-      if r.Type.IsValueType then
-        let mi = getMethod <@ (1).ToString() @> in dict.Add(mi, loadVariableInLocalScope r |>> emitOpCode (Constrainted r.Type) |>> emitCallMethod mi)
-      dict
+        if r.Type.IsValueType then
+          let mi = getMethod <@ (1).ToString() @> in dict.Add(mi, loadVariableInLocalScope r |>> emitOpCode (Constrainted r.Type) |>> emitCallMethod mi)
+        dict
     | _ -> dict
     :> IReadOnlyDictionary<_, _>
 

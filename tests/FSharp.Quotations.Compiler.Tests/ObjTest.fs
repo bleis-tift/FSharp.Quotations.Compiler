@@ -52,3 +52,9 @@ module ObjTest =
        c.InstanceField <- "new str"
        c.InstanceField
     @> |> check "new str"
+
+  [<Test>]
+  let ``value type stringify`` () =
+    <@ (1).ToString() @> |> check "1"
+    <@ (true).ToString() @> |> check "True"
+    <@ "aaa".ToString() @> |> check "aaa"

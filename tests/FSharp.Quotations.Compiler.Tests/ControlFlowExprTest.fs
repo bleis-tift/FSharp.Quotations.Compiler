@@ -162,7 +162,3 @@ module ControlFlowExprTest =
         _ -> ""
     @>
     |> check "1"
-
-  [<Test>]
-  let ``stringify`` () =
-    <@ (1).ToString() @> |> check "1"
