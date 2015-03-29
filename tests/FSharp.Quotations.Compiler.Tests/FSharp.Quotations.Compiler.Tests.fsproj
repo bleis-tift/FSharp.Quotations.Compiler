@@ -96,6 +96,7 @@
     <Compile Include="StringFuncTest.fs" />
     <Compile Include="ArrayOpTest.fs" />
     <Compile Include="ArrayFuncTest.fs" />
+    <Compile Include="ListTest.fs" />
     <Compile Include="ControlFlowExprTest.fs" />
     <Compile Include="LetTest.fs" />
     <Compile Include="FSharpTypeTest.fs" />
