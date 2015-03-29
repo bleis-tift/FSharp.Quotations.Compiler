@@ -50,3 +50,24 @@ module FSharpTypeTest =
        [x1; x2; x3; x4; x5; x6; x7; x8; x9; x10; x11; x12; x13; x14; x15]
     @>
     |> check [1..15]
+
+  [<Test>]
+  let ``create ref`` () =
+    <@ ref 42 @> |> check (ref 42)
+    <@ ref "" @> |> check (ref "")
+
+  [<Test>]
+  let ``reference ref`` () =
+    <@ let x = ref 42 in !x @> |> check 42
+    <@ let x = ref "" in !x @> |> check ""
+
+  [<Test>]
+  let ``substitute ref`` () =
+    <@ let x = ref 42 in x := 10; !x @> |> check 10
+    <@ let x = ref "" in x := "str"; !x @> |> check "str"
+
+  [<Test>]
+  let ``incr ref`` () = <@ let x = ref 0 in incr x; !x @> |> check 1
+
+  [<Test>]
+  let ``decr ref`` () = <@ let x = ref 0 in decr x; !x @> |> check -1
