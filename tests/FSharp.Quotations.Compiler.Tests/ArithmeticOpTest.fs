@@ -40,6 +40,34 @@ module ArithmeticOpTest =
     <@ 1 % 0 @> |> checkExn<_, DivideByZeroException>
 
   [<Test>]
+  let ``+ bigint`` () =
+    <@ +(1I) @> |> check (+(1I))
+
+  [<Test>]
+  let ``- bigint`` () =
+    <@ -(1I) @> |> check (-(1I))
+
+  [<Test>]
+  let ``bigint + bigint`` () =
+    <@ 1I + 1I @> |> check (1I + 1I)
+
+  [<Test>]
+  let ``bigint - bigint`` () =
+    <@ 1I - 1I @> |> check (1I - 1I)
+
+  [<Test>]
+  let ``bigint * bigint`` () =
+    <@ 1I * 1I @> |> check (1I * 1I)
+
+  [<Test>]
+  let ``bigint / bigint`` () =
+    <@ 1I / 1I @> |> check (1I / 1I)
+
+  [<Test>]
+  let ``bigint % bigint`` () =
+    <@ 1I % 1I @> |> check (1I % 1I)
+
+  [<Test>]
   let ``char + char`` () =
     <@ 'a' + 'a' @> |> check ('a' + 'a')
     <@ Char.MaxValue + (char 1) @> |> check (Char.MaxValue + (char 1))
@@ -103,6 +131,34 @@ module ArithmeticOpTest =
     let ``int * int`` () =
       <@ 2 * 3 @> |> check 6
       <@ Int32.MinValue * -1 @> |> checkExn<_, OverflowException>
+
+    [<Test>]
+    let ``+ bigint`` () =
+      <@ +(1I) @> |> check (+(1I))
+
+    [<Test>]
+    let ``- bigint`` () =
+      <@ -(1I) @> |> check (-(1I))
+
+    [<Test>]
+    let ``bigint + bigint`` () =
+      <@ 1I + 1I @> |> check (1I + 1I)
+
+    [<Test>]
+    let ``bigint - bigint`` () =
+      <@ 1I - 1I @> |> check (1I - 1I)
+
+    [<Test>]
+    let ``bigint * bigint`` () =
+      <@ 1I * 1I @> |> check (1I * 1I)
+
+    [<Test>]
+    let ``bigint / bigint`` () =
+      <@ 1I / 1I @> |> check (1I / 1I)
+
+    [<Test>]
+    let ``bigint % bigint`` () =
+      <@ 1I % 1I @> |> check (1I % 1I)
 
     [<Test>]
     let ``char + char`` () =

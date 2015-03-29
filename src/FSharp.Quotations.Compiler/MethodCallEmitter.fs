@@ -74,6 +74,11 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ 1 <<< 1 @>, emitOpCode Shl)
     dict.Add(getMethod <@ ~~~1 @>, emitOpCode Not)
 
+    dict.Add(getMethod <@ -(1I) @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_UnaryNegation(1I) @>))
+    dict.Add(getMethod <@ 1I - 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Subtraction(1I, 1I) @>))
+    dict.Add(getMethod <@ 1I / 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Division(1I, 1I) @>))
+    dict.Add(getMethod <@ 1I % 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Modulus(1I, 1I) @>))
+
     dict.Add(getMethod <@ byte 1 @>, doNothing)
     dict.Add(getMethod <@ sbyte 1 @>, doNothing)
     dict.Add(getMethod <@ char 1 @>, doNothing)
@@ -123,6 +128,12 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ 1.0 * 1.0 @>, emitOpCode Mul)
     dict.Add(getMethod <@ 1 - 1 @>, emitOpCode Sub_Ovf)
     dict.Add(getMethod <@ 1 * 1 @>, emitOpCode Mul_Ovf)
+
+    dict.Add(getMethod <@ -(1I) @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_UnaryNegation(1I) @>))
+    dict.Add(getMethod <@ 1I - 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Subtraction(1I, 1I) @>))
+    dict.Add(getMethod <@ 1I * 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Multiply(1I, 1I) @>))
+    dict.Add(getMethod <@ 1I / 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Division(1I, 1I) @>))
+    dict.Add(getMethod <@ 1I % 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Modulus(1I, 1I) @>))
 
     dict.Add(getMethod <@ int 1 @>, doNothing)
     dict.Add(getMethod <@ int32 1 @>, doNothing)
