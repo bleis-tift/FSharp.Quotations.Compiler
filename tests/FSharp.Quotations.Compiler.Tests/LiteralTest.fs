@@ -53,6 +53,10 @@ module LiteralTest =
 
   // TODO : more tests
   [<Test>]
+  let bigint () = <@ 1I @> |> check 1I
+
+  // TODO : more tests
+  [<Test>]
   let float32 () = <@ 42.0f @> |> check 42.0f
 
   [<Test>]
