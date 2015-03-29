@@ -38,6 +38,40 @@ module CmpOpTest =
     <@ 1 >= 1 @> |> check true
     <@ 0 >= 1 @> |> check false
 
+  [<Test>]
+  let ``bigint = bigint`` () =
+    <@ 1I = 1I @> |> check true
+    <@ 1I = 0I @> |> check false
+
+  [<Test>]
+  let ``bigint <> bigint`` () =
+    <@ 1I = 1I @> |> check true
+    <@ 1I = 0I @> |> check false
+
+  [<Test>]
+  let ``bigint < bigint`` () =
+    <@ 1I < 0I @> |> check false
+    <@ 1I < 1I @> |> check false
+    <@ 0I < 1I @> |> check true
+
+  [<Test>]
+  let ``bigint <= bigint`` () =
+    <@ 1I <= 0I @> |> check false
+    <@ 1I <= 1I @> |> check true
+    <@ 0I <= 1I @> |> check true
+
+  [<Test>]
+  let ``bigint > bigint`` () =
+    <@ 1I > 0I @> |> check true
+    <@ 1I > 1I @> |> check false
+    <@ 0I > 1I @> |> check false
+
+  [<Test>]
+  let ``bigint >= bigint`` () =
+    <@ 1I >= 0I @> |> check true
+    <@ 1I >= 1I @> |> check true
+    <@ 0I >= 1I @> |> check false
+
   let ``char = char`` () =
     <@ 'a' = 'a' @> |> check true
     <@ 'a' = 'b' @> |> check false
