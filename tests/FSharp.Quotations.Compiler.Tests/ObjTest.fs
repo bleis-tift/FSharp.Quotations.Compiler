@@ -55,6 +55,21 @@ module ObjTest =
        c.InstanceField
     @> |> check "new str"
 
+  [<Struct>]
+  [<CustomEquality>]
+  [<NoComparisonAttribute>]
+  type Struct(i: int) =
+    member __.Value = i
+    override this.Equals(o) =
+      match o with
+      | :? Struct as a -> a.Value = this.Value
+      | _ -> false
+
+  [<Test>]
+  let ``struct property get`` () =
+    <@ Struct(1).Value @>
+    |> check 1
+
   [<Test>]
   let ``value type stringify`` () =
     <@ (1).ToString() @> |> check ((1).ToString())
