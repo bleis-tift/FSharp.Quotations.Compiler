@@ -238,6 +238,16 @@ module internal MethodCallEmitter =
     | _ -> dict
     :> IReadOnlyDictionary<_, _>
 
+  let loadReceiverAddress (r: Expr) (varEnv: VariableEnv ref) =
+    let v = match r with | Patterns.Var v -> v | _ -> failwith "argument is not variable"
+    let (local, name) =
+      match List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv with
+      | Local (local, name) -> (local, name)
+      | _ -> failwith "variable is not found in varEnv"
+    [
+      Compiling (fun (gen: ILGeneratorWrapper) -> gen.Emit(ILOpCode.ldloca local name))
+    ]
+
   let private getPushingCompileStackInfos (recv: Expr option) (mi: MethodInfo) =
     match altEmitterTableUnchecked.TryGetValue(mi) with
     | true, emitter -> (emitter, None)
@@ -246,7 +256,7 @@ module internal MethodCallEmitter =
         | true, emitter -> (emitter, None)
         | _ ->
             match altEmitterTableReceiver(recv, mi).TryGetValue(mi) with
-            | true, emitter -> (emitter, Some (fun (r: Expr) -> loadVariableInLocalScope r))
+            | true, emitter -> (emitter, Some loadReceiverAddress)
             | _ ->
                 let emitCall (gen: ILGeneratorWrapper) =
                   if mi.IsVirtual then gen.Emit(Callvirt (Method mi))
@@ -270,14 +280,13 @@ module internal MethodCallEmitter =
                                | _, gen -> emitCall gen) ]
                 (assumed, None)
 
-  let emit (recv: Expr option, mi: MethodInfo, argsExprs: Expr list) (stack: CompileStack) =
+  let emit (recv: Expr option, mi: MethodInfo, argsExprs: Expr list) (stack: CompileStack) (varEnv: VariableEnv ref) =
     let (emitter, recvEmitter) = getPushingCompileStackInfos recv mi
     emitter |> List.iter stack.Push
     argsExprs |> List.rev |> List.iter (fun argExpr -> stack.Push(CompileTarget argExpr))
     match recv, recvEmitter with
     | Some r, Some re ->
-        re r |> List.iter stack.Push
-        stack.Push(CompileTarget r)
+        re r varEnv |> List.iter stack.Push
     | Some r, _ ->
         stack.Push(CompileTarget r)
     | _, _ -> ()
