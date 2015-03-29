@@ -244,9 +244,8 @@ module internal MethodCallEmitter =
                     let assumed = 
                       if isReturnVoid then
                         [ Assumed (function
-                                   | IfSequential, _ -> ()
-                                   | _, gen -> gen.Emit(Ldnull))
-                          Compiling emitCall ]
+                                   | IfSequential, gen -> emitCall gen
+                                   | _, gen -> emitCall gen; gen.Emit(Ldnull)) ]
                       elif mi.ReturnType = typeof<unit> then
                         [ Assumed (function
                                    | IfSequential, gen -> emitCall gen; gen.Emit(Pop)
