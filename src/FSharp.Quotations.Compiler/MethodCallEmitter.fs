@@ -222,6 +222,11 @@ module internal MethodCallEmitter =
                          | IfSequential, _ -> ()
                          | _, gen -> gen.Emit(Ldnull))
                 Compiling emitCall ]
+            elif mi.ReturnType = typeof<unit> then
+              [ Assumed (function
+                         | IfSequential, gen -> emitCall gen; gen.Emit(Pop)
+                         | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
+                         | _, gen -> emitCall gen; gen.Emit(Ldnull)) ]
             else
               [ Assumed (function
                          | IfRet, gen -> gen.Emit(Tailcall); emitCall gen

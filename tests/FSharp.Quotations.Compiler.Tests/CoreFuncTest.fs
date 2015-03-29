@@ -185,6 +185,22 @@ module CoreFuncTest =
   [<Test>]
   let ``snd int * string`` () = <@ snd (1, "str") @> |> check "str"
 
+  type Disposable () =
+    member val Disposed = false with get, set
+    interface System.IDisposable with
+      member this.Dispose () =
+        this.Disposed <- true
+
+  [<Test>]
+  let ``using`` () =
+    <@ let x = new Disposable()
+       using x (fun _ -> ())
+       x.Disposed @>
+    |> check true
+    <@ let x: Disposable = Unchecked.defaultof<Disposable>
+       using x (fun _ -> ()) @>
+    |> check ()
+
   module Unchecked =
     open Microsoft.FSharp.Core.Operators.Unchecked
 
