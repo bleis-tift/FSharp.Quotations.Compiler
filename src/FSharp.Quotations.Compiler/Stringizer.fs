@@ -111,3 +111,23 @@ module Stringizer =
     member this.ToStringWithRichInfo() =
       let bytesStr = this.ToBytesStr()
       bytesStr + " " + richInfoStr this
+
+  let private richInfoStr2 (x: float32) =
+    if Single.IsNaN(x) then "// NaN"
+    elif Single.IsPositiveInfinity(x) then "// infinity"
+    elif Single.IsNegativeInfinity(x) then "// -infinity"
+    else
+      let str = string x
+      try
+        if float32 str = x then "// " + str
+        else "// about " + str
+      with
+        _ -> "// about " + str
+
+  type Single with
+    member private this.ToBytesStr() =
+      "(" + (BitConverter.GetBytes(this) |> Array.map b2s |> String.concat " ") + ")"
+
+    member this.ToStringWithRichInfo() =
+      let bytesStr = this.ToBytesStr()
+      bytesStr + " " + richInfoStr2 this

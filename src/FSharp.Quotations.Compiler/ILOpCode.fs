@@ -85,6 +85,7 @@ type ILOpCode =
   | Ldc_I4_S of int
   | Ldc_I4 of int
   | Ldc_I8 of int64
+  | Ldc_R4 of float32
   | Ldc_R8 of float
   | Stelem of Type
   | Ldtoken of Token
@@ -192,6 +193,7 @@ module ILOpCode =
   | Ldc_I4_S _ -> OpCodes.Ldc_I4_S
   | Ldc_I4 _ -> OpCodes.Ldc_I4
   | Ldc_I8 _ -> OpCodes.Ldc_I8
+  | Ldc_R4 _ -> OpCodes.Ldc_R4
   | Ldc_R8 _ -> OpCodes.Ldc_R8
   | Stelem _ -> OpCodes.Stelem
   | Ldtoken _ -> OpCodes.Ldtoken

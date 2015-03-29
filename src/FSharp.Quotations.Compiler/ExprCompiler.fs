@@ -255,12 +255,24 @@ module ExprCompiler =
             | Value (value, typ) ->
                 if typ = typeof<int> then
                   emitLoadInteger<int> value gen
+                elif typ = typeof<sbyte> then
+                  emitLoadInteger<sbyte> value gen
+                elif typ = typeof<int16> then
+                  emitLoadInteger<int16> value gen
+                elif typ = typeof<uint16> then
+                  emitLoadInteger<uint16> value gen
+                elif typ = typeof<uint32> then
+                  emitLoadInteger<uint32> value gen
                 elif typ = typeof<char> then
                   emitLoadInteger<char> value gen
                 elif typ = typeof<bool> then
                   emitLoadInteger<int> (if unbox<bool> value then 1 else 0) gen
                 elif typ = typeof<int64> then
                   gen.Emit(Ldc_I8 (unbox<int64> value))
+                elif typ = typeof<uint64> then
+                  gen.Emit(Ldc_I8 (int64 (unbox<uint64> value)))
+                elif typ = typeof<float32> then
+                  gen.Emit(Ldc_R4 (unbox<float32> value))
                 elif typ = typeof<float> then
                   gen.Emit(Ldc_R8 (unbox<float> value))
                 elif typ = typeof<string> then
