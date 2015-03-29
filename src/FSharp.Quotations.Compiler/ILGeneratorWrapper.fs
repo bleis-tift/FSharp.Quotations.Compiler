@@ -42,9 +42,10 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string,
       | last::preLast::prePreLast::_ ->
           assert (last = Ret)
           match preLast with
-          | Call _ | Callvirt _ ->
-              if prePreLast <> Tailcall then
-                failwith "detect tail call but did not emitted tailcall."
+          | Call _ | Callvirt _ -> ()
+              // 本当なら有効化しておきたいが、ここで取得できるMethodInfoは値型かそうでないかの判定ができないのでコメントアウト
+              //if prePreLast <> Tailcall then
+                //failwith "detect tail call but did not emitted tailcall."
           | _ -> ()
       | _ -> invalidOp ""
     #endif

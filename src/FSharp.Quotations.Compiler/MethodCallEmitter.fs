@@ -47,7 +47,8 @@ module internal MethodCallEmitter =
 
   let private emitCallPrim call =
     [ Assumed (function
-               | IfRet, gen -> gen.Emit(Tailcall); call gen
+               // 本当ならここでTailcallをemitしておきたいが、tail.命令があることでアドレス周りがおかしくなるケースがあるため一旦除去
+               | IfRet, gen -> call gen
                | _, gen -> call gen) ]
 
   let emitCallMethod mi = emitCallPrim (fun gen -> emitCall mi gen)

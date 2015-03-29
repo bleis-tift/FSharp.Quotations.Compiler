@@ -66,6 +66,15 @@ module ObjTest =
       | _ -> false
 
   [<Test>]
+  let ``copied struct property get`` () =
+    <@
+      let x = Struct(1)
+      let y = x
+      y.Value
+    @>
+    |> check 1
+
+  [<Test>]
   let ``struct property get`` () =
     <@ Struct(1).Value @>
     |> check 1
