@@ -78,6 +78,11 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ 1I - 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Subtraction(1I, 1I) @>))
     dict.Add(getMethod <@ 1I / 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Division(1I, 1I) @>))
     dict.Add(getMethod <@ 1I % 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Modulus(1I, 1I) @>))
+    dict.Add(getMethod <@ 1I &&& 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_BitwiseAnd(1I, 1I) @>))
+    dict.Add(getMethod <@ 1I ||| 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_BitwiseOr(1I, 1I) @>))
+    dict.Add(getMethod <@ 1I ^^^ 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_ExclusiveOr(1I, 1I) @>))
+    dict.Add(getMethod <@ 1I >>> 1 @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_RightShift(1I, 1) @>))
+    dict.Add(getMethod <@ 1I <<< 1 @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_LeftShift(1I, 1) @>))
 
     dict.Add(getMethod <@ byte 1 @>, doNothing)
     dict.Add(getMethod <@ sbyte 1 @>, doNothing)

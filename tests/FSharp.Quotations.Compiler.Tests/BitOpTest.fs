@@ -29,3 +29,23 @@ module BitOpTest =
 
   [<Test>]
   let ``~~~ int`` () = <@ ~~~1 @> |> check -2
+
+  [<Test>]
+  let ``bigint &&& bigint`` () =
+    <@ 1I &&& 1I @> |> check (1I &&& 1I)
+
+  [<Test>]
+  let ``bigint ||| bigint`` () =
+    <@ 1I ||| 1I @> |> check (1I ||| 1I)
+
+  [<Test>]
+  let ``bigint ^^^ bigint`` () =
+    <@ 1I ^^^ 1I @> |> check (1I ^^^ 1I)
+
+  [<Test>]
+  let ``bigint >>> int`` () =
+    <@ 42I >>> 1 @> |> check (42I >>> 1)
+
+  [<Test>]
+  let ``bigint <<< int`` () =
+    <@ 42I <<< 1 @> |> check (42I <<< 1)
