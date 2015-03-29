@@ -9,6 +9,9 @@ module TypeOpTest =
   let ``int :> obj`` () = <@ 42 :> obj @> |> check (42 :> obj)
 
   [<Test>]
+  let ``bigint :> obj`` () = <@ 1I :> obj @> |> check (1I :> obj)
+
+  [<Test>]
   let `` char :> obj`` () = <@ 'c' :> obj @> |> check ('c' :> obj)
 
   [<Test>]
@@ -17,6 +20,10 @@ module TypeOpTest =
   [<Test>]
   let ``int :> IEquatable<int>`` () =
     <@ 42 :> IEquatable<int> @> |> check (42 :> IEquatable<int>)
+
+  [<Test>]
+  let ``bigint :> IEquatable<bigint>`` () =
+    <@ 42I :> IEquatable<bigint> @> |> check (42I :> IEquatable<bigint>)
 
   [<Test>]
   let ``char :> IEquatable<char>`` () =
