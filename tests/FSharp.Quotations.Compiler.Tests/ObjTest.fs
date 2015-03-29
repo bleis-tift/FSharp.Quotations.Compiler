@@ -80,6 +80,7 @@ module ObjTest =
     <@ (box true).ToString() @> |> check ((box true).ToString())
     <@ (box 'a').ToString() @> |> check ((box 'a').ToString())
     <@ (box "aaa").ToString() @> |> check ((box "aaa").ToString())
+    <@ Struct(1).ToString() @> |> check (Struct(1).ToString())
 
   [<Test>]
   let ``value type get type`` () =
@@ -91,6 +92,7 @@ module ObjTest =
     <@ (box true).GetType() @> |> check ((box true).GetType())
     <@ (box 'a').GetType() @> |> check ((box 'a').GetType())
     <@ (box "aaa").GetType() @> |> check ((box "aaa").GetType())
+    <@ Struct(1).GetType() @> |> check (Struct(1).GetType())
 
   [<TestCase(1, 1)>]
   [<TestCase(1, 2)>]
@@ -167,6 +169,10 @@ module ObjTest =
     <@ "aaa".CompareTo(null) @> |> check ("aaa".CompareTo(null))
 
   [<Test>]
+  let ``struct equals`` () =
+    <@ Struct(1).Equals(Struct(1)) @> |> check (Struct(1).Equals(Struct(1)))
+
+  [<Test>]
   let ``value type get type code`` () =
     <@ (1).GetTypeCode() @> |> check ((1).GetTypeCode())
     <@ (true).GetTypeCode() @> |> check ((true).GetTypeCode())
@@ -179,3 +185,4 @@ module ObjTest =
     <@ (true).GetHashCode() @> |> check ((true).GetHashCode())
     <@ 'a'.GetHashCode() @> |> check ('a'.GetHashCode())
     <@ "aaa".GetHashCode() @> |> check ("aaa".GetHashCode())
+    <@ Struct(1).GetHashCode() @> |> check (Struct(1).GetHashCode())
