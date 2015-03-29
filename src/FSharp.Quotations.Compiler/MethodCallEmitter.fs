@@ -95,6 +95,19 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ uint32 1 @>, doNothing)
     dict.Add(getMethod <@ uint64 1 @>, emitOpCode Conv_I8)
 
+    dict.Add(getMethod <@ byte 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : byte @>))
+    dict.Add(getMethod <@ sbyte 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : sbyte @>))
+    dict.Add(getMethod <@ decimal 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : decimal @>))
+    dict.Add(getMethod <@ float 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : float @>))
+    dict.Add(getMethod <@ float32 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : float32 @>))
+    dict.Add(getMethod <@ int 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : int @>))
+    dict.Add(getMethod <@ int16 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : int16 @>))
+    dict.Add(getMethod <@ uint16 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : uint16 @>))
+    dict.Add(getMethod <@ int32 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : int32 @>))
+    dict.Add(getMethod <@ uint32 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : uint32 @>))
+    dict.Add(getMethod <@ int64 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : int64 @>))
+    dict.Add(getMethod <@ uint64 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : uint64 @>))
+
     dict.Add(getMethod <@ byte "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseUInt32("") @>)))
                                       |>> emitOpCode Conv_Ovf_U1)
     dict.Add(getMethod <@ sbyte "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseInt32("") @>)))
@@ -142,6 +155,20 @@ module internal MethodCallEmitter =
 
     dict.Add(getMethod <@ int 1 @>, doNothing)
     dict.Add(getMethod <@ int32 1 @>, doNothing)
+
+    dict.Add(getMethod <@ byte 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : byte @>))
+    dict.Add(getMethod <@ sbyte 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : sbyte @>))
+    dict.Add(getMethod <@ decimal 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : decimal @>))
+    dict.Add(getMethod <@ float 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : float @>))
+    dict.Add(getMethod <@ float32 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : float32 @>))
+    dict.Add(getMethod <@ int 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : int @>))
+    dict.Add(getMethod <@ int16 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : int16 @>))
+    dict.Add(getMethod <@ uint16 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : uint16 @>))
+    dict.Add(getMethod <@ int32 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : int32 @>))
+    dict.Add(getMethod <@ uint32 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : uint32 @>))
+    dict.Add(getMethod <@ int64 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : int64 @>))
+    dict.Add(getMethod <@ uint64 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : uint64 @>))
+
     dict.Add(getMethod <@ char 'a' @>, doNothing)
 
     dict.Add(getMethod <@ byte "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseUInt32("") @>)))

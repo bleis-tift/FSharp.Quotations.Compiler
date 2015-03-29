@@ -34,6 +34,11 @@ module ConvertFuncTest =
     testByteFrom<int> [1; max + 1; min - 1]
 
   [<Test>]
+  let ``byte bigint`` () =
+    let max, min = Numerics.BigInteger(int Byte.MaxValue), Numerics.BigInteger(int Byte.MinValue)
+    testByteFrom<bigint> [1I; max + 1I; min - 1I]
+
+  [<Test>]
   let ``byte char`` () = testByteFrom ['a'; char (Byte.MaxValue + byte 1); char (Byte.MinValue - byte 1)]
 
   [<Test>]
@@ -51,6 +56,11 @@ module ConvertFuncTest =
   let ``sbyte int`` () =
     let max, min = int SByte.MaxValue, int SByte.MinValue
     testSByteFrom<int> [1; max + 1; min - 1]
+
+  [<Test>]
+  let ``sbyte bigint`` () =
+    let max, min = Numerics.BigInteger(int SByte.MaxValue), Numerics.BigInteger(int SByte.MinValue)
+    testSByteFrom<bigint> [1I; max + 1I; min - 1I]
 
   [<Test>]
   let ``sbyte char`` () = testSByteFrom ['a'; char (SByte.MaxValue + sbyte 1); char (SByte.MinValue - sbyte 1)]
@@ -89,6 +99,9 @@ module ConvertFuncTest =
   let ``decimal int`` () = testDecimalFrom<int> [1]
 
   [<Test>]
+  let ``decimal bigint`` () = testDecimalFrom<bigint> [1I]
+
+  [<Test>]
   let ``decimal float`` () = testDecimalFrom<float> [1.0; Double.MaxValue; Double.MinValue; nan; infinity; -infinity]
 
   [<Test>]
@@ -105,6 +118,9 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``float int`` () = testFloatFrom<int> [1]
+
+  [<Test>]
+  let ``float bigint`` () = testFloatFrom<bigint> [1I]
 
   [<Test>]
   let ``float char`` () = testFloatFrom ['a'; Char.MaxValue; Char.MinValue]
@@ -128,6 +144,9 @@ module ConvertFuncTest =
   let ``float32 int`` () = testFloat32From<int> [1]
 
   [<Test>]
+  let ``float32 bigitn`` () = testFloat32From<bigint> [1I]
+
+  [<Test>]
   let ``float32 char`` () = testFloat32From ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
@@ -149,6 +168,11 @@ module ConvertFuncTest =
   let ``int int`` () = testIntFrom<int> [1]
 
   [<Test>]
+  let ``int bigint`` () =
+    let max, min = Numerics.BigInteger(Int32.MaxValue), Numerics.BigInteger(Int32.MinValue)
+    testIntFrom<bigint> [1I; max + 1I; min - 1I]
+
+  [<Test>]
   let ``int char`` () = testIntFrom ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
@@ -168,6 +192,11 @@ module ConvertFuncTest =
     testInt16From<int> [1; max + 1; min - 1]
 
   [<Test>]
+  let ``int16 bigint`` () =
+    let max, min = Numerics.BigInteger(int Int16.MaxValue), Numerics.BigInteger(int Int16.MinValue)
+    testInt16From<bigint> [1I; max + 1I; min - 1I]
+
+  [<Test>]
   let ``int16 char`` () = testInt16From ['a'; char (Int16.MaxValue + int16 1); Char.MinValue]
 
   [<Test>]
@@ -185,6 +214,11 @@ module ConvertFuncTest =
   let ``uint16 int`` () =
     let max, min = int UInt16.MaxValue, int UInt16.MinValue
     testUInt16From<int> [1; max + 1; min - 1]
+
+  [<Test>]
+  let ``uint16 bigint`` () =
+    let max, min = Numerics.BigInteger(int UInt16.MaxValue), Numerics.BigInteger(int UInt16.MinValue)
+    testUInt16From<bigint> [1I; max + 1I; min - 1I]
 
   [<Test>]
   let ``uint16 char`` () = testUInt16From ['a'; Char.MaxValue; Char.MinValue]
@@ -223,6 +257,11 @@ module ConvertFuncTest =
     testUInt32From<int> [1; min - 1]
 
   [<Test>]
+  let ``uint32 bigint`` () =
+    let max, min = Numerics.BigInteger(UInt32.MaxValue), Numerics.BigInteger(UInt32.MinValue)
+    testUInt32From<bigint> [1I; max + 1I; min - 1I]
+
+  [<Test>]
   let ``uint32 char`` () = testUInt32From ['a'; Char.MaxValue; Char.MinValue]
 
   [<Test>]
@@ -238,6 +277,11 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``int64 int`` () = testInt64From<int> [1]
+
+  [<Test>]
+  let ``int64 bigint`` () =
+    let max, min = Numerics.BigInteger(Int64.MaxValue), Numerics.BigInteger(Int64.MinValue)
+    testInt64From<bigint> [1I; max + 1I; min + 1I]
 
   [<Test>]
   let ``int64 char`` () = testInt64From ['a'; Char.MaxValue; Char.MinValue]
@@ -258,6 +302,11 @@ module ConvertFuncTest =
   let ``uint64 int`` () =
     let min = int UInt64.MinValue
     testUInt64From<int> [1; min - 1]
+
+  [<Test>]
+  let ``uint64 bigint`` () =
+    let max, min = Numerics.BigInteger(UInt64.MaxValue), Numerics.BigInteger(UInt64.MinValue)
+    testUInt64From<bigint> [1I; max + 1I; min - 1I]
 
   [<Test>]
   let ``uint64 char`` () = testUInt64From ['a'; Char.MaxValue; Char.MinValue]
@@ -308,6 +357,9 @@ module ConvertFuncTest =
   let ``string int`` () = <@ string 42 @> |> check "42"
 
   [<Test>]
+  let ``string bigint`` () = <@ string 1L @> |> check (string 1L)
+
+  [<Test>]
   let ``string char`` () = <@ string 'a' @> |> check "a"
 
   [<Test>]
@@ -344,6 +396,11 @@ module ConvertFuncTest =
       testByteFrom<int> [1; max + 1; min - 1]
 
     [<Test>]
+    let ``byte bigint`` () =
+      let max, min = Numerics.BigInteger(int Byte.MaxValue), Numerics.BigInteger(int Byte.MinValue)
+      testByteFrom<bigint> [1I; max + 1I; min - 1I]
+
+    [<Test>]
     let ``byte char`` () = testByteFrom ['a'; Char.MinValue; char Byte.MaxValue + char 1]
 
     [<Test>]
@@ -361,6 +418,11 @@ module ConvertFuncTest =
     let ``sbyte int`` () =
       let max, min = int SByte.MaxValue, int SByte.MinValue
       testSByteFrom<int> [1; max + 1; min - 1]
+
+    [<Test>]
+    let ``sbyte bigint`` () =
+      let max, min = Numerics.BigInteger(int SByte.MaxValue), Numerics.BigInteger(int SByte.MinValue)
+      testSByteFrom<bigint> [1I; max + 1I; min - 1I]
 
     [<Test>]
     let ``sbyte char`` () = testSByteFrom ['a'; Char.MinValue; char SByte.MaxValue + char 1]
@@ -399,6 +461,11 @@ module ConvertFuncTest =
     let ``int int`` () = testIntFrom<int> [1]
 
     [<Test>]
+    let ``int bigint`` () =
+      let max, min = Numerics.BigInteger(Int32.MaxValue), Numerics.BigInteger(Int32.MinValue)
+      testIntFrom<bigint> [1I; max + 1I; min - 1I]
+
+    [<Test>]
     let ``int char`` () = testIntFrom ['a'; Char.MaxValue; Char.MinValue]
 
     [<Test>]
@@ -418,6 +485,11 @@ module ConvertFuncTest =
       testInt16From<int> [1; max + 1; min - 1]
 
     [<Test>]
+    let ``int16 bigint`` () =
+      let max, min = Numerics.BigInteger(int Int16.MaxValue), Numerics.BigInteger(int Int16.MinValue)
+      testInt16From<bigint> [1I; max + 1I; min - 1I]
+
+    [<Test>]
     let ``int16 char`` () = testInt16From ['a'; Char.MinValue; char Int16.MaxValue + char 1]
 
     [<Test>]
@@ -435,6 +507,11 @@ module ConvertFuncTest =
     let ``uint16 int`` () =
       let max, min = int UInt16.MaxValue, int UInt16.MinValue
       testUInt16From<int> [1; max + 1; min - 1]
+    
+    [<Test>]
+    let ``uint16 bigint`` () =
+      let max, min = Numerics.BigInteger(int UInt16.MaxValue), Numerics.BigInteger(int UInt16.MinValue)
+      testUInt16From<bigint> [1I; max + 1I; min - 1I]
 
     [<Test>]
     let ``uint16 char`` () = testUInt16From ['a'; Char.MaxValue; Char.MinValue]
@@ -452,6 +529,11 @@ module ConvertFuncTest =
 
     [<Test>]
     let ``int32 int`` () = testInt32From<int> [1]
+
+    [<Test>]
+    let ``int32 bigint`` () =
+      let max, min = Numerics.BigInteger(Int32.MaxValue), Numerics.BigInteger(Int32.MinValue)
+      testInt32From<bigint> [1I; max + 1I; min - 1I]
 
     [<Test>]
     let ``int32 char`` () = testInt32From ['a'; Char.MaxValue; Char.MinValue]
@@ -473,6 +555,11 @@ module ConvertFuncTest =
       testUInt32From<int> [1; min - 1]
 
     [<Test>]
+    let ``uint32 bigint`` () =
+      let max, min = Numerics.BigInteger(UInt32.MaxValue), Numerics.BigInteger(UInt32.MinValue)
+      testUInt32From<bigint> [1I; max + 1I; min - 1I]
+    
+    [<Test>]
     let ``uint32 char`` () = testUInt32From ['a'; Char.MaxValue; Char.MinValue]
 
     [<Test>]
@@ -488,6 +575,11 @@ module ConvertFuncTest =
 
     [<Test>]
     let ``int64 int`` () = testInt64From<int> [1]
+
+    [<Test>]
+    let ``int64 bigint`` () =
+      let max, min = Numerics.BigInteger(Int64.MaxValue), Numerics.BigInteger(Int64.MinValue)
+      testInt64From<bigint> [1I; max + 1I; min + 1I]
 
     [<Test>]
     let ``int64 char`` () = testInt64From ['a'; Char.MaxValue; Char.MinValue]
@@ -508,6 +600,11 @@ module ConvertFuncTest =
     let ``uint64 int`` () =
       let min = int UInt64.MinValue
       testUInt64From<int> [1; min - 1]
+
+    [<Test>]
+    let ``uint64 bigint`` () =
+      let max, min = Numerics.BigInteger(UInt64.MaxValue), Numerics.BigInteger(UInt64.MinValue)
+      testUInt64From<bigint> [1I; max + 1I; min - 1I]
 
     [<Test>]
     let ``uint64 char`` () = testUInt64From ['a'; Char.MaxValue; Char.MinValue]

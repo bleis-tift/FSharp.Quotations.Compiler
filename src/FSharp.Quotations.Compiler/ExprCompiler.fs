@@ -25,6 +25,32 @@ module ExprCompiler =
     | i ->
         gen.Emit(Ldc_I4 i)
 
+  let getMethod = function
+  | Let (_, Call(_, mi, _), _)
+  | Let (_, _, Call(_, mi, _))
+  | Call (_, mi, _) -> mi
+  | expr -> failwithf "expr is not Method call: %A" expr
+
+  let getProperty = function
+  | PropertyGet (_, pi, _) -> pi
+  | expr -> failwithf "expr is not property get: %A" expr
+
+  let emitLoadBigInteger (value: obj) (gen: ILGeneratorWrapper) =
+    let v = unbox<bigint> value
+    if v = Numerics.BigInteger.MinusOne then
+      gen.Emit(Call (PropGet (getProperty <@ Numerics.BigInteger.MinusOne @> )))
+    elif v = Numerics.BigInteger.One then
+      gen.Emit(Call (PropGet (getProperty <@ Numerics.BigInteger.One @>)))
+    elif Numerics.BigInteger(Int32.MinValue) <= v  && v <= Numerics.BigInteger(Int32.MaxValue) then
+      emitLoadInteger<int> (int v) gen
+      gen.Emit(Call (Method (getMethod <@ NumericLiterals.NumericLiteralI.FromInt32(1) : bigint @>)))
+    elif Numerics.BigInteger(Int64.MinValue) <= v  && v <= Numerics.BigInteger(Int64.MaxValue) then
+      gen.Emit(Ldc_I8 (int64 v))
+      gen.Emit(Call (Method (getMethod <@ NumericLiterals.NumericLiteralI.FromInt64(1L) : bigint @>)))
+    else
+      gen.Emit(Ldstr (string v))
+      gen.Emit(Call (Method (getMethod <@ NumericLiterals.NumericLiteralI.FromString("1") : bigint @>)))
+
   type ICompiledType<'T> =
     abstract member ExecuteCompiledCode: unit -> 'T
 
@@ -265,6 +291,8 @@ module ExprCompiler =
                   gen.Emit(Ldc_I8 (unbox<int64> value))
                 elif typ = typeof<uint64> then
                   gen.Emit(Ldc_I8 (int64 (unbox<uint64> value)))
+                elif typ = typeof<bigint> then
+                  emitLoadBigInteger value gen
                 elif typ = typeof<float32> then
                   gen.Emit(Ldc_R4 (unbox<float32> value))
                 elif typ = typeof<float> then
