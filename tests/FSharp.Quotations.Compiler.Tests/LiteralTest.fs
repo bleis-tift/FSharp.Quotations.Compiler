@@ -5,8 +5,13 @@ module LiteralTest =
   [<Test>]
   let unit () = <@ () @> |> check ()
 
+  #if FULLTEST
   [<Test>]
   let int ([<IntRange(-2, 128)>] i: int) = <@ i @> |> check i
+  #else
+  [<Test>]
+  let int () = <@ 42 @> |> check 42
+  #endif
 
   // TODO : more tests
   [<Test>]
@@ -24,8 +29,13 @@ module LiteralTest =
   [<Test>]
   let uint32 () = <@ 1u @> |> check 1u
 
+  #if FULLTEST
   [<Test>]
   let char ([<CharRange('\000', '\128')>] c: char) = <@ c @> |> check c
+  #else
+  [<Test>]
+  let char () = <@ 'a' @> |> check 'a'
+  #endif
 
   [<TestCase(true)>]
   [<TestCase(false)>]
