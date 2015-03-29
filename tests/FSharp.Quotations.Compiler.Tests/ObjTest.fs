@@ -56,14 +56,8 @@ module ObjTest =
     @> |> check "new str"
 
   [<Struct>]
-  [<CustomEquality>]
-  [<NoComparisonAttribute>]
   type Struct(i: int) =
     member __.Value = i
-    override this.Equals(o) =
-      match o with
-      | :? Struct as a -> a.Value = this.Value
-      | _ -> false
 
   [<Test>]
   let ``copied struct property get`` () =
