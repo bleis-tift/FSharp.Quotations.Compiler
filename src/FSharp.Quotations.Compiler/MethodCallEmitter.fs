@@ -22,8 +22,12 @@ module internal MethodCallEmitter =
   | PropertyGet (_, pi, _) -> pi
   | expr -> failwithf "expr is not property get: %A" expr
 
+  let private getGenericMethod = function
+  | Call (_, mi, _) -> mi.GetGenericMethodDefinition()
+  | expr -> failwithf "expr is not Method call: %A" expr
+
   let typeTestGenericInt32MethodInfo = getMethod <@ box 42 :? int @>
-  let genericEqualityIntrinsicM = (getMethod <@ LanguagePrimitives.HashCompare.GenericEqualityIntrinsic null null @>).GetGenericMethodDefinition()
+  let genericEqualityIntrinsicM = getGenericMethod <@ LanguagePrimitives.HashCompare.GenericEqualityIntrinsic null null @>
 
   let private identityEqualityComparer =
     { new IEqualityComparer<MethodInfo> with
