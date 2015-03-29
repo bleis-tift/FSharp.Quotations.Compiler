@@ -1,5 +1,7 @@
 ﻿namespace FSharp.Quotations.Compiler.Tests
 
+open System
+
 [<TestModule>]
 module ObjTest =
   type Class (value: int) as this =
@@ -57,84 +59,108 @@ module ObjTest =
   let ``value type stringify`` () =
     <@ (1).ToString() @> |> check ((1).ToString())
     <@ (true).ToString() @> |> check ((true).ToString())
-    <@ "aaa".ToString() @> |> check ("aaa".ToString())
     <@ 'a'.ToString() @> |> check ('a'.ToString())
+    <@ "aaa".ToString() @> |> check ("aaa".ToString())
+    <@ (box 1).ToString() @> |> check ((box 1).ToString())
+    <@ (box true).ToString() @> |> check ((box true).ToString())
+    <@ (box 'a').ToString() @> |> check ((box 'a').ToString())
+    <@ (box "aaa").ToString() @> |> check ((box "aaa").ToString())
 
   [<Test>]
   let ``value type get type`` () =
     <@ (1).GetType() @> |> check ((1).GetType())
     <@ (true).GetType() @> |> check ((true).GetType())
-    <@ "aaa".GetType() @> |> check ("aaa".GetType())
     <@ 'a'.GetType() @> |> check ('a'.GetType())
+    <@ "aaa".GetType() @> |> check ("aaa".GetType())
+    <@ (box 1).GetType() @> |> check ((box 1).GetType())
+    <@ (box true).GetType() @> |> check ((box true).GetType())
+    <@ (box 'a').GetType() @> |> check ((box 'a').GetType())
+    <@ (box "aaa").GetType() @> |> check ((box "aaa").GetType())
 
   [<TestCase(1, 1)>]
   [<TestCase(1, 2)>]
   [<TestCase(2, 1)>]
   let ``int compare to`` (a: int, b: int) =
     <@ let a = a in a.CompareTo(b) @> |> check (a.CompareTo(b))
+    <@ let a = a :> IComparable<_> in a.CompareTo(b) @> |> check ((a :> IComparable<_>).CompareTo(b))
 
   [<Test>]
   let ``bool compare to`` ([<Values(true, false)>] a: bool, [<Values(true, false)>] b: bool) =
     <@ let a = a in a.CompareTo(b) @> |> check (a.CompareTo(b))
-
-  [<TestCase("aaa", "aaa")>]
-  [<TestCase("aaa", "bbb")>]
-  [<TestCase("bbb", "aaa")>]
-  let ``string compare to`` (a: string, b: string) =
-    <@ let a = a in a.CompareTo(b) @> |> check (a.CompareTo(b))
+    <@ let a = a :> IComparable<_> in a.CompareTo(b) @> |> check ((a :> IComparable<_>).CompareTo(b))
 
   [<TestCase('a', 'a')>]
   [<TestCase('a', 'b')>]
   [<TestCase('b', 'a')>]
   let ``char compare to`` (a: char, b: char) =
     <@ let a = a in a.CompareTo(b) @> |> check (a.CompareTo(b))
+    <@ let a = a :> IComparable<_> in a.CompareTo(b) @> |> check ((a :> IComparable<_>).CompareTo(b))
+
+  [<TestCase("aaa", "aaa")>]
+  [<TestCase("aaa", "bbb")>]
+  [<TestCase("bbb", "aaa")>]
+  let ``string compare to`` (a: string, b: string) =
+    <@ let a = a in a.CompareTo(b) @> |> check (a.CompareTo(b))
+    <@ let a = a :> IComparable<_> in a.CompareTo(b) @> |> check ((a :> IComparable<_>).CompareTo(b))
 
   [<Test>]
   let ``value type compare to null`` () =
     <@ (1).CompareTo(null) @> |> check ((1).CompareTo(null))
     <@ (true).CompareTo(null) @> |> check ((true).CompareTo(null))
-    <@ "aaa".CompareTo(null) @> |> check ("aaa".CompareTo(null))
     <@ 'a'.CompareTo(null) @> |> check ('a'.CompareTo(null))
+    <@ "aaa".CompareTo(null) @> |> check ("aaa".CompareTo(null))
+    <@ (1 :> IComparable).CompareTo(null) @> |> check ((1 :> IComparable).CompareTo(null))
+    <@ (true :> IComparable).CompareTo(null) @> |> check ((true :> IComparable).CompareTo(null))
+    <@ ('a' :> IComparable).CompareTo(null) @> |> check (('a' :> IComparable).CompareTo(null))
+    <@ ("aaa" :> IComparable).CompareTo(null) @> |> check (("aaa" :> IComparable).CompareTo(null))
 
   [<TestCase(1, 1)>]
   [<TestCase(1, 2)>]
   [<TestCase(2, 1)>]
   let ``int equals`` (a: int, b: int) =
     <@ let a = a in a.Equals(b) @> |> check (a.Equals(b))
+    <@ let a = a in a.Equals(box b) @> |> check (a.Equals(box b))
+    <@ let a = a in (box a).Equals(box b) @> |> check ((box a).Equals(box b))
 
   [<Test>]
   let ``bool equals`` ([<Values(true, false)>] a: bool, [<Values(true, false)>] b: bool) =
     <@ let a = a in a.Equals(b) @> |> check (a.Equals(b))
-
-  [<TestCase("aaa", "aaa")>]
-  [<TestCase("aaa", "bbb")>]
-  [<TestCase("bbb", "aaa")>]
-  let ``string equals`` (a: string, b: string) =
-    <@ let a = a in a.Equals(b) @> |> check (a.Equals(b))
+    <@ let a = a in a.Equals(box b) @> |> check (a.Equals(box b))
+    <@ let a = a in (box a).Equals(box b) @> |> check ((box a).Equals(box b))
 
   [<TestCase('a', 'a')>]
   [<TestCase('a', 'b')>]
   [<TestCase('b', 'a')>]
   let ``char equals`` (a: char, b: char) =
     <@ let a = a in a.Equals(b) @> |> check (a.Equals(b))
+    <@ let a = a in a.Equals(box b) @> |> check (a.Equals(box b))
+    <@ let a = a in (box a).Equals(box b) @> |> check ((box a).Equals(box b))
+
+  [<TestCase("aaa", "aaa")>]
+  [<TestCase("aaa", "bbb")>]
+  [<TestCase("bbb", "aaa")>]
+  let ``string equals`` (a: string, b: string) =
+    <@ let a = a in a.Equals(b) @> |> check (a.Equals(b))
+    <@ let a = a in a.Equals(box b) @> |> check (a.Equals(box b))
+    <@ let a = a in (box a).Equals(box b) @> |> check ((box a).Equals(box b))
 
   [<Test>]
   let ``value type equals null`` () =
     <@ (1).CompareTo(null) @> |> check ((1).CompareTo(null))
     <@ (true).CompareTo(null) @> |> check ((true).CompareTo(null))
-    <@ "aaa".CompareTo(null) @> |> check ("aaa".CompareTo(null))
     <@ 'a'.CompareTo(null) @> |> check ('a'.CompareTo(null))
+    <@ "aaa".CompareTo(null) @> |> check ("aaa".CompareTo(null))
 
   [<Test>]
   let ``value type get type code`` () =
     <@ (1).GetTypeCode() @> |> check ((1).GetTypeCode())
     <@ (true).GetTypeCode() @> |> check ((true).GetTypeCode())
-    <@ "aaa".GetTypeCode() @> |> check ("aaa".GetTypeCode())
     <@ 'a'.GetTypeCode() @> |> check ('a'.GetTypeCode())
+    <@ "aaa".GetTypeCode() @> |> check ("aaa".GetTypeCode())
 
   [<Test>]
   let ``value type get hash code`` () =
     <@ (1).GetHashCode() @> |> check ((1).GetHashCode())
     <@ (true).GetHashCode() @> |> check ((true).GetHashCode())
-    <@ "aaa".GetHashCode() @> |> check ("aaa".GetHashCode())
     <@ 'a'.GetHashCode() @> |> check ('a'.GetHashCode())
+    <@ "aaa".GetHashCode() @> |> check ("aaa".GetHashCode())
