@@ -27,7 +27,6 @@ module internal MethodCallEmitter =
   | expr -> failwithf "expr is not Method call: %A" expr
 
   let typeTestGenericInt32MethodInfo = getMethod <@ box 42 :? int @>
-  let genericEqualityIntrinsicM = getGenericMethod <@ LanguagePrimitives.HashCompare.GenericEqualityIntrinsic null null @>
 
   let private identityEqualityComparer =
     { new IEqualityComparer<MethodInfo> with
@@ -57,12 +56,6 @@ module internal MethodCallEmitter =
 
   let emitCallMethod mi = emitCallPrim (fun gen -> emitCall mi gen)
   let emitCallMethodPrim mi call = emitCallPrim (fun gen -> gen.Emit(call (Method mi)))
-
-  let emitCallVoidMethod mi =
-    [ Assumed (function
-               | IfSequential, _ -> ()
-               | _, gen -> gen.Emit(Ldnull))
-      Compiling (emitCall mi) ]
 
   let emitStrToFloat (mi: MethodInfo) =
     emitOpCode (Ldc_I4 (int NumberStyles.Float))
