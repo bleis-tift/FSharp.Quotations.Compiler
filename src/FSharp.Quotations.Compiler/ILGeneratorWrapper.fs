@@ -149,12 +149,14 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string,
     | Newobj ci ->
         this.WriteLineAndMark(raw.Name + " " + ci.ToReadableText())
         gen.Emit(raw, ci)
-    | And | Or | Xor | Not | Shl | Shr | Div | Mul | Mul_Ovf | Neg | Rem | Add | Sub | Sub_Ovf
+    | And | Or | Xor | Not | Shl | Shr | Shr_Un | Div | Mul | Mul_Ovf | Mul_Ovf_Un | Neg | Rem | Rem_Un | Add | Sub | Sub_Ovf | Sub_Ovf_Un
     | Conv_I | Conv_I1 | Conv_I2 | Conv_I4 | Conv_I8
     | Conv_U | Conv_U1 | Conv_U2 | Conv_U4 | Conv_U8
-    | Conv_R4 | Conv_R8
+    | Conv_R_Un | Conv_R4 | Conv_R8
     | Conv_Ovf_I | Conv_Ovf_I1 | Conv_Ovf_I2 | Conv_Ovf_I4 | Conv_Ovf_I8
     | Conv_Ovf_U | Conv_Ovf_U1 | Conv_Ovf_U2 | Conv_Ovf_U4 | Conv_Ovf_U8
+    | Conv_Ovf_I1_Un | Conv_Ovf_I2_Un | Conv_Ovf_I4_Un | Conv_Ovf_I8_Un
+    | Conv_Ovf_U1_Un | Conv_Ovf_U2_Un | Conv_Ovf_U4_Un | Conv_Ovf_U8_Un
     | Ldarg_0 | Ldarg_1 | Ldarg_2 | Ldarg_3
     | Ldnull | Ldc_I4_M1 | Ldc_I4_0 | Ldc_I4_1 | Ldc_I4_2 | Ldc_I4_3 | Ldc_I4_4 | Ldc_I4_5 | Ldc_I4_6 | Ldc_I4_7 | Ldc_I4_8
     | Tailcall | Dup | Pop | Ret | Endfinally ->

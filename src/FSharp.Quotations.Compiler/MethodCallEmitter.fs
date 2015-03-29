@@ -64,6 +64,12 @@ module internal MethodCallEmitter =
     |>> emitOpCode (Unbox_Any typeof<IFormatProvider>)
     |>> emitCallMethod mi
 
+  let convInt16 = [ Compiling (fun gen -> gen.Emit(Conv_I2)) ]
+  let convInt8 = [ Compiling (fun gen -> gen.Emit(Conv_I1)) ]
+
+  let convUInt16 = [ Compiling (fun gen -> gen.Emit(Conv_U2)) ]
+  let convUInt8 = [ Compiling (fun gen -> gen.Emit(Conv_U1)) ]
+
   let declareLocal<'T> loader =
     [
       Compiling (fun (gen: ILGeneratorWrapper) -> let loc = gen.DeclareLocal(typeof<'T>) in gen.Emit(Stloc (loc, None)); gen.Emit(loader (loc, None)))
@@ -72,13 +78,34 @@ module internal MethodCallEmitter =
   let private altEmitterTableUnchecked =
     let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
     dict.Add(getMethod <@ 'a' + 'a' @>, emitOpCode Add)
-    dict.Add(getMethod <@ 1 % 1 @>, emitOpCode Rem)
-    dict.Add(getMethod <@ 1 &&& 1 @>, emitOpCode And)
-    dict.Add(getMethod <@ 1 ||| 1 @>, emitOpCode Or)
-    dict.Add(getMethod <@ 1 ^^^ 1 @>, emitOpCode Xor)
-    dict.Add(getMethod <@ 1 >>> 1 @>, emitOpCode Shr)
-    dict.Add(getMethod <@ 1 <<< 1 @>, emitOpCode Shl)
-    dict.Add(getMethod <@ ~~~1 @>, emitOpCode Not)
+
+    dict.Add(getMethod <@ 1s % 1s @>, emitOpCode Rem |>> convInt16)
+    dict.Add(getMethod <@ 1y % 1y @>, emitOpCode Rem |>> convInt8)
+
+    dict.Add(getMethod <@ 1uL % 1uL @>, emitOpCode Rem_Un)
+    dict.Add(getMethod <@ 1u % 1u @>, emitOpCode Rem_Un)
+    dict.Add(getMethod <@ 1us % 1us @>, emitOpCode Rem_Un |>> convUInt16)
+    dict.Add(getMethod <@ 1uy % 1uy @>, emitOpCode Rem_Un |>> convUInt8)
+
+    dict.Add(getMethod <@ 1L >>> 1 @>, emitOpCode (Ldc_I4_S 63) |>> emitOpCode And |>> emitOpCode Shr)
+    dict.Add(getMethod <@ 1 >>> 1 @>, emitOpCode (Ldc_I4_S 31) |>> emitOpCode And |>> emitOpCode Shr)
+    dict.Add(getMethod <@ 1s >>> 1 @>, emitOpCode (Ldc_I4_S 15) |>> emitOpCode And |>> emitOpCode Shr |>> convInt16)
+    dict.Add(getMethod <@ 1y >>> 1 @>, emitOpCode (Ldc_I4_7) |>> emitOpCode And |>> emitOpCode Shr |>> convInt8)
+
+    dict.Add(getMethod <@ 1L <<< 1 @>, emitOpCode (Ldc_I4_S 63) |>> emitOpCode And |>> emitOpCode Shl)
+    dict.Add(getMethod <@ 1 <<< 1 @>, emitOpCode (Ldc_I4_S 31) |>> emitOpCode And |>> emitOpCode Shl)
+    dict.Add(getMethod <@ 1s <<< 1 @>, emitOpCode (Ldc_I4_S 15) |>> emitOpCode And |>> emitOpCode Shl |>> convInt16)
+    dict.Add(getMethod <@ 1y <<< 1 @>, emitOpCode (Ldc_I4_7) |>> emitOpCode And |>> emitOpCode Shl |>> convInt8)
+
+    dict.Add(getMethod <@ 1uL >>> 1 @>, emitOpCode (Ldc_I4_S 63) |>> emitOpCode And |>> emitOpCode Shr_Un)
+    dict.Add(getMethod <@ 1u >>> 1 @>, emitOpCode (Ldc_I4_S 31) |>> emitOpCode And |>> emitOpCode Shr_Un)
+    dict.Add(getMethod <@ 1us >>> 1 @>, emitOpCode (Ldc_I4_S 15) |>> emitOpCode And |>> emitOpCode Shr_Un |>> convUInt16)
+    dict.Add(getMethod <@ 1uy >>> 1 @>, emitOpCode (Ldc_I4_7) |>> emitOpCode And |>> emitOpCode Shr_Un |>> convUInt8)
+
+    dict.Add(getMethod <@ 1uL <<< 1 @>, emitOpCode (Ldc_I4_S 63) |>> emitOpCode And |>> emitOpCode Shl)
+    dict.Add(getMethod <@ 1u <<< 1 @>, emitOpCode (Ldc_I4_S 31) |>> emitOpCode And |>> emitOpCode Shl)
+    dict.Add(getMethod <@ 1us <<< 1 @>, emitOpCode (Ldc_I4_S 15) |>> emitOpCode And |>> emitOpCode Shl |>> convUInt16)
+    dict.Add(getMethod <@ 1uy <<< 1 @>, emitOpCode (Ldc_I4_7) |>> emitOpCode And |>> emitOpCode Shl |>> convUInt8)
 
     dict.Add(getMethod <@ -(1I) @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_UnaryNegation(1I) @>))
     dict.Add(getMethod <@ 1I - 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Subtraction(1I, 1I) @>))
@@ -93,13 +120,62 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ byte 1 @>, doNothing)
     dict.Add(getMethod <@ sbyte 1 @>, doNothing)
     dict.Add(getMethod <@ char 1 @>, doNothing)
-    dict.Add(getMethod <@ decimal 1 @>, emitCallMethod (getMethod <@ Convert.ToDecimal(1) @>))
-    dict.Add(getMethod <@ int 1 @>, doNothing)
     dict.Add(getMethod <@ int16 1 @>, doNothing)
     dict.Add(getMethod <@ uint16 1 @>, doNothing)
+
+    dict.Add(getMethod <@ int 1y @>, doNothing)
+    dict.Add(getMethod <@ int32 1y @>, doNothing)
+    dict.Add(getMethod <@ int 1s @>, doNothing)
+    dict.Add(getMethod <@ int32 1s @>, doNothing)
+    dict.Add(getMethod <@ int 1 @>, doNothing)
     dict.Add(getMethod <@ int32 1 @>, doNothing)
+    dict.Add(getMethod <@ int 1u @>, doNothing)
+    dict.Add(getMethod <@ int32 1u @>, doNothing)
+
+    dict.Add(getMethod <@ uint32 1y @>, doNothing)
+    dict.Add(getMethod <@ uint32 1s @>, doNothing)
     dict.Add(getMethod <@ uint32 1 @>, doNothing)
+    dict.Add(getMethod <@ uint32 1u @>, doNothing)
+
+    dict.Add(getMethod <@ int64 1L @>, doNothing)
+    dict.Add(getMethod <@ int64 1uL @>, doNothing)
+    dict.Add(getMethod <@ int64 1uy @>, emitOpCode Conv_U8)
+    dict.Add(getMethod <@ int64 1us @>, emitOpCode Conv_U8)
+    dict.Add(getMethod <@ int64 1u @>, emitOpCode Conv_U8)
+    dict.Add(getMethod <@ int64 'a' @>, emitOpCode Conv_U8)
+
+    dict.Add(getMethod <@ uint64 1L @>, doNothing)
+    dict.Add(getMethod <@ uint64 1uL @>, doNothing)
+    dict.Add(getMethod <@ uint64 1y @>, emitOpCode Conv_I8)
+    dict.Add(getMethod <@ uint64 1s @>, emitOpCode Conv_I8)
     dict.Add(getMethod <@ uint64 1 @>, emitOpCode Conv_I8)
+
+    dict.Add(getMethod <@ float 1.0 @>, doNothing)
+    dict.Add(getMethod <@ float 1uy @>, emitOpCode Conv_R_Un |>> emitOpCode Conv_R8)
+    dict.Add(getMethod <@ float 1us @>, emitOpCode Conv_R_Un |>> emitOpCode Conv_R8)
+    dict.Add(getMethod <@ float 1u @>, emitOpCode Conv_R_Un |>> emitOpCode Conv_R8)
+    dict.Add(getMethod <@ float 1uL @>, emitOpCode Conv_R_Un |>> emitOpCode Conv_R8)
+    dict.Add(getMethod <@ float 'a' @>, emitOpCode Conv_R_Un |>> emitOpCode Conv_R8)
+
+    dict.Add(getMethod <@ float32 1.0f @>, doNothing)
+    dict.Add(getMethod <@ float32 1uy @>, emitOpCode Conv_R_Un |>> emitOpCode Conv_R4)
+    dict.Add(getMethod <@ float32 1us @>, emitOpCode Conv_R_Un |>> emitOpCode Conv_R4)
+    dict.Add(getMethod <@ float32 1u @>, emitOpCode Conv_R_Un |>> emitOpCode Conv_R4)
+    dict.Add(getMethod <@ float32 1uL @>, emitOpCode Conv_R_Un |>> emitOpCode Conv_R4)
+    dict.Add(getMethod <@ float32 'a' @>, emitOpCode Conv_R_Un |>> emitOpCode Conv_R4)
+
+    dict.Add(getMethod <@ decimal 1uy @>, emitCallMethod (getMethod <@ Convert.ToDecimal(1uy) @>))
+    dict.Add(getMethod <@ decimal 1y @>, emitCallMethod (getMethod <@ Convert.ToDecimal(1y) @>))
+    dict.Add(getMethod <@ decimal 1s @>, emitCallMethod (getMethod <@ Convert.ToDecimal(1s) @>))
+    dict.Add(getMethod <@ decimal 1us @>, emitCallMethod (getMethod <@ Convert.ToDecimal(1us) @>))
+    dict.Add(getMethod <@ decimal 1 @>, emitCallMethod (getMethod <@ Convert.ToDecimal(1) @>))
+    dict.Add(getMethod <@ decimal 1u @>, emitCallMethod (getMethod <@ Convert.ToDecimal(1u) @>))
+    dict.Add(getMethod <@ decimal 1L @>, emitCallMethod (getMethod <@ Convert.ToDecimal(1L) @>))
+    dict.Add(getMethod <@ decimal 1uL @>, emitCallMethod (getMethod <@ Convert.ToDecimal(1uL) @>))
+    dict.Add(getMethod <@ decimal 1.0 @>, emitCallMethod (getMethod <@ Convert.ToDecimal(1.0) @>))
+    dict.Add(getMethod <@ decimal 1.0f @>, emitCallMethod (getMethod <@ Convert.ToDecimal(1.0f) @>))
+
+    dict.Add(getMethod <@ char 'a' @>, doNothing)
 
     dict.Add(getMethod <@ byte 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : byte @>))
     dict.Add(getMethod <@ sbyte 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : sbyte @>))
@@ -132,14 +208,6 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ int64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseInt64("") @>))
     dict.Add(getMethod <@ uint64 "" @>, emitCallMethod (getMethod <@ LanguagePrimitives.ParseUInt64("") @>))
 
-    dict.Add(getMethod <@ char 'a' @>, doNothing)
-
-    dict.Add(getMethod <@ char 1.0 @>, emitOpCode Conv_U2)
-    dict.Add(getMethod <@ decimal 1.0 @>, emitCallMethod (getMethod <@ Convert.ToDecimal(1.0) @>))
-    dict.Add(getMethod <@ float 1.0 @>, doNothing)
-    dict.Add(getMethod <@ nativeint 1.0 @>, emitOpCode Conv_I)
-    dict.Add(getMethod <@ unativeint 1.0 @>, emitOpCode Conv_U)
-
     dict.Add(getMethod <@ sign 1I @>, declareLocal<bigint> Ldloca |>> emitOpCode (Call (PropGet (getProperty <@ (1I).Sign @>))))
 
     dict :> IReadOnlyDictionary<_, _>
@@ -148,12 +216,62 @@ module internal MethodCallEmitter =
 
   let private altEmitterTableChecked =
     let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
-    dict.Add(getMethod <@ -(1) @>, emitOpCode Ldc_I4_M1 |>> emitOpCode Mul_Ovf)
     dict.Add(getMethod <@ -(1.0) @>, emitOpCode Neg)
-    dict.Add(getMethod <@ 1.0 - 1.0 @>, emitOpCode Sub)
-    dict.Add(getMethod <@ 1.0 * 1.0 @>, emitOpCode Mul)
+    dict.Add(getMethod <@ -(1.0f) @>, emitOpCode Neg)
+
+    dict.Add(getMethod <@ 1y - 1y @>, emitOpCode Sub_Ovf |>> emitOpCode Conv_Ovf_I1)
+    dict.Add(getMethod <@ 1s - 1s @>, emitOpCode Sub_Ovf |>> emitOpCode Conv_Ovf_I2)
     dict.Add(getMethod <@ 1 - 1 @>, emitOpCode Sub_Ovf)
+    dict.Add(getMethod <@ 1L - 1L @>, emitOpCode Sub_Ovf)
+    dict.Add(getMethod <@ 1uy - 1uy @>, emitOpCode Sub_Ovf_Un |>> emitOpCode Conv_Ovf_U1_Un)
+    dict.Add(getMethod <@ 1us - 1us @>, emitOpCode Sub_Ovf_Un |>> emitOpCode Conv_Ovf_U2_Un)
+    dict.Add(getMethod <@ 1u - 1u @>, emitOpCode Sub_Ovf_Un)
+    dict.Add(getMethod <@ 1uL - 1uL @>, emitOpCode Sub_Ovf_Un)
+    dict.Add(getMethod <@ 1.0 - 1.0 @>, emitOpCode Sub)
+    dict.Add(getMethod <@ 1.0f - 1.0f @>, emitOpCode Sub)
+
+    dict.Add(getMethod <@ 1y * 1y @>, emitOpCode Mul_Ovf |>> emitOpCode Conv_Ovf_I1)
+    dict.Add(getMethod <@ 1s * 1s @>, emitOpCode Mul_Ovf |>> emitOpCode Conv_Ovf_I2)
     dict.Add(getMethod <@ 1 * 1 @>, emitOpCode Mul_Ovf)
+    dict.Add(getMethod <@ 1L * 1L @>, emitOpCode Mul_Ovf)
+    dict.Add(getMethod <@ 1uy * 1uy @>, emitOpCode Mul_Ovf_Un |>> emitOpCode Conv_Ovf_U1_Un)
+    dict.Add(getMethod <@ 1us * 1us @>, emitOpCode Mul_Ovf_Un |>> emitOpCode Conv_Ovf_U2_Un)
+    dict.Add(getMethod <@ 1u * 1u @>, emitOpCode Mul_Ovf_Un)
+    dict.Add(getMethod <@ 1uL * 1uL @>, emitOpCode Mul_Ovf_Un)
+    dict.Add(getMethod <@ 1.0 * 1.0 @>, emitOpCode Mul)
+    dict.Add(getMethod <@ 1.0f * 1.0f @>, emitOpCode Mul)
+
+    dict.Add(getMethod <@ byte 1uy @>, doNothing)
+    dict.Add(getMethod <@ byte 1us @>, emitOpCode Conv_Ovf_U1_Un)
+    dict.Add(getMethod <@ byte 1u @>, emitOpCode Conv_Ovf_U1_Un)
+    dict.Add(getMethod <@ byte 1uL @>, emitOpCode Conv_Ovf_U1_Un)
+    dict.Add(getMethod <@ byte 'a' @>, emitOpCode Conv_Ovf_U1_Un)
+
+    dict.Add(getMethod <@ sbyte 1y @>, doNothing)
+    dict.Add(getMethod <@ sbyte 1uy @>, emitOpCode Conv_Ovf_I1_Un)
+    dict.Add(getMethod <@ sbyte 1us @>, emitOpCode Conv_Ovf_I1_Un)
+    dict.Add(getMethod <@ sbyte 1u @>, emitOpCode Conv_Ovf_I1_Un)
+    dict.Add(getMethod <@ sbyte 1uL @>, emitOpCode Conv_Ovf_I1_Un)
+    dict.Add(getMethod <@ sbyte 'a' @>, emitOpCode Conv_Ovf_I1_Un)
+
+    dict.Add(getMethod <@ int16 1s @>, doNothing)
+    dict.Add(getMethod <@ int16 1uy @>, emitOpCode Conv_Ovf_I2_Un)
+    dict.Add(getMethod <@ int16 1us @>, emitOpCode Conv_Ovf_I2_Un)
+    dict.Add(getMethod <@ int16 1u @>, emitOpCode Conv_Ovf_I2_Un)
+    dict.Add(getMethod <@ int16 1uL @>, emitOpCode Conv_Ovf_I2_Un)
+    dict.Add(getMethod <@ int16 'a' @>, emitOpCode Conv_Ovf_I2_Un)
+
+    dict.Add(getMethod <@ uint16 1uy @>, emitOpCode Conv_Ovf_U2_Un)
+    dict.Add(getMethod <@ uint16 1us @>, doNothing)
+    dict.Add(getMethod <@ uint16 1u @>, emitOpCode Conv_Ovf_U2_Un)
+    dict.Add(getMethod <@ uint16 1uL @>, emitOpCode Conv_Ovf_U2_Un)
+    dict.Add(getMethod <@ uint16 'a' @>, emitOpCode Conv_Ovf_U2_Un)
+
+    dict.Add(getMethod <@ char 1uy @>, emitOpCode Conv_Ovf_U2_Un)
+    dict.Add(getMethod <@ char 1us @>, emitOpCode Conv_Ovf_U2_Un)
+    dict.Add(getMethod <@ char 1u @>, emitOpCode Conv_Ovf_U2_Un)
+    dict.Add(getMethod <@ char 1uL @>, emitOpCode Conv_Ovf_U2_Un)
+    dict.Add(getMethod <@ char 'a' @>, doNothing)
 
     dict.Add(getMethod <@ -(1I) @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_UnaryNegation(1I) @>))
     dict.Add(getMethod <@ 1I - 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Subtraction(1I, 1I) @>))
@@ -163,6 +281,35 @@ module internal MethodCallEmitter =
 
     dict.Add(getMethod <@ int 1 @>, doNothing)
     dict.Add(getMethod <@ int32 1 @>, doNothing)
+    dict.Add(getMethod <@ int 1uy @>, emitOpCode Conv_Ovf_I4_Un)
+    dict.Add(getMethod <@ int32 1uy @>, emitOpCode Conv_Ovf_I4_Un)
+    dict.Add(getMethod <@ int 1us @>, emitOpCode Conv_Ovf_I4_Un)
+    dict.Add(getMethod <@ int32 1us @>, emitOpCode Conv_Ovf_I4_Un)
+    dict.Add(getMethod <@ int 1u @>, emitOpCode Conv_Ovf_I4_Un)
+    dict.Add(getMethod <@ int32 1u @>, emitOpCode Conv_Ovf_I4_Un)
+    dict.Add(getMethod <@ int 1uL @>, emitOpCode Conv_Ovf_I4_Un)
+    dict.Add(getMethod <@ int32 1uL @>, emitOpCode Conv_Ovf_I4_Un)
+    dict.Add(getMethod <@ int 'a' @>, emitOpCode Conv_Ovf_I4_Un)
+    dict.Add(getMethod <@ int32 'a' @>, emitOpCode Conv_Ovf_I4_Un)
+
+    dict.Add(getMethod <@ uint32 1uy @>, emitOpCode Conv_Ovf_U4_Un)
+    dict.Add(getMethod <@ uint32 1us @>, emitOpCode Conv_Ovf_U4_Un)
+    dict.Add(getMethod <@ uint32 1u @>, doNothing)
+    dict.Add(getMethod <@ uint32 1uL @>, emitOpCode Conv_Ovf_U4_Un)
+    dict.Add(getMethod <@ uint32 'a' @>, emitOpCode Conv_Ovf_U4_Un)
+
+    dict.Add(getMethod <@ int64 1L @>, doNothing)
+    dict.Add(getMethod <@ int64 1uy @>, emitOpCode Conv_Ovf_I8_Un)
+    dict.Add(getMethod <@ int64 1us @>, emitOpCode Conv_Ovf_I8_Un)
+    dict.Add(getMethod <@ int64 1u @>, emitOpCode Conv_Ovf_I8_Un)
+    dict.Add(getMethod <@ int64 1uL @>, emitOpCode Conv_Ovf_I8_Un)
+    dict.Add(getMethod <@ int64 'a' @>, emitOpCode Conv_Ovf_I8_Un)
+
+    dict.Add(getMethod <@ uint64 1uy @>, emitOpCode Conv_Ovf_U8_Un)
+    dict.Add(getMethod <@ uint64 1us @>, emitOpCode Conv_Ovf_U8_Un)
+    dict.Add(getMethod <@ uint64 1u @>, emitOpCode Conv_Ovf_U8_Un)
+    dict.Add(getMethod <@ uint64 1uL @>, doNothing)
+    dict.Add(getMethod <@ uint64 'a' @>, emitOpCode Conv_Ovf_U8_Un)
 
     dict.Add(getMethod <@ byte 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : byte @>))
     dict.Add(getMethod <@ sbyte 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : sbyte @>))
@@ -176,8 +323,6 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ uint32 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : uint32 @>))
     dict.Add(getMethod <@ int64 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : int64 @>))
     dict.Add(getMethod <@ uint64 1I @>, emitCallMethod (getMethod <@ Numerics.BigInteger.op_Explicit(1I) : uint64 @>))
-
-    dict.Add(getMethod <@ char 'a' @>, doNothing)
 
     dict.Add(getMethod <@ byte "" @>, emitOpCode (Call (Method (getMethod <@ LanguagePrimitives.ParseUInt32("") @>)))
                                       |>> emitOpCode Conv_Ovf_U1)
@@ -206,20 +351,29 @@ module internal MethodCallEmitter =
     dict.Add(getGenericMethod <@ -(x) @>, emitOpCode Neg)
     dict.Add(getGenericMethod <@ x - x @>, emitOpCode Sub)
     dict.Add(getGenericMethod <@ x / x @>, emitOpCode Div)
+    dict.Add(getGenericMethod <@ x % x @>, emitOpCode Rem)
+
+    dict.Add(getGenericMethod <@ x &&& x @>, emitOpCode And)
+    dict.Add(getGenericMethod <@ x ||| x @>, emitOpCode Or)
+    dict.Add(getGenericMethod <@ x ^^^ x @>, emitOpCode Xor)
+    dict.Add(getGenericMethod <@ ~~~x @>, emitOpCode Not)
 
     dict.Add(getGenericMethod <@ byte x @>, emitOpCode Conv_U1)
     dict.Add(getGenericMethod <@ sbyte x @>, emitOpCode Conv_I1)
-    dict.Add(getGenericMethod <@ int x @>, emitOpCode Conv_I4)
     dict.Add(getGenericMethod <@ int16 x @>, emitOpCode Conv_I2)
     dict.Add(getGenericMethod <@ uint16 x @>, emitOpCode Conv_U2)
+    dict.Add(getGenericMethod <@ int x @>, emitOpCode Conv_I4)
     dict.Add(getGenericMethod <@ int32 x @>, emitOpCode Conv_I4)
     dict.Add(getGenericMethod <@ uint32 x @>, emitOpCode Conv_U4)
     dict.Add(getGenericMethod <@ int64 x @>, emitOpCode Conv_I8)
     dict.Add(getGenericMethod <@ uint64 x @>, emitOpCode Conv_U8)
     dict.Add(getGenericMethod <@ nativeint x @>, emitOpCode Conv_I)
-    dict.Add(getGenericMethod <@ unativeint x @>, emitOpCode Conv_I)
+    dict.Add(getGenericMethod <@ unativeint x @>, emitOpCode Conv_U)
     dict.Add(getGenericMethod <@ float32 x @>, emitOpCode Conv_R4)
     dict.Add(getGenericMethod <@ float x @>, emitOpCode Conv_R8)
+    dict.Add(getGenericMethod <@ char x @>, emitOpCode Conv_U2)
+
+    dict.Add(getGenericMethod <@ Checked.(~-) x @>, emitOpCode Ldc_I4_M1 |>> emitOpCode Mul_Ovf)
 
     dict.Add(getGenericMethod <@ Checked.byte x @>, emitOpCode Conv_Ovf_U1)
     dict.Add(getGenericMethod <@ Checked.sbyte x @>, emitOpCode Conv_Ovf_I1)

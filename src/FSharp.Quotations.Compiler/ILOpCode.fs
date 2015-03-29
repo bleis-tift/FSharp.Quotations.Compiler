@@ -21,14 +21,18 @@ type ILOpCode =
   | Not
   | Shl
   | Shr
+  | Shr_Un
   | Div
   | Mul
   | Mul_Ovf
+  | Mul_Ovf_Un
   | Neg
   | Rem
+  | Rem_Un
   | Add
   | Sub
   | Sub_Ovf
+  | Sub_Ovf_Un
   | Brfalse of Label
   | Br of Label
   | Leave of Label
@@ -39,6 +43,7 @@ type ILOpCode =
   | Conv_I2
   | Conv_I4
   | Conv_I8
+  | Conv_R_Un
   | Conv_R4
   | Conv_R8
   | Conv_U
@@ -56,6 +61,14 @@ type ILOpCode =
   | Conv_Ovf_U2
   | Conv_Ovf_U4
   | Conv_Ovf_U8
+  | Conv_Ovf_I1_Un
+  | Conv_Ovf_I2_Un
+  | Conv_Ovf_I4_Un
+  | Conv_Ovf_I8_Un
+  | Conv_Ovf_U1_Un
+  | Conv_Ovf_U2_Un
+  | Conv_Ovf_U4_Un
+  | Conv_Ovf_U8_Un
   | Box of Type
   | Unbox_Any of Type
   | Stloc of LocalBuilder * string option
@@ -130,14 +143,18 @@ module ILOpCode =
   | Not -> OpCodes.Not
   | Shl -> OpCodes.Shl
   | Shr -> OpCodes.Shr
+  | Shr_Un -> OpCodes.Shr_Un
   | Div -> OpCodes.Div
   | Mul -> OpCodes.Mul
   | Mul_Ovf -> OpCodes.Mul_Ovf
+  | Mul_Ovf_Un -> OpCodes.Mul_Ovf_Un
   | Neg -> OpCodes.Neg
   | Rem -> OpCodes.Rem
+  | Rem_Un -> OpCodes.Rem_Un
   | Add -> OpCodes.Add
   | Sub -> OpCodes.Sub
   | Sub_Ovf -> OpCodes.Sub_Ovf
+  | Sub_Ovf_Un -> OpCodes.Sub_Ovf_Un
   | Brfalse _ -> OpCodes.Brfalse
   | Br _ -> OpCodes.Br
   | Leave _ -> OpCodes.Leave
@@ -153,6 +170,7 @@ module ILOpCode =
   | Conv_U2 -> OpCodes.Conv_U2
   | Conv_U4 -> OpCodes.Conv_U4
   | Conv_U8 -> OpCodes.Conv_U8
+  | Conv_R_Un -> OpCodes.Conv_R_Un
   | Conv_R4 -> OpCodes.Conv_R4
   | Conv_R8 -> OpCodes.Conv_R8
   | Conv_Ovf_I -> OpCodes.Conv_Ovf_I
@@ -165,6 +183,14 @@ module ILOpCode =
   | Conv_Ovf_U2 -> OpCodes.Conv_Ovf_U2
   | Conv_Ovf_U4 -> OpCodes.Conv_Ovf_U4
   | Conv_Ovf_U8 -> OpCodes.Conv_Ovf_U8
+  | Conv_Ovf_I1_Un -> OpCodes.Conv_Ovf_I1_Un
+  | Conv_Ovf_I2_Un -> OpCodes.Conv_Ovf_I2_Un
+  | Conv_Ovf_I4_Un -> OpCodes.Conv_Ovf_I4_Un
+  | Conv_Ovf_I8_Un -> OpCodes.Conv_Ovf_I8_Un
+  | Conv_Ovf_U1_Un -> OpCodes.Conv_Ovf_U1_Un
+  | Conv_Ovf_U2_Un -> OpCodes.Conv_Ovf_U2_Un
+  | Conv_Ovf_U4_Un -> OpCodes.Conv_Ovf_U4_Un
+  | Conv_Ovf_U8_Un -> OpCodes.Conv_Ovf_U8_Un
   | Box _ -> OpCodes.Box
   | Unbox_Any _ -> OpCodes.Unbox_Any
   | Stloc _ -> OpCodes.Stloc

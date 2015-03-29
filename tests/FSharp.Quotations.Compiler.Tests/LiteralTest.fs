@@ -15,6 +15,10 @@ module LiteralTest =
 
   // TODO : more tests
   [<Test>]
+  let byte () = <@ 1uy @> |> check 1uy
+
+  // TODO : more tests
+  [<Test>]
   let sbyte () = <@ 1y @> |> check 1y
 
   // TODO : more tests

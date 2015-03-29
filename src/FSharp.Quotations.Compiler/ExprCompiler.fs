@@ -275,6 +275,8 @@ module ExprCompiler =
             | Value (value, typ) ->
                 if typ = typeof<int> then
                   emitLoadInteger<int> value gen
+                elif typ = typeof<byte> then
+                  emitLoadInteger<byte> value gen
                 elif typ = typeof<sbyte> then
                   emitLoadInteger<sbyte> value gen
                 elif typ = typeof<int16> then
