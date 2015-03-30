@@ -71,6 +71,7 @@
     <None Include="paket.references" />
     <None Include="paket.template" />
     <Compile Include="DebugUtil.fs" />
+    <Compile Include="ExprUtil.fs" />
     <Compile Include="Stringizer.fs" />
     <Compile Include="ModuleBuilderWrapper.fs" />
     <Compile Include="TypeBuilderWrapper.fs" />
