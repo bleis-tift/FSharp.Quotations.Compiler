@@ -66,6 +66,12 @@ module LiteralTest =
   [<Test>]
   let float () = <@ 42.0 @> |> check 42.0
 
+  // TODO : more tests
+  [<Test>]
+  let decimal () =
+    <@ 42.0m @> |> check 42.0m
+    <@ 42.0M @> |> check 42.0M
+
   [<TestCase("test string")>]
   [<TestCase(null: string)>]
   let string (str: string) = <@ str @> |> check str
