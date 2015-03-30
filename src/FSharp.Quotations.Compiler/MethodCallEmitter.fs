@@ -19,6 +19,7 @@ module internal MethodCallEmitter =
   | expr -> failwithf "expr is not Method call: %A" expr
 
   let private getProperty = function
+  | Let (_, _, PropertyGet (_, pi, _))
   | PropertyGet (_, pi, _) -> pi
   | expr -> failwithf "expr is not property get: %A" expr
 
@@ -62,6 +63,11 @@ module internal MethodCallEmitter =
     |>> emitOpCode (Call (PropGet (getProperty <@ CultureInfo.InvariantCulture @>)))
     |>> emitOpCode (Unbox_Any typeof<IFormatProvider>)
     |>> emitCallMethod mi
+
+  let declareLocal<'T> loader =
+    [
+      Compiling (fun (gen: ILGeneratorWrapper) -> let loc = gen.DeclareLocal(typeof<'T>) in gen.Emit(Stloc (loc, None)); gen.Emit(loader (loc, None)))
+    ]
 
   let private altEmitterTableUnchecked =
     let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
@@ -133,6 +139,8 @@ module internal MethodCallEmitter =
     dict.Add(getMethod <@ float 1.0 @>, doNothing)
     dict.Add(getMethod <@ nativeint 1.0 @>, emitOpCode Conv_I)
     dict.Add(getMethod <@ unativeint 1.0 @>, emitOpCode Conv_U)
+
+    dict.Add(getMethod <@ sign 1I @>, declareLocal<bigint> Ldloca |>> emitOpCode (Call (PropGet (getProperty <@ (1I).Sign @>))))
 
     dict :> IReadOnlyDictionary<_, _>
 

@@ -6,6 +6,9 @@ module MathFuncTest =
   let ``abs int`` () = <@ abs -1 @> |> check 1
 
   [<Test>]
+  let ``abs bigint`` () = <@ abs -1I @> |> check 1I
+
+  [<Test>]
   let ``abs float`` () = <@ abs -1.0 @> |> check 1.0
 
   [<Test>]
@@ -48,6 +51,9 @@ module MathFuncTest =
   let ``nan`` () = <@ nan @> |> check nan
 
   [<Test>]
+  let ``pown bigint int`` () = <@ pown 2I 2 @> |> check (pown 2I 2)
+
+  [<Test>]
   let ``pown float int`` () = <@ pown 0.5 2 @> |> check (pown 0.5 2)
 
   [<Test>]
@@ -55,6 +61,9 @@ module MathFuncTest =
 
   [<Test>]
   let ``sign int`` () = <@ sign -10 @> |> check -1
+
+  [<Test>]
+  let ``sign bigint`` () = <@ sign -10I @> |> check (sign -10I)
 
   [<Test>]
   let ``sign float`` () = <@ sign -1.0 @> |> check -1
