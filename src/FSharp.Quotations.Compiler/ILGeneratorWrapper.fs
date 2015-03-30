@@ -103,7 +103,7 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string,
         let hint = match nameOpt with Some name -> "  // " + name | None -> ""
         this.WriteLineAndMark(raw.Name + " " + string local.LocalIndex + hint)
         gen.Emit(raw, local)
-    | Ldsfld fld | Stfld fld | Ldfld fld ->
+    | Stsfld fld | Ldsfld fld | Stfld fld | Ldfld fld ->
         this.WriteLineAndMark(raw.Name + " " + (fld.ToReadableText()))
         gen.Emit(raw, fld)
     | Ldstr str ->

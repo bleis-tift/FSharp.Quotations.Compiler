@@ -104,6 +104,11 @@
     <Compile Include="FSharpTypeTest.fs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FSharp.Quotations.Compiler.Tests.CSharp\FSharp.Quotations.Compiler.Tests.CSharp.csproj">
+      <Name>FSharp.Quotations.Compiler.Tests.CSharp</Name>
+      <Project>{b69bd2f7-bd0b-4dec-af95-6069212101a8}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <Reference Include="FsUnit.NUnit">
       <HintPath>..\..\packages\FsUnit.1.3.0.1\Lib\Net40\FsUnit.NUnit.dll</HintPath>
       <Private>True</Private>

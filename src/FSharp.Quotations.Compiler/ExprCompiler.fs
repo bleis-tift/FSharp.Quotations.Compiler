@@ -194,7 +194,7 @@ module ExprCompiler =
                 MethodCallEmitter.emit (recv, pi.SetMethod, (argsExprs @ [expr])) stack varEnv
             | FieldSet (None, fi, expr) ->
                 stack.Push(Compiling (fun gen ->
-                  gen.Emit(Stfld fi)
+                  gen.Emit(Stsfld fi)
                 ))
                 stack.Push(CompileTarget expr)
             | FieldSet (Some recv, fi, expr) ->

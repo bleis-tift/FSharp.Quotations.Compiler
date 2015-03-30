@@ -1,6 +1,7 @@
 ﻿namespace FSharp.Quotations.Compiler.Tests
 
 open System
+open FSharp.Quotations.Compiler.Tests.CSharp
 
 [<TestModule>]
 module ObjTest =
@@ -54,6 +55,19 @@ module ObjTest =
        c.InstanceField <- "new str"
        c.InstanceField
     @> |> check "new str"
+
+  [<Test>]
+  let ``static field get`` () = <@ CSharpClass.StaticField @> |> check CSharpClass.StaticField
+
+  [<Test>]
+  let ``static field set`` () =
+    let initialStaticFieldValue = CSharpClass.StaticField
+    try
+      <@ CSharpClass.StaticField <- initialStaticFieldValue * 2
+         CSharpClass.StaticField @>
+      |> check (initialStaticFieldValue * 2)
+    finally
+      CSharpClass.StaticField <- initialStaticFieldValue
 
   [<Struct>]
   type Struct(i: int) =
