@@ -58,8 +58,8 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string,
     #endif
     loc
 
-  member this.DeclareLocal(typ: Type) =
-    let loc = this.DeclareLocal(sprintf "$loc_%d" localVariableNumber, typ)
+  member this.DeclareTemp(typ: Type) =
+    let loc = this.DeclareLocal(sprintf "$tmp_%d" localVariableNumber, typ)
     localVariableNumber <- localVariableNumber + 1
     loc
 

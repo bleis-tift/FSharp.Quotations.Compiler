@@ -56,13 +56,65 @@ module internal MethodCallEmitter =
   let convUInt16 = [ Compiling (fun gen -> gen.Emit(Conv_U2)) ]
   let convUInt8 = [ Compiling (fun gen -> gen.Emit(Conv_U1)) ]
 
-  let declareLocal<'T> loader =
+  let declareTemp<'T> loader =
     [
-      Compiling (fun gen -> let loc = gen.DeclareLocal(typeof<'T>) in gen.Emit(Stloc (loc, None)); gen.Emit(loader (loc, None)))
+      Compiling (fun gen -> let loc = gen.DeclareTemp(typeof<'T>) in gen.Emit(Stloc (loc, None)); gen.Emit(loader (loc, None)))
     ]
+
+  let private nint = Expr.Value(1n) |> Expr.Cast
+  let private unint = Expr.Value(1un) |> Expr.Cast
+
+  let private rangeByteM = Expr.getMethodInfo <@ OperatorIntrinsics.RangeByte 1uy  1uy  1uy  @>
+  let private rangeCharM = Expr.getMethodInfo <@ OperatorIntrinsics.RangeChar 'a' 'a' @>
+  let private rangeDoubleM = Expr.getMethodInfo <@ OperatorIntrinsics.RangeDouble 1.0 1.0 1.0 @>
+  let private rangeInt16M = Expr.getMethodInfo <@ OperatorIntrinsics.RangeInt16 1s 1s 1s @>
+  let private rangeInt32M = Expr.getMethodInfo <@ OperatorIntrinsics.RangeInt32 1 1 1 @>
+  let private rangeInt64M = Expr.getMethodInfo <@ OperatorIntrinsics.RangeInt64 1L 1L 1L @>
+  let private rangeIntPtrM = Expr.getMethodInfo <@ OperatorIntrinsics.RangeIntPtr %nint %nint %nint @>
+  let private rangeSByteM = Expr.getMethodInfo <@ OperatorIntrinsics.RangeSByte 1y  1y  1y  @>
+  let private rangeSingleM = Expr.getMethodInfo <@ OperatorIntrinsics.RangeSingle 1.0f 1.0f 1.0f @>
+  let private rangeUInt16M = Expr.getMethodInfo <@ OperatorIntrinsics.RangeUInt16 1us 1us 1us @>
+  let private rangeUInt32M = Expr.getMethodInfo <@ OperatorIntrinsics.RangeUInt32 1u 1u 1u @>
+  let private rangeUInt64M = Expr.getMethodInfo <@ OperatorIntrinsics.RangeUInt64 1uL 1uL 1uL @>
+  let private rangeUIntPtrM = Expr.getMethodInfo <@ OperatorIntrinsics.RangeUIntPtr %unint %unint %unint @>
+
+  let private emitRange<'T> mi =
+    [ Compiling (fun gen ->
+        let tmp = gen.DeclareTemp(typeof<'T>)
+        gen.Emit(Stloc (tmp, None))
+        gen.Emit(Ldc_I4_1)
+        gen.Emit(Ldloc (tmp, None))
+      ) ]
+    |>> emitCallMethod mi
 
   let private altEmitterTableUnchecked =
     let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
+    dict.Add(Expr.getMethodInfo <@ (..) 1uy 1uy @>, emitRange<byte> rangeByteM)
+    dict.Add(Expr.getMethodInfo <@ (.. ..) 1uy 1uy 1uy @>, emitCallMethod rangeByteM)
+    dict.Add(Expr.getMethodInfo <@ (..) 'a' 'a' @>, emitCallMethod rangeCharM)
+    dict.Add(Expr.getMethodInfo <@ (..) 1.0 1.0 @>, emitRange<float> rangeDoubleM)
+    dict.Add(Expr.getMethodInfo <@ (.. ..) 1.0 1.0 1.0 @>, emitCallMethod rangeDoubleM)
+    dict.Add(Expr.getMethodInfo <@ (..) 1s 1s @>, emitRange<int16> rangeInt16M)
+    dict.Add(Expr.getMethodInfo <@ (.. ..) 1s 1s 1s @>, emitCallMethod rangeInt16M)
+    dict.Add(Expr.getMethodInfo <@ (..) 1 1 @>, emitRange<int> rangeInt32M)
+    dict.Add(Expr.getMethodInfo <@ (.. ..) 1 1 1 @>, emitCallMethod rangeInt32M)
+    dict.Add(Expr.getMethodInfo <@ (..) 1L 1L @>, emitRange<int64> rangeInt64M)
+    dict.Add(Expr.getMethodInfo <@ (.. ..) 1L 1L 1L @>, emitCallMethod rangeInt64M)
+    dict.Add(Expr.getMethodInfo <@ (..) %nint %nint @>, emitRange<nativeint> rangeIntPtrM)
+    dict.Add(Expr.getMethodInfo <@ (.. ..) %nint %nint %nint @>, emitCallMethod rangeIntPtrM)
+    dict.Add(Expr.getMethodInfo <@ (..) 1y 1y @>, emitRange<sbyte> rangeSByteM)
+    dict.Add(Expr.getMethodInfo <@ (.. ..) 1y 1y 1y @>, emitCallMethod rangeSByteM)
+    dict.Add(Expr.getMethodInfo <@ (..) 1.0f 1.0f @>, emitRange<float32> rangeSingleM)
+    dict.Add(Expr.getMethodInfo <@ (.. ..) 1.0f 1.0f 1.0f @>, emitCallMethod rangeSingleM)
+    dict.Add(Expr.getMethodInfo <@ (..) 1us 1us @>, emitRange<uint16> rangeUInt16M)
+    dict.Add(Expr.getMethodInfo <@ (.. ..) 1us 1us 1us @>, emitCallMethod rangeUInt16M)
+    dict.Add(Expr.getMethodInfo <@ (..) 1u 1u @>, emitRange<uint32> rangeUInt32M)
+    dict.Add(Expr.getMethodInfo <@ (.. ..) 1u 1u 1u @>, emitCallMethod rangeUInt32M)
+    dict.Add(Expr.getMethodInfo <@ (..) 1uL 1uL @>, emitRange<uint64> rangeUInt64M)
+    dict.Add(Expr.getMethodInfo <@ (.. ..) 1uL 1uL 1uL @>, emitCallMethod rangeUInt64M)
+    dict.Add(Expr.getMethodInfo <@ (..) %unint %unint @>, emitRange<unativeint> rangeUIntPtrM)
+    dict.Add(Expr.getMethodInfo <@ (.. ..) %unint %unint %unint @>, emitCallMethod rangeUIntPtrM)
+
     dict.Add(Expr.getMethodInfo <@ 'a' + 'a' @>, emitOpCode Add)
 
     dict.Add(Expr.getMethodInfo <@ 1s % 1s @>, emitOpCode Rem |>> convInt16)
@@ -214,7 +266,7 @@ module internal MethodCallEmitter =
     dict.Add(Expr.getMethodInfo <@ int64 "" @>, emitCallMethod (Expr.getMethodInfo <@ LanguagePrimitives.ParseInt64("") @>))
     dict.Add(Expr.getMethodInfo <@ uint64 "" @>, emitCallMethod (Expr.getMethodInfo <@ LanguagePrimitives.ParseUInt64("") @>))
 
-    dict.Add(Expr.getMethodInfo <@ sign 1I @>, declareLocal<bigint> Ldloca |>> emitOpCode (Call (PropGet (Expr.getPropertyInfo <@ (1I).Sign @>))))
+    dict.Add(Expr.getMethodInfo <@ sign 1I @>, declareTemp<bigint> Ldloca |>> emitOpCode (Call (PropGet (Expr.getPropertyInfo <@ (1I).Sign @>))))
 
     dict :> IReadOnlyDictionary<_, _>
 
