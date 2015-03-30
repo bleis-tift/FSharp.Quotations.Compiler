@@ -2,6 +2,12 @@
 
 [<TestModule>]
 module ExtraTopLevelOpTest =
+  open System.Collections.Generic
+
+  [<Test>]
+  let ``dict`` () =
+    <@ dict []: IDictionary<int, string> @> |> check (dict [])
+    <@ dict [(1, "one"); (2, "two")] @> |> check (dict [(1, "one"); (2, "two")])
 
   [<Test>]
   let ``eprintf`` () =
