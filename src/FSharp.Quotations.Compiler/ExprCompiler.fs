@@ -41,6 +41,16 @@ module ExprCompiler =
       gen.Emit(Ldstr (string v))
       gen.Emit(Call (Method (Expr.getMethodInfo <@ NumericLiterals.NumericLiteralI.FromString("1") : bigint @>)))
 
+  let emitLoadDecimal (value: decimal) (gen: ILGeneratorWrapper) =
+    match Decimal.GetBits(value) with
+    | [|lo; mid; hi; flags|] ->
+        let scale = flags >>> 16
+        let isNegative = if value < 0M then 1 else 0
+        [lo; mid; hi; isNegative; scale] |> List.iter (fun i -> emitLoadInteger<int> i gen)
+        let ctor = typeof<decimal>.GetConstructor([|typeof<int>; typeof<int>; typeof<int>; typeof<bool>; typeof<byte>|])
+        gen.Emit(Newobj ctor)
+    | _ -> failwith "oops!"
+
   type ICompiledType<'T> =
     abstract member ExecuteCompiledCode: unit -> 'T
 
@@ -289,6 +299,8 @@ module ExprCompiler =
                   gen.Emit(Ldc_R4 (unbox<float32> value))
                 elif typ = typeof<float> then
                   gen.Emit(Ldc_R8 (unbox<float> value))
+                elif typ = typeof<decimal> then
+                  emitLoadDecimal (unbox<decimal> value) gen
                 elif typ = typeof<string> then
                   gen.Emit(Ldstr (unbox<string> value))
                 else

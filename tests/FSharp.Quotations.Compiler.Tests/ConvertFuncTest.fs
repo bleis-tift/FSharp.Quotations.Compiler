@@ -47,6 +47,11 @@ module ConvertFuncTest =
     testByteFrom<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
 
   [<Test>]
+  let ``byte decimal`` () =
+    let max, min = decimal Byte.MaxValue, decimal Byte.MinValue
+    testByteFrom<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+  [<Test>]
   let ``byte string`` () = testByteFrom<string> ["1"; "256"; "-1"; "str"; null]
 
   let inline testSByteFrom< ^T when ^T : (static member op_Explicit: ^T -> sbyte) > data =
@@ -71,6 +76,11 @@ module ConvertFuncTest =
     testSByteFrom<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
 
   [<Test>]
+  let ``sbyte decimal`` () =
+    let max, min = decimal SByte.MaxValue, decimal SByte.MinValue
+    testSByteFrom<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+  [<Test>]
   let ``sbyte string`` () = testSByteFrom<string> ["1"; "128"; "-129"; "str"; null]
 
   let inline testCharFrom< ^T when ^T : (static member op_Explicit: ^T -> char) > data =
@@ -90,6 +100,11 @@ module ConvertFuncTest =
     testCharFrom<float> [97.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
 
   [<Test>]
+  let ``char decimal`` () =
+    let max, min = decimal (int Char.MaxValue), decimal (int Char.MinValue)
+    testCharFrom<decimal> [97.0M; max + 1.0M; min - 1.0M]
+
+  [<Test>]
   let ``char string`` () = testCharFrom<string> ["a"; "aa"; null]
 
   let inline testDecimalFrom< ^T when ^T : (static member op_Explicit: ^T -> decimal) > data =
@@ -103,6 +118,9 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``decimal float`` () = testDecimalFrom<float> [1.0; Double.MaxValue; Double.MinValue; nan; infinity; -infinity]
+
+  [<Test>]
+  let ``decimal decimal`` () = testDecimalFrom<decimal> [1.0M]
 
   [<Test>]
   let ``decimal string`` () =
@@ -129,6 +147,9 @@ module ConvertFuncTest =
   let ``float float`` () = testFloatFrom<float> [1.0; nan; infinity; -infinity]
 
   [<Test>]
+  let ``float decimal`` () = testFloatFrom<decimal> [1.0M; Decimal.MaxValue; Decimal.MinValue]
+
+  [<Test>]
   let ``float string`` () =
     testFloatFrom<string> [
       "1"; "NaN"; "Infinity"; "-Infinity";
@@ -151,6 +172,9 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``float32 float`` () = testFloat32From<float> [0.0; nan; infinity; -infinity]
+
+  [<Test>]
+  let ``float32 decimal`` () = testFloat32From<decimal> [0.0M]
 
   [<Test>]
   let ``float32 string`` () =
@@ -181,6 +205,11 @@ module ConvertFuncTest =
     testIntFrom<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
 
   [<Test>]
+  let ``int decimal`` () =
+    let max, min = decimal Int32.MaxValue, decimal Int32.MinValue
+    testIntFrom<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+  [<Test>]
   let ``int string`` () = testIntFrom<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
 
   let inline testInt16From< ^T when ^T : (static member op_Explicit: ^T -> int16) > data =
@@ -203,6 +232,11 @@ module ConvertFuncTest =
   let ``int16 float`` () =
     let max, min = float Int16.MaxValue, float Int16.MinValue
     testInt16From<float> [1.0; max + 1.0; min - 1.0]
+
+  [<Test>]
+  let ``int16 decimal`` () =
+    let max, min = decimal Int16.MaxValue, decimal Int16.MinValue
+    testInt16From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
   [<Test>]
   let ``int16 string`` () = testInt16From<string> ["1"; "32768"; "-32769"; "str"; null]
@@ -229,6 +263,11 @@ module ConvertFuncTest =
     testUInt16From<float> [1.0; max + 1.0; min - 1.0]
 
   [<Test>]
+  let ``uint16 decimal`` () =
+    let max, min = decimal UInt16.MaxValue, decimal UInt16.MinValue
+    testUInt16From<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+  [<Test>]
   let ``uint16 string`` () = testUInt16From<string> ["1"; "65536"; "-1"; "str"; null]
 
   let inline testInt32From< ^T when ^T : (static member op_Explicit: ^T -> int32) > data =
@@ -244,6 +283,11 @@ module ConvertFuncTest =
   let ``int32 float`` () =
     let max, min = float Int32.MaxValue, float Int32.MinValue
     testInt32From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+  [<Test>]
+  let ``int32 decimal`` () =
+    let max, min = decimal Int32.MaxValue, decimal Int32.MinValue
+    testInt32From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
   [<Test>]
   let ``int32 string`` () = testInt32From<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
@@ -270,6 +314,11 @@ module ConvertFuncTest =
     testUInt32From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
 
   [<Test>]
+  let ``uint32 decimal`` () =
+    let max, min = decimal UInt32.MaxValue, decimal UInt32.MinValue
+    testUInt32From<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+  [<Test>]
   let ``uint32 string`` () = testUInt32From<string> ["1"; "4294967296"; "-1"; "str"; null]
 
   let inline testInt64From< ^T when ^T : (static member op_Explicit: ^T -> int64) > data =
@@ -290,6 +339,11 @@ module ConvertFuncTest =
   let ``int64 float`` () =
     let max, min = float Int64.MaxValue, float Int64.MinValue
     testInt64From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+  [<Test>]
+  let ``int64 decimal`` () =
+    let max, min = decimal Int64.MaxValue, decimal Int64.MinValue
+    testInt64From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
   [<Test>]
   let ``int64 string`` () =
@@ -315,6 +369,11 @@ module ConvertFuncTest =
   let ``uint64 float`` () =
     let max, min = float UInt64.MaxValue, float UInt64.MinValue
     testUInt64From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+  [<Test>]
+  let ``uint64 decimal`` () =
+    let max, min = decimal UInt64.MaxValue, decimal UInt64.MinValue
+    testUInt64From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
   [<Test>]
   let ``uint64 string`` () =
@@ -371,6 +430,10 @@ module ConvertFuncTest =
     <@ string -infinity @> |> check (string -infinity)
 
   [<Test>]
+  let ``string decimal`` () =
+    <@ string 1.0M @> |> check (string 1.0M)
+
+  [<Test>]
   let ``string bool`` () = <@ string true @> |> check "True"
 
   [<Test>]
@@ -409,6 +472,11 @@ module ConvertFuncTest =
       testByteFrom<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
 
     [<Test>]
+    let ``byte decimal`` () =
+      let max, min = decimal Byte.MaxValue, decimal Byte.MinValue
+      testByteFrom<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+    [<Test>]
     let ``byte string`` () = testByteFrom<string> ["1"; "256"; "-1"; "str"; null]
 
     let inline testSByteFrom< ^T when ^T : (static member op_Explicit: ^T -> sbyte) > data =
@@ -433,6 +501,11 @@ module ConvertFuncTest =
       testSByteFrom<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
 
     [<Test>]
+    let ``sbyte decimal`` () =
+      let max, min = decimal SByte.MaxValue, decimal SByte.MinValue
+      testSByteFrom<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+    [<Test>]
     let ``sbyte string`` () = testSByteFrom<string> ["1"; "128"; "-129"; "str"; null]
 
     let inline testCharFrom< ^T when ^T : (static member op_Explicit: ^T -> char) > data =
@@ -450,6 +523,11 @@ module ConvertFuncTest =
     let ``char float`` () =
       let max, min = float Char.MaxValue, float Char.MinValue
       testCharFrom<float> [97.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+    [<Test>]
+    let ``char decimal`` () =
+      let max, min = decimal (int Char.MaxValue), decimal (int Char.MinValue)
+      testCharFrom<decimal> [97.0M; max + 1.0M; min - 1.0M]
 
     [<Test>]
     let ``char string`` () = testCharFrom<string> ["a"; "aa"; null]
@@ -472,6 +550,11 @@ module ConvertFuncTest =
     let ``int float`` () =
       let max, min = float Int32.MaxValue, float Int32.MinValue
       testIntFrom<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+    [<Test>]
+    let ``int decimal`` () =
+      let max, min = decimal Int32.MaxValue, decimal Int32.MinValue
+      testIntFrom<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
     [<Test>]
     let ``int string`` () = testIntFrom<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
@@ -498,6 +581,11 @@ module ConvertFuncTest =
       testInt16From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
 
     [<Test>]
+    let ``int16 decimal`` () =
+      let max, min = decimal Int16.MaxValue, decimal Int16.MinValue
+      testInt16From<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+    [<Test>]
     let ``int16 string`` () = testInt16From<string> ["1"; "32768"; "-32769"; "str"; null]
 
     let inline testUInt16From< ^T when ^T : (static member op_Explicit: ^T -> uint16) > data =
@@ -522,6 +610,11 @@ module ConvertFuncTest =
       testUInt16From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
 
     [<Test>]
+    let ``uint16 decimal`` () =
+      let max, min = decimal UInt16.MaxValue, decimal UInt16.MinValue
+      testUInt16From<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+    [<Test>]
     let ``uint16 string`` () = testUInt16From<string> ["1"; "65536"; "-1"; "str"; null]
 
     let inline testInt32From< ^T when ^T : (static member op_Explicit: ^T -> int32) > data =
@@ -542,6 +635,11 @@ module ConvertFuncTest =
     let ``int32 float`` () =
       let max, min = float Int32.MaxValue, float Int32.MinValue
       testInt32From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+    [<Test>]
+    let ``int32 decimal`` () =
+      let max, min = decimal Int32.MaxValue, decimal Int32.MinValue
+      testInt32From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
     [<Test>]
     let ``int32 string`` () = testInt32From<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
@@ -568,6 +666,11 @@ module ConvertFuncTest =
       testUInt32From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
 
     [<Test>]
+    let ``uint32 decimal`` () =
+      let max, min = decimal UInt32.MaxValue, decimal UInt32.MinValue
+      testUInt32From<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+    [<Test>]
     let ``uint32 string`` () = testUInt32From<string> ["1"; "4294967296"; "-1"; "str"; null]
 
     let inline testInt64From< ^T when ^T : (static member op_Explicit: ^T -> int64) > data =
@@ -588,6 +691,11 @@ module ConvertFuncTest =
     let ``int64 float`` () =
       let max, min = float Int64.MaxValue, float Int64.MinValue
       testInt64From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+    [<Test>]
+    let ``int64 decimal`` () =
+      let max, min = decimal Int64.MaxValue, decimal Int64.MinValue
+      testInt64From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
     [<Test>]
     let ``int64 string`` () =
@@ -613,6 +721,11 @@ module ConvertFuncTest =
     let ``uint64 float`` () =
       let max, min = float UInt64.MaxValue, float UInt64.MinValue
       testUInt64From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+    [<Test>]
+    let ``uint64 decimal`` () =
+      let max, min = decimal UInt64.MaxValue, decimal UInt64.MinValue
+      testUInt64From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
     [<Test>]
     let ``uint64 string`` () =
