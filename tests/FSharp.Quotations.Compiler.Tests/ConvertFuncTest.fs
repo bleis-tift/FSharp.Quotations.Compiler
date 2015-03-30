@@ -559,6 +559,14 @@ module ConvertFuncTest =
     <@ string [||] @> |> check "System.Object[]"
     <@ string (null: int[]) @> |> check ""
 
+  [<Test>]
+  let ``set`` () =
+    <@ set [] @> |> check (set [])
+    <@ set [1] @> |> check (set [1])
+    <@ set ["hoge"] @> |> check (set ["hoge"])
+    <@ set [1; 2] @> |> check (set [1; 2])
+    <@ set [1; 2; 1] @> |> check (set [1; 2; 1])
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
