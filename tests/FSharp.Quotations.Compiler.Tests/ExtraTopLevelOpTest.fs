@@ -53,3 +53,9 @@ module ExtraTopLevelOpTest =
     <@ failwithf "hoge" @> |> checkExnMsg "hoge"
     <@ failwithf "hoge%d" 1 @> |> checkExnMsg "hoge1"
     <@ failwithf "%s" "hoge" @> |> checkExnMsg "hoge"
+
+  [<Test>]
+  let ``sprintf`` () =
+    <@ sprintf "hoge" @> |> check "hoge"
+    <@ sprintf "hoge%d" 1 @> |> check "hoge1"
+    <@ sprintf "%s" "hoge" @> |> check "hoge"
