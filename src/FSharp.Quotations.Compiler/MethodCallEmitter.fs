@@ -222,6 +222,7 @@ module internal MethodCallEmitter =
     dict.Add(Expr.getMethodInfo <@ char 'a' @>, doNothing)
 
     dict.Add(Expr.getMethodInfo <@ byte 1I @>, emitCallMethod (Expr.getMethodInfo <@ Numerics.BigInteger.op_Explicit(1I) : byte @>))
+    dict.Add(Expr.getMethodInfo <@ uint8 1I @>, emitCallMethod (Expr.getMethodInfo <@ Numerics.BigInteger.op_Explicit(1I) : byte @>))
     dict.Add(Expr.getMethodInfo <@ sbyte 1I @>, emitCallMethod (Expr.getMethodInfo <@ Numerics.BigInteger.op_Explicit(1I) : sbyte @>))
     dict.Add(Expr.getMethodInfo <@ decimal 1I @>, emitCallMethod (Expr.getMethodInfo <@ Numerics.BigInteger.op_Explicit(1I) : decimal @>))
     dict.Add(Expr.getMethodInfo <@ float 1I @>, emitCallMethod (Expr.getMethodInfo <@ Numerics.BigInteger.op_Explicit(1I) : float @>))
@@ -236,6 +237,7 @@ module internal MethodCallEmitter =
     dict.Add(Expr.getMethodInfo <@ uint64 1I @>, emitCallMethod (Expr.getMethodInfo <@ Numerics.BigInteger.op_Explicit(1I) : uint64 @>))
 
     dict.Add(Expr.getMethodInfo <@ byte 1.0M @>, emitCallMethod (Expr.getMethodInfo <@ Decimal.op_Explicit(1.0M) : byte @>))
+    dict.Add(Expr.getMethodInfo <@ uint8 1.0M @>, emitCallMethod (Expr.getMethodInfo <@ Decimal.op_Explicit(1.0M) : byte @>))
     dict.Add(Expr.getMethodInfo <@ sbyte 1.0M @>, emitCallMethod (Expr.getMethodInfo <@ Decimal.op_Explicit(1.0M) : sbyte @>))
     dict.Add(Expr.getMethodInfo <@ char 1.0M @>, emitCallMethod (Expr.getMethodInfo <@ Decimal.op_Explicit(1.0M) : char @>))
     dict.Add(Expr.getMethodInfo <@ decimal 1.0M @>, doNothing)
@@ -251,6 +253,8 @@ module internal MethodCallEmitter =
     dict.Add(Expr.getMethodInfo <@ uint64 1.0M @>, emitCallMethod (Expr.getMethodInfo <@ Decimal.op_Explicit(1.0M) : uint64 @>))
 
     dict.Add(Expr.getMethodInfo <@ byte "" @>, emitOpCode (Call (Method (Expr.getMethodInfo <@ LanguagePrimitives.ParseUInt32("") @>)))
+                                      |>> emitOpCode Conv_Ovf_U1)
+    dict.Add(Expr.getMethodInfo <@ uint8 "" @>, emitOpCode (Call (Method (Expr.getMethodInfo <@ LanguagePrimitives.ParseUInt32("") @>)))
                                       |>> emitOpCode Conv_Ovf_U1)
     dict.Add(Expr.getMethodInfo <@ sbyte "" @>, emitOpCode (Call (Method (Expr.getMethodInfo <@ LanguagePrimitives.ParseInt32("") @>)))
                                        |>> emitOpCode Conv_Ovf_I1)
@@ -437,6 +441,7 @@ module internal MethodCallEmitter =
     dict.Add(Expr.getGenericMethodInfo <@ ~~~x @>, emitOpCode Not)
 
     dict.Add(Expr.getGenericMethodInfo <@ byte x @>, emitOpCode Conv_U1)
+    dict.Add(Expr.getGenericMethodInfo <@ uint8 x @>, emitOpCode Conv_U1)
     dict.Add(Expr.getGenericMethodInfo <@ sbyte x @>, emitOpCode Conv_I1)
     dict.Add(Expr.getGenericMethodInfo <@ int16 x @>, emitOpCode Conv_I2)
     dict.Add(Expr.getGenericMethodInfo <@ uint16 x @>, emitOpCode Conv_U2)
