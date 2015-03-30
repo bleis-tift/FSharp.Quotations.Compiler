@@ -241,7 +241,7 @@ module ConvertFuncTest =
   let ``float32 int`` () = testFloat32From<int> [1]
 
   [<Test>]
-  let ``float32 bigitn`` () = testFloat32From<bigint> [1I]
+  let ``float32 bigint`` () = testFloat32From<bigint> [1I]
 
   [<Test>]
   let ``float32 char`` () = testFloat32From ['a'; Char.MaxValue; Char.MinValue]
@@ -301,7 +301,7 @@ module ConvertFuncTest =
   let ``single int`` () = testSingleFrom<int> [1]
 
   [<Test>]
-  let ``single bigitn`` () = testSingleFrom<bigint> [1I]
+  let ``single bigint`` () = testSingleFrom<bigint> [1I]
 
   [<Test>]
   let ``single char`` () = testSingleFrom ['a'; Char.MaxValue; Char.MinValue]
