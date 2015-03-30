@@ -6,6 +6,9 @@ module CoreFuncTest =
   let ``box int`` () = <@ box 1 @> |> check (box 1)
 
   [<Test>]
+  let ``box bigint`` () = <@ box 1I @> |> check (box 1I)
+
+  [<Test>]
   let ``box char`` () = <@ box 'a' @> |> check (box 'a')
 
   [<Test>]
@@ -25,6 +28,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``compare int int`` () = <@ compare 1 1 @> |> check 0
+
+  [<Test>]
+  let ``compare bigint bigint`` () = <@ compare 1I 1I @> |> check (compare 1I 1I)
 
   [<Test>]
   let ``compare char char`` () = <@ compare 'a' 'a' @> |> check 0
@@ -60,6 +66,9 @@ module CoreFuncTest =
   let ``hash int`` () = <@ hash 1 @> |> check 1
 
   [<Test>]
+  let ``hash bigint`` () = <@ hash 1I @> |> check (hash 1I)
+
+  [<Test>]
   let ``hash char`` () = <@ hash 'c' @> |> check (hash 'c')
 
   [<Test>]
@@ -76,6 +85,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``limitedHash int int`` () = <@ limitedHash 1 1 @> |> check 1
+
+  [<Test>]
+  let ``limitedHash int bigint`` () = <@ limitedHash 1 1I @> |> check (limitedHash 1 1I)
 
   [<Test>]
   let ``limitedHash int char`` () = <@ limitedHash 1 'c' @> |> check (limitedHash 1 'c')
@@ -96,6 +108,9 @@ module CoreFuncTest =
   let ``id int`` () = <@ id 1 @> |> check 1
 
   [<Test>]
+  let ``id bigint`` () = <@ id 1I @> |> check (id 1I)
+
+  [<Test>]
   let ``id char`` () = <@ id 'c' @> |> check 'c'
 
   [<Test>]
@@ -112,6 +127,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``ignore int`` () = <@ ignore 1 @> |> check ()
+
+  [<Test>]
+  let ``ignore bigint`` () = <@ ignore 1I @> |> check ()
 
   [<Test>]
   let ``ignore char`` () = <@ ignore 'c' @> |> check ()
@@ -140,6 +158,9 @@ module CoreFuncTest =
   let ``max int int`` () = <@ max 10 20 @> |> check 20
 
   [<Test>]
+  let ``max bigint bigint`` () = <@ max 10I 20I @> |> check (max 10I 20I)
+
+  [<Test>]
   let ``max char char`` () = <@ max 'a' 'b' @> |> check 'b'
 
   [<Test>]
@@ -156,6 +177,9 @@ module CoreFuncTest =
 
   [<Test>]
   let ``min int int`` () = <@ min 10 20 @> |> check 10
+
+  [<Test>]
+  let ``min bigint bigint`` () = <@ min 10I 20I @> |> check 10I
 
   [<Test>]
   let ``min char char`` () = <@ min 'a' 'b' @> |> check 'a'
@@ -208,6 +232,9 @@ module CoreFuncTest =
     let ``Unchecked.compre int int`` () = <@ compare 1 1 @> |> check 0
 
     [<Test>]
+    let ``Unchecked.compre bigint bigint`` () = <@ compare 1I 1I @> |> check (compare 1I 1I)
+
+    [<Test>]
     let ``Unchecked.compare char char`` () = <@ compare 'a' 'a' @> |> check 0
 
     [<Test>]
@@ -217,6 +244,9 @@ module CoreFuncTest =
     let ``Unchecked.hash int`` () = <@ hash 1 @> |> check 1
 
     [<Test>]
+    let ``Unchecked.hash bigint`` () = <@ hash 1I @> |> check (hash 1I)
+
+    [<Test>]
     let ``Unchecked.hash char`` () = <@ hash 'c' @> |> check (hash 'c')
 
     [<Test>]
@@ -224,6 +254,9 @@ module CoreFuncTest =
 
     [<Test>]
     let ``Unchecked.equals int int`` () = <@ equals 1 1 @> |> check true
+
+    [<Test>]
+    let ``Unchecked.equals bigint bigint`` () = <@ equals 1I 1I @> |> check true
 
     [<Test>]
     let ``Unchecked.equals char char`` () = <@ equals 'c' 'c' @> |> check true
