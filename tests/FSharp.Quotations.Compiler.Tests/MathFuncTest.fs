@@ -12,6 +12,9 @@ module MathFuncTest =
   let ``abs float`` () = <@ abs -1.0 @> |> check 1.0
 
   [<Test>]
+  let ``abs decimal`` () = <@ abs -1.0M @> |> check 1.0M
+
+  [<Test>]
   let ``acos float`` () = <@ acos 0.5 @> |> check (acos 0.5)
 
   [<Test>]
@@ -27,6 +30,9 @@ module MathFuncTest =
   let ``ceil float`` () = <@ ceil 1.5 @> |> check 2.0
 
   [<Test>]
+  let ``ceil decimal`` () = <@ ceil 1.5M @> |> check 2.0M
+
+  [<Test>]
   let ``cos float`` () = <@ cos 0.5 @> |> check (cos 0.5)
 
   [<Test>]
@@ -37,6 +43,9 @@ module MathFuncTest =
 
   [<Test>]
   let ``floor float`` () = <@ floor 1.5 @> |> check 1.0
+
+  [<Test>]
+  let ``floor decimal`` () = <@ floor 1.5M @> |> check 1.0M
 
   [<Test>]
   let ``infinity`` () = <@ infinity @> |> check infinity
@@ -57,7 +66,13 @@ module MathFuncTest =
   let ``pown float int`` () = <@ pown 0.5 2 @> |> check (pown 0.5 2)
 
   [<Test>]
+  let ``pown decimal int`` () = <@ pown 0.5M 2 @> |> check (pown 0.5M 2)
+
+  [<Test>]
   let ``round float`` () = <@ round 0.5 @> |> check (round 0.5)
+
+  [<Test>]
+  let ``round decimal`` () = <@ round 0.5M @> |> check (round 0.5M)
 
   [<Test>]
   let ``sign int`` () = <@ sign -10 @> |> check -1
@@ -67,6 +82,9 @@ module MathFuncTest =
 
   [<Test>]
   let ``sign float`` () = <@ sign -1.0 @> |> check -1
+
+  [<Test>]
+  let ``sign decimal`` () = <@ sign -1.0M @> |> check -1
 
   [<Test>]
   let ``sin float`` () = <@ sin 0.5 @> |> check (sin 0.5)
