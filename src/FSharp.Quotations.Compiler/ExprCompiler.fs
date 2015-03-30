@@ -320,14 +320,9 @@ module ExprCompiler =
                 let prop = typ.GetProperty("Is" + case.Name)
                 MethodCallEmitter.emit (None, prop.GetMethod, [expr]) stack varEnv
             | TypeTest (expr, typ) ->
-                if typ = typeof<int> then
-                  stack.Push(Compiling (fun gen ->
-                    gen.Emit(Call (Method MethodCallEmitter.typeTestGenericInt32MethodInfo))
-                  ))
-                else
-                  stack.Push(Compiling (fun gen ->
-                    gen.Emit(Isinst typ)
-                  ))
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Isinst typ)
+                ))
                 stack.Push(CompileTarget expr)
             | Coerce (expr, typ) ->
                 if typ = typeof<obj> then
