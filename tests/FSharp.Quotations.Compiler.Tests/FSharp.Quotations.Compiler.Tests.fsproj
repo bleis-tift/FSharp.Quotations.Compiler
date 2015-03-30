@@ -102,6 +102,7 @@
     <Compile Include="ControlFlowExprTest.fs" />
     <Compile Include="LetTest.fs" />
     <Compile Include="FSharpTypeTest.fs" />
+    <Compile Include="ExtraTopLevelOpTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Quotations.Compiler.Tests.CSharp\FSharp.Quotations.Compiler.Tests.CSharp.csproj">

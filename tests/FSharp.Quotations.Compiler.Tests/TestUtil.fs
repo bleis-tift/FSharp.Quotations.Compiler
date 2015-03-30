@@ -6,6 +6,7 @@ open FsUnit
 open Microsoft.FSharp.Quotations
 open FSharp.Quotations.Compiler
 open System
+open System.IO
 
 [<AutoOpen>]
 module TestUtil =
@@ -49,3 +50,29 @@ module TestUtil =
       Assert.Fail("exception is not thrown.")
     with e ->
       e.GetType() |> should equal expectedType
+
+  type RobWriter(encoding: Text.Encoding) =
+    inherit TextWriter()
+
+    let mutable result = ""
+
+    member __.Result = result
+
+    override __.Encoding = encoding
+    override this.Write(c: char) =
+      result <- result + c.ToString()
+
+  type PrintType = Error | Out
+
+  let private getDefaultPrinter printType: (TextWriter * (TextWriter -> unit)) =
+    match printType with
+    | Error -> (stderr, fun w -> System.Console.SetError(w))
+    | Out -> (stdout, fun w -> System.Console.SetOut(w))
+
+  let checkPrinted printType (expected: string) (expr: Expr<unit>) =
+    let (defaultPrinter, setter) = getDefaultPrinter printType
+    use writer = new RobWriter(defaultPrinter.Encoding)
+    setter writer
+    expr |> ExprCompiler.compile
+    setter defaultPrinter
+    writer.Result |> should equal expected
