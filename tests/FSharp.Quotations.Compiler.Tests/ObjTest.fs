@@ -12,6 +12,7 @@ module ObjTest =
     member val Value = value with get, set
     static member val SValue = -1 with get, set
     member __.VarArgMethod([<ParamArray>] xs: int[]) = xs.Length
+    member __.OptArgMethod(x: int, ?y: int) = x + (defaultArg y -1)
     override __.Equals(x) =
       match x with
       | :? Class as other -> value = other.Value
@@ -33,6 +34,15 @@ module ObjTest =
 
     // call variable argument method written by C#
     <@ String.Format("{0}{1}", "hoge", 42) @> |> check "hoge42"
+
+  [<Test>]
+  let ``optional argument method call`` () =
+    <@ let x = Class(42)
+       x.OptArgMethod(10) @>
+    |> check 9
+
+    // call optional argument method written by C#
+    <@ CSharpClass.OptionalArgument(10) @> |> check 9
 
   [<Test>]
   let ``ToString()`` () = <@ (Class(42).ToString()) @> |> check (Class(42).ToString())
