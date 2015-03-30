@@ -185,6 +185,33 @@ module ConvertFuncTest =
       "str"; null
     ]
 
+  let inline testDoubleFrom< ^T when ^T : (static member op_Explicit: ^T -> double) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ double x @>); Fun = double }
+
+  [<Test>]
+  let ``double int`` () = testDoubleFrom<int> [1]
+
+  [<Test>]
+  let ``double bigint`` () = testDoubleFrom<bigint> [1I]
+
+  [<Test>]
+  let ``double char`` () = testDoubleFrom ['a'; Char.MaxValue; Char.MinValue]
+
+  [<Test>]
+  let ``double double`` () = testDoubleFrom<double> [1.0; nan; infinity; -infinity]
+
+  [<Test>]
+  let ``double decimal`` () = testDoubleFrom<decimal> [1.0M; Decimal.MaxValue; Decimal.MinValue]
+
+  [<Test>]
+  let ``double string`` () =
+    testDoubleFrom<string> [
+      "1"; "NaN"; "Infinity"; "-Infinity";
+      "1.797693135e+308"
+      "-1.797693135e+308" 
+      "str"; null
+    ]
+
   let inline testIntFrom< ^T when ^T : (static member op_Explicit: ^T -> int) > data =
     test { Data = data; ExprFun = (fun (x: ^T) -> <@ int x @>); Fun = int }
 
