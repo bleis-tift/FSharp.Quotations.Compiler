@@ -11,6 +11,7 @@ module ObjTest =
       this.InstanceField <- "str"
     member val Value = value with get, set
     static member val SValue = -1 with get, set
+    member __.VarArgMethod([<ParamArray>] xs: int[]) = xs.Length
     override __.Equals(x) =
       match x with
       | :? Class as other -> value = other.Value
@@ -23,6 +24,15 @@ module ObjTest =
 
   [<Test>]
   let ``struct default value`` () = <@ System.Guid() @> |> check (System.Guid())
+
+  [<Test>]
+  let ``variable argument method call`` () =
+    <@ let x = Class(42)
+       x.VarArgMethod(10, 20, 30) @>
+    |> check 3
+
+    // call variable argument method written by C#
+    <@ String.Format("{0}{1}", "hoge", 42) @> |> check "hoge42"
 
   [<Test>]
   let ``ToString()`` () = <@ (Class(42).ToString()) @> |> check (Class(42).ToString())
