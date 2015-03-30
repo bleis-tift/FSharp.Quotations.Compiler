@@ -112,6 +112,35 @@ module ConvertFuncTest =
   [<Test>]
   let ``sbyte string`` () = testSByteFrom<string> ["1"; "128"; "-129"; "str"; null]
 
+  let inline testInt8From< ^T when ^T : (static member op_Explicit: ^T -> int8) > data =
+    test { Data = data; ExprFun = (fun (x: ^T) -> <@ int8 x @>); Fun = int8 }
+
+  [<Test>]
+  let ``int8 int`` () =
+    let max, min = int SByte.MaxValue, int SByte.MinValue
+    testInt8From<int> [1; max + 1; min - 1]
+
+  [<Test>]
+  let ``int8 bigint`` () =
+    let max, min = Numerics.BigInteger(int SByte.MaxValue), Numerics.BigInteger(int SByte.MinValue)
+    testInt8From<bigint> [1I; max + 1I; min - 1I]
+
+  [<Test>]
+  let ``int8 char`` () = testInt8From ['a']
+
+  [<Test>]
+  let ``int8 float`` () =
+    let max, min = float Byte.MaxValue, float Byte.MinValue
+    testInt8From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+  [<Test>]
+  let ``int8 decimal`` () =
+    let max, min = decimal SByte.MaxValue, decimal SByte.MinValue
+    testInt8From<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+  [<Test>]
+  let ``int8 string`` () = testInt8From<string> ["1"; "128"; "-129"; "str"; null]
+
   let inline testCharFrom< ^T when ^T : (static member op_Explicit: ^T -> char) > data =
     test { Data = data; ExprFun = (fun (x: ^T) -> <@ char x @>); Fun = char }
 
@@ -592,6 +621,35 @@ module ConvertFuncTest =
 
     [<Test>]
     let ``sbyte string`` () = testSByteFrom<string> ["1"; "128"; "-129"; "str"; null]
+
+    let inline testInt8From< ^T when ^T : (static member op_Explicit: ^T -> int8) > data =
+      test { Data = data; ExprFun = (fun (x: ^T) -> <@ int8 x @>); Fun = int8 }
+
+    [<Test>]
+    let ``int8 int`` () =
+      let max, min = int SByte.MaxValue, int SByte.MinValue
+      testInt8From<int> [1; max + 1; min - 1]
+
+    [<Test>]
+    let ``int8 bigint`` () =
+      let max, min = Numerics.BigInteger(int SByte.MaxValue), Numerics.BigInteger(int SByte.MinValue)
+      testInt8From<bigint> [1I; max + 1I; min - 1I]
+
+    [<Test>]
+    let ``int8 char`` () = testInt8From ['a']
+
+    [<Test>]
+    let ``int8 float`` () =
+      let max, min = float Byte.MaxValue, float Byte.MinValue
+      testInt8From<float> [1.0; max + 1.0; min - 1.0; nan; infinity; -infinity]
+
+    [<Test>]
+    let ``int8 decimal`` () =
+      let max, min = decimal SByte.MaxValue, decimal SByte.MinValue
+      testInt8From<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+    [<Test>]
+    let ``int8 string`` () = testInt8From<string> ["1"; "128"; "-129"; "str"; null]
 
     let inline testCharFrom< ^T when ^T : (static member op_Explicit: ^T -> char) > data =
       test { Data = data; ExprFun = (fun (x: ^T) -> <@ char x @>); Fun = char }
