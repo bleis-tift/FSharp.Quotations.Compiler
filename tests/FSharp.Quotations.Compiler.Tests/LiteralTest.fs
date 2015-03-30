@@ -13,9 +13,11 @@ module LiteralTest =
   let int () = <@ 42 @> |> check 42
   #endif
 
-  // TODO : more tests
-  [<Test>]
-  let byte () = <@ 1uy @> |> check 1uy
+  [<TestCase(0uy)>]
+  [<TestCase(1uy)>]
+  [<TestCase(254uy)>]
+  [<TestCase(255uy)>]
+  let ``byte`` (b:byte) =  <@ b @> |> check b
 
   // TODO : more tests
   [<Test>]
@@ -104,3 +106,18 @@ module LiteralTest =
   let ``nested tuple`` () =
     <@ (1, ("str", true)) @> |> check (1, ("str", true))
     <@ (1, (1, 2, 3, 4, 5, 6, 7, 8)) @> |> check (1, (1, 2, 3, 4, 5, 6, 7, 8))
+
+  [<TestCase(0uy, 1uy)>]
+  [<TestCase(1uy, 10uy)>]
+  [<TestCase(1uy, 255uy)>]
+  let ``byte .. byte`` (a:byte, b:byte) =  <@ [a .. b] @> |> check [a .. b]
+
+  [<TestCase(0uy, 1uy, 0uy)>]
+  [<TestCase(1uy, 1uy, 1uy)>]
+  [<TestCase(1uy, 3uy, 10uy)>]
+  [<TestCase(2uy, 3uy, 10uy)>]
+  [<TestCase(10uy, 2uy, 255uy)>]
+  let ``byte .. byte .. byte`` (a:byte, b:byte, c:byte) =  <@ [a .. b .. c] @> |> check [a .. b .. c]
+
+  [<TestCase(1uy, 10uy)>]
+  let ``byte .. 0 .. byte`` (a:byte, b:byte) =  <@ [a .. 0uy .. b] @> |> checkExn<_, System.ArgumentException>

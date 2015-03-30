@@ -49,3 +49,100 @@ module BitOpTest =
   [<Test>]
   let ``bigint <<< int`` () =
     <@ 42I <<< 1 @> |> check (42I <<< 1)
+  [<Test>]
+  let ``byte >>> int`` () =
+    <@ 0uy >>> -1 @> |> check 0uy
+    <@ 0uy >>> 0 @> |> check 0uy
+    <@ 0uy >>> 1 @> |> check 0uy
+    <@ 1uy >>> -2 @> |> check 0uy
+    <@ 1uy >>> -1 @> |> check 0uy
+    <@ 1uy >>> 0 @> |> check 1uy
+    <@ 1uy >>> 1 @> |> check 0uy
+    <@ 1uy >>> 2 @> |> check 0uy
+    <@ 255uy >>> -256 @> |> check 255uy
+    <@ 255uy >>> -255 @> |> check 127uy
+    <@ 255uy >>> -2 @> |> check 3uy
+    <@ 255uy >>> -1 @> |> check 1uy
+    <@ 255uy >>> 0 @> |> check 255uy
+    <@ 255uy >>> 1 @> |> check 127uy
+    <@ 255uy >>> 2 @> |> check 63uy
+    <@ 255uy >>> 255 @> |> check 1uy
+    <@ 255uy >>> 256 @> |> check 255uy
+
+  [<Test>]
+  let ``byte <<< int`` () =
+    <@ 0uy <<< -1 @> |> check 0uy
+    <@ 0uy <<< 0 @> |> check 0uy
+    <@ 0uy <<< 1 @> |> check 0uy
+    <@ 1uy <<< -2 @> |> check 64uy
+    <@ 1uy <<< -1 @> |> check 128uy
+    <@ 1uy <<< 0 @> |> check 1uy
+    <@ 1uy <<< 1 @> |> check 2uy
+    <@ 1uy <<< 2 @> |> check 4uy
+    <@ 255uy <<< -256 @> |> check 255uy
+    <@ 255uy <<< -255 @> |> check 254uy
+    <@ 255uy <<< -254 @> |> check 252uy
+    <@ 255uy <<< -2 @> |> check 192uy
+    <@ 255uy <<< -1 @> |> check 128uy
+    <@ 255uy <<< 0 @> |> check 255uy
+    <@ 255uy <<< 1 @> |> check 254uy
+    <@ 255uy <<< 2 @> |> check 252uy
+    <@ 255uy <<< 255 @> |> check 128uy
+    <@ 255uy <<< 256 @> |> check 255uy
+
+  [<Test>]
+  let ``byte ^^^ byte`` () =
+    <@ 0uy ^^^ 0uy @> |> check 0uy
+    <@ 0uy ^^^ 1uy @> |> check 1uy
+    <@ 1uy ^^^ 0uy @> |> check 1uy
+    <@ 1uy ^^^ 1uy @> |> check 0uy
+    <@ 1uy ^^^ 2uy @> |> check 3uy
+    <@ 255uy ^^^ 0uy @> |> check 255uy
+    <@ 255uy ^^^ 1uy @> |> check 254uy
+    <@ 255uy ^^^ 128uy @> |> check 127uy
+    <@ 255uy ^^^ 254uy @> |> check 1uy
+    <@ 255uy ^^^ 255uy @> |> check 0uy
+
+  [<Test>]
+  let ``byte ||| byte`` () =
+    <@ 0uy ||| 0uy @> |> check 0uy
+    <@ 0uy ||| 1uy @> |> check 1uy
+    <@ 0uy ||| 255uy @> |> check 255uy
+    <@ 1uy ||| 0uy @> |> check 1uy
+    <@ 1uy ||| 1uy @> |> check 1uy
+    <@ 1uy ||| 255uy @> |> check 255uy
+    <@ 128uy ||| 0uy @> |> check 128uy
+    <@ 128uy ||| 1uy @> |> check 129uy
+    <@ 128uy ||| 126uy @> |> check 254uy
+    <@ 128uy ||| 127uy @> |> check 255uy
+    <@ 128uy ||| 255uy @> |> check 255uy
+    <@ 255uy ||| 0uy @> |> check 255uy
+    <@ 255uy ||| 1uy @> |> check 255uy
+    <@ 255uy ||| 128uy @> |> check 255uy
+    <@ 255uy ||| 254uy @> |> check 255uy
+    <@ 255uy ||| 255uy @> |> check 255uy
+
+  [<Test>]
+  let ``byte &&& byte`` () =
+    <@ 0uy &&& 0uy @> |> check 0uy
+    <@ 0uy &&& 1uy @> |> check 0uy
+    <@ 0uy &&& 255uy @> |> check 0uy
+    <@ 1uy &&& 0uy @> |> check 0uy
+    <@ 1uy &&& 1uy @> |> check 1uy
+    <@ 1uy &&& 255uy @> |> check 1uy
+    <@ 128uy &&& 0uy @> |> check 0uy
+    <@ 128uy &&& 127uy @> |> check 0uy
+    <@ 128uy &&& 128uy @> |> check 128uy
+    <@ 128uy &&& 255uy @> |> check 128uy
+    <@ 255uy &&& 0uy @> |> check 0uy
+    <@ 255uy &&& 1uy @> |> check 1uy
+    <@ 255uy &&& 128uy @> |> check 128uy
+    <@ 255uy &&& 254uy @> |> check 254uy
+    <@ 255uy &&& 255uy @> |> check 255uy
+
+  [<Test>]
+  let ``~~~ byte`` () =
+    <@ ~~~ 0uy @> |> check 255uy
+    <@ ~~~ 1uy @> |> check 254uy
+    <@ ~~~ 254uy @> |> check 1uy
+    <@ ~~~ 255uy @> |> check 0uy

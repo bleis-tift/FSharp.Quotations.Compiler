@@ -24,6 +24,9 @@ module TestUtil =
   type TestCase ([<ParamArray>] arguments: obj []) =
     inherit TestCaseAttribute(arguments)
 
+  type Ignore(message:string) =
+    inherit IgnoreAttribute(message)
+
   type IntRange(from: int, ``to``: int, step: int) =
     inherit RangeAttribute(from, ``to``, step)
 

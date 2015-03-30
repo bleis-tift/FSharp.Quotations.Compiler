@@ -137,6 +137,55 @@ module ArithmeticOpTest =
   let ``string + string`` () =
     <@ "aaa" + "bbb" @> |> check "aaabbb"
 
+  [<TestCase(0uy)>]
+  [<TestCase(1uy)>]
+  [<TestCase(254uy)>]
+  [<TestCase(255uy)>]
+  let ``+ byte `` (i) =  <@ +(i) @> |> check i
+
+  [<TestCase(0uy, 1uy)>]
+  [<TestCase(1uy, 254uy)>]
+  [<TestCase(255uy, 0uy)>]
+  [<TestCase(255uy, 1uy)>]
+  let `` byte + byte `` (b1:byte, b2:byte) =  <@ b1 + b2 @> |> check(b1 + b2)
+
+  [<TestCase(0uy, 1uy)>]
+  [<TestCase(255uy, 0uy)>]
+  [<TestCase(255uy, 1uy)>]
+  [<TestCase(255uy, 255uy)>]
+  let `` byte - byte `` (b1:byte, b2:byte) =  <@ b1 - b2 @> |> check(b1 - b2)
+
+  [<TestCase(0uy, 1uy)>]
+  [<TestCase(1uy, 1uy)>]
+  [<TestCase(10uy, 2uy)>]
+  [<TestCase(255uy, 1uy)>]
+  [<TestCase(1uy, 255uy)>]
+  let `` byte % byte `` (b1:byte, b2:byte) =  <@ b1 % b2 @> |> check(b1 % b2)
+
+  [<TestCase(0uy, 1uy)>]
+  [<TestCase(1uy, 0uy)>]
+  [<TestCase(1uy, 255uy)>]
+  [<TestCase(255uy, 1uy)>]
+  [<TestCase(2uy, 255uy)>]
+  [<TestCase(255uy, 255uy)>]
+  let `` byte * byte `` (b1:byte, b2:byte) =  <@ b1 * b2 @> |> check(b1 * b2)
+
+  [<TestCase(0uy, 1uy)>]
+  [<TestCase(0uy, 255uy)>]
+  [<TestCase(1uy, 1uy)>]
+  [<TestCase(255uy, 255uy)>]
+  [<TestCase(255uy, 1uy)>]
+  [<TestCase(255uy, 5uy)>]
+  let `` byte / byte `` (b1:byte, b2:byte) =  <@ b1 / b2 @> |> check(b1 / b2)
+
+  [<TestCase(1uy, 0uy)>]
+  [<TestCase(255uy, 0uy)>]
+  let `` byte / 0 `` (b1:byte, b2:byte) =  <@ b1 / b2 @> |> checkExn<_, DivideByZeroException>
+
+  [<TestCase(1uy, 0uy)>]
+  [<TestCase(255uy, 0uy)>]
+  let `` byte % 0 `` (b1:byte, b2:byte) =  <@ b1 % b2 @> |> checkExn<_, DivideByZeroException>
+
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
 
@@ -240,6 +289,18 @@ module ArithmeticOpTest =
     [<Test>]
     let ``decimal % decimal`` () =
       <@ 1.0m % 1.0m @> |> check (1.0m % 1.0m)
+
+    [<Test>]
+    let ``byte - byte`` () =
+      <@ 254uy - 255uy @> |> checkExn<_, OverflowException>
+
+    [<Test>]
+    let ``byte + byte`` () =
+      <@ 1uy + 255uy @> |> checkExn<_, OverflowException>
+
+    [<TestCase(2uy, 255uy)>]
+    [<TestCase(255uy, 255uy)>]
+    let `` byte * byte `` (b1:byte, b2:byte) =  <@ b1 * b2 @> |> checkExn<_, OverflowException>
 
     [<Test>]
     let ``string + string`` () =

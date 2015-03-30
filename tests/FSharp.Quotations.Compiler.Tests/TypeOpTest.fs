@@ -17,6 +17,12 @@ module TypeOpTest =
   [<Test>]
   let ``decimal :> obj`` () = <@ 1M :> obj @> |> check (1M :> obj)
 
+  [<TestCase(0uy)>]
+  [<TestCase(1uy)>]
+  [<TestCase(254uy)>]
+  [<TestCase(255uy)>]
+  let ``byte :> obj`` (b:byte) = <@ b :> obj @> |> check (b :> obj)
+
   [<Test>]
   let ``string :> obj`` () = <@ "hoge" :> obj @> |> check ("hoge" :> obj)
 
@@ -35,6 +41,13 @@ module TypeOpTest =
   [<Test>]
   let ``decimal :> IEquatable<decimal>`` () =
     <@ 1M :> IEquatable<decimal> @> |> check (1M :> IEquatable<decimal>)
+
+  [<TestCase(0uy)>]
+  [<TestCase(1uy)>]
+  [<TestCase(254uy)>]
+  [<TestCase(255uy)>]
+  let ``byte :> IEquatable<decimal>`` (b:byte) =
+    <@ b :> IEquatable<byte> @> |> check (b :> IEquatable<byte>)
 
   [<Test>]
   let ``string :> IEquatable<string>`` () =

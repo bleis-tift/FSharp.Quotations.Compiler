@@ -81,6 +81,9 @@ module ConvertFuncTest =
     testUInt8From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
   [<Test>]
+  let ``uint8 byte`` () = testUInt8From<byte> [0uy; 1uy; 254uy; 255uy;]
+
+  [<Test>]
   let ``uint8 string`` () = testUInt8From<string> ["1"; "256"; "-1"; "str"; null]
 
   let inline testSByteFrom< ^T when ^T : (static member op_Explicit: ^T -> sbyte) > data =
@@ -108,6 +111,9 @@ module ConvertFuncTest =
   let ``sbyte decimal`` () =
     let max, min = decimal SByte.MaxValue, decimal SByte.MinValue
     testSByteFrom<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+  [<Test>]
+  let ``sbyte byte`` () = testSByteFrom<byte> [0uy; 1uy; 127uy; 128uy; 254uy; 255uy;]
 
   [<Test>]
   let ``sbyte string`` () = testSByteFrom<string> ["1"; "128"; "-129"; "str"; null]
@@ -139,6 +145,9 @@ module ConvertFuncTest =
     testInt8From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
   [<Test>]
+  let ``int8 byte`` () = testInt8From<byte> [0uy; 1uy; 127uy; 128uy; 254uy; 255uy;]
+
+  [<Test>]
   let ``int8 string`` () = testInt8From<string> ["1"; "128"; "-129"; "str"; null]
 
   let inline testCharFrom< ^T when ^T : (static member op_Explicit: ^T -> char) > data =
@@ -163,6 +172,9 @@ module ConvertFuncTest =
     testCharFrom<decimal> [97.0M; max + 1.0M; min - 1.0M]
 
   [<Test>]
+  let ``char byte`` () = testCharFrom<byte> [0uy; 1uy; 254uy; 255uy;]
+
+  [<Test>]
   let ``char string`` () = testCharFrom<string> ["a"; "aa"; null]
 
   let inline testDecimalFrom< ^T when ^T : (static member op_Explicit: ^T -> decimal) > data =
@@ -179,6 +191,9 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``decimal decimal`` () = testDecimalFrom<decimal> [1.0M]
+
+  [<Test>]
+  let ``decimal byte`` () = testDecimalFrom<byte> [0uy; 1uy; 254uy; 255uy;]
 
   [<Test>]
   let ``decimal string`` () =
@@ -208,6 +223,9 @@ module ConvertFuncTest =
   let ``float decimal`` () = testFloatFrom<decimal> [1.0M; Decimal.MaxValue; Decimal.MinValue]
 
   [<Test>]
+  let ``float byte`` () = testFloatFrom<byte> [0uy; 1uy; 254uy; 255uy;]
+
+  [<Test>]
   let ``float string`` () =
     testFloatFrom<string> [
       "1"; "NaN"; "Infinity"; "-Infinity";
@@ -233,6 +251,9 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``float32 decimal`` () = testFloat32From<decimal> [0.0M]
+
+  [<Test>]
+  let ``float32 byte`` () = testFloat32From<byte> [0uy; 1uy; 254uy; 255uy;]
 
   [<Test>]
   let ``float32 string`` () =
@@ -262,6 +283,9 @@ module ConvertFuncTest =
   let ``double decimal`` () = testDoubleFrom<decimal> [1.0M; Decimal.MaxValue; Decimal.MinValue]
 
   [<Test>]
+  let ``double byte`` () = testDoubleFrom<byte> [0uy; 1uy; 254uy; 255uy;]
+
+  [<Test>]
   let ``double string`` () =
     testDoubleFrom<string> [
       "1"; "NaN"; "Infinity"; "-Infinity";
@@ -287,6 +311,9 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``single decimal`` () = testSingleFrom<decimal> [0.0M]
+
+  [<Test>]
+  let ``single byte`` () = testSingleFrom<byte> [0uy; 1uy; 254uy; 255uy;]
 
   [<Test>]
   let ``single string`` () =
@@ -322,6 +349,9 @@ module ConvertFuncTest =
     testIntFrom<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
   [<Test>]
+  let ``int byte`` () = testIntFrom<byte> [0uy; 1uy; 254uy; 255uy;]
+
+  [<Test>]
   let ``int string`` () = testIntFrom<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
 
   let inline testInt16From< ^T when ^T : (static member op_Explicit: ^T -> int16) > data =
@@ -349,6 +379,9 @@ module ConvertFuncTest =
   let ``int16 decimal`` () =
     let max, min = decimal Int16.MaxValue, decimal Int16.MinValue
     testInt16From<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+  [<Test>]
+  let ``int16 byte`` () = testInt16From<byte> [0uy; 1uy; 254uy; 255uy;]
 
   [<Test>]
   let ``int16 string`` () = testInt16From<string> ["1"; "32768"; "-32769"; "str"; null]
@@ -380,6 +413,9 @@ module ConvertFuncTest =
     testUInt16From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
   [<Test>]
+  let ``uint16 byte`` () = testUInt16From<byte> [0uy; 1uy; 254uy; 255uy;]
+
+  [<Test>]
   let ``uint16 string`` () = testUInt16From<string> ["1"; "65536"; "-1"; "str"; null]
 
   let inline testInt32From< ^T when ^T : (static member op_Explicit: ^T -> int32) > data =
@@ -400,6 +436,9 @@ module ConvertFuncTest =
   let ``int32 decimal`` () =
     let max, min = decimal Int32.MaxValue, decimal Int32.MinValue
     testInt32From<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+  [<Test>]
+  let ``int32 byte`` () = testInt32From<byte> [0uy; 1uy; 254uy; 255uy;]
 
   [<Test>]
   let ``int32 string`` () = testInt32From<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
@@ -431,6 +470,9 @@ module ConvertFuncTest =
     testUInt32From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
   [<Test>]
+  let ``uint32 byte`` () = testUInt32From<byte> [0uy; 1uy; 254uy; 255uy;]
+
+  [<Test>]
   let ``uint32 string`` () = testUInt32From<string> ["1"; "4294967296"; "-1"; "str"; null]
 
   let inline testInt64From< ^T when ^T : (static member op_Explicit: ^T -> int64) > data =
@@ -456,6 +498,9 @@ module ConvertFuncTest =
   let ``int64 decimal`` () =
     let max, min = decimal Int64.MaxValue, decimal Int64.MinValue
     testInt64From<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+  [<Test>]
+  let ``int64 byte`` () = testInt64From<byte> [0uy; 1uy; 254uy; 255uy;]
 
   [<Test>]
   let ``int64 string`` () =
@@ -488,6 +533,9 @@ module ConvertFuncTest =
     testUInt64From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
   [<Test>]
+  let ``uint64 byte`` () = testUInt64From<byte> [0uy; 1uy; 254uy; 255uy;]
+
+  [<Test>]
   let ``uint64 string`` () =
     testUInt64From<string> ["1"; "18446744073709551616"; "-18446744073709551617"; "str"; null]
 
@@ -503,6 +551,12 @@ module ConvertFuncTest =
   [<Test>]
   let ``nativeint float`` () = testNativeIntFrom<float> [1.0; nan; infinity; -infinity]
 
+  [<TestCase(0uy)>]
+  [<TestCase(1uy)>]
+  [<TestCase(254uy)>]
+  [<TestCase(255uy)>]
+  let ``nativeint byte`` (b:byte) = <@ nativeint b @> |> check (nativeint b)
+
   let inline testUNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> unativeint) > data =
     test { Data = data; ExprFun = (fun (x: ^T) -> <@ unativeint x @>); Fun = unativeint }
 
@@ -516,6 +570,12 @@ module ConvertFuncTest =
 
   [<Test>]
   let ``unativeint float`` () = testUNativeIntFrom<float> [1.0; nan; infinity; -infinity]
+
+  [<TestCase(0uy)>]
+  [<TestCase(1uy)>]
+  [<TestCase(254uy)>]
+  [<TestCase(255uy)>]
+  let ``unativeint byte`` (b:byte) = <@ unativeint b @> |> check (unativeint b)
 
   [<Test>]
   let ``enum int`` () =
@@ -545,6 +605,12 @@ module ConvertFuncTest =
   let ``string decimal`` () =
     <@ string 1.0M @> |> check (string 1.0M)
 
+  [<TestCase(0uy)>]
+  [<TestCase(1uy)>]
+  [<TestCase(254uy)>]
+  [<TestCase(255uy)>]
+  let ``string byte`` (b:byte) = <@ string b @> |> check (string b)
+
   [<Test>]
   let ``string bool`` () = <@ string true @> |> check "True"
 
@@ -566,6 +632,7 @@ module ConvertFuncTest =
     <@ set ["hoge"] @> |> check (set ["hoge"])
     <@ set [1; 2] @> |> check (set [1; 2])
     <@ set [1; 2; 1] @> |> check (set [1; 2; 1])
+    <@ set [0uy; 1uy; 1uy; 254uy; 255uy] @> |> check (set [0uy; 1uy; 1uy; 254uy; 255uy])
 
   module Checked =
     open Microsoft.FSharp.Core.Operators.Checked
@@ -626,6 +693,9 @@ module ConvertFuncTest =
       testUInt8From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
     [<Test>]
+    let ``uint8 byte`` () = testUInt8From<byte> [0uy; 1uy; 254uy; 255uy;]
+
+    [<Test>]
     let ``uint8 string`` () = testUInt8From<string> ["1"; "256"; "-1"; "str"; null]
 
     let inline testSByteFrom< ^T when ^T : (static member op_Explicit: ^T -> sbyte) > data =
@@ -653,6 +723,9 @@ module ConvertFuncTest =
     let ``sbyte decimal`` () =
       let max, min = decimal SByte.MaxValue, decimal SByte.MinValue
       testSByteFrom<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+    [<Test>]
+    let ``sbyte byte`` () = testSByteFrom<byte> [0uy; 1uy; 127uy; 128uy; 254uy; 255uy;]
 
     [<Test>]
     let ``sbyte string`` () = testSByteFrom<string> ["1"; "128"; "-129"; "str"; null]
@@ -684,6 +757,9 @@ module ConvertFuncTest =
       testInt8From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
     [<Test>]
+    let ``int8 byte`` () = testInt8From<byte> [0uy; 1uy; 127uy; 128uy; 254uy; 255uy;]
+    
+    [<Test>]
     let ``int8 string`` () = testInt8From<string> ["1"; "128"; "-129"; "str"; null]
 
     let inline testCharFrom< ^T when ^T : (static member op_Explicit: ^T -> char) > data =
@@ -707,6 +783,9 @@ module ConvertFuncTest =
       let max, min = decimal (int Char.MaxValue), decimal (int Char.MinValue)
       testCharFrom<decimal> [97.0M; max + 1.0M; min - 1.0M]
 
+    [<Test>]
+    let ``char byte`` () = testCharFrom<byte> [0uy; 1uy; 254uy; 255uy;]
+    
     [<Test>]
     let ``char string`` () = testCharFrom<string> ["a"; "aa"; null]
 
@@ -734,6 +813,9 @@ module ConvertFuncTest =
       let max, min = decimal Int32.MaxValue, decimal Int32.MinValue
       testIntFrom<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
+    [<Test>]
+    let ``int byte`` () = testIntFrom<byte> [0uy; 1uy; 254uy; 255uy;]
+    
     [<Test>]
     let ``int string`` () = testIntFrom<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
 
@@ -764,6 +846,9 @@ module ConvertFuncTest =
       testInt16From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
     [<Test>]
+    let ``int16 byte`` () = testInt16From<byte> [0uy; 1uy; 254uy; 255uy;]
+    
+    [<Test>]
     let ``int16 string`` () = testInt16From<string> ["1"; "32768"; "-32769"; "str"; null]
 
     let inline testUInt16From< ^T when ^T : (static member op_Explicit: ^T -> uint16) > data =
@@ -793,6 +878,9 @@ module ConvertFuncTest =
       testUInt16From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
     [<Test>]
+    let ``uint16 byte`` () = testUInt16From<byte> [0uy; 1uy; 254uy; 255uy;]
+    
+    [<Test>]
     let ``uint16 string`` () = testUInt16From<string> ["1"; "65536"; "-1"; "str"; null]
 
     let inline testInt32From< ^T when ^T : (static member op_Explicit: ^T -> int32) > data =
@@ -819,6 +907,9 @@ module ConvertFuncTest =
       let max, min = decimal Int32.MaxValue, decimal Int32.MinValue
       testInt32From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
+    [<Test>]
+    let ``int32 byte`` () = testInt32From<byte> [0uy; 1uy; 254uy; 255uy;]
+    
     [<Test>]
     let ``int32 string`` () = testInt32From<string> ["1"; "2147483648"; "-2147483649"; "str"; null]
 
@@ -849,6 +940,9 @@ module ConvertFuncTest =
       testUInt32From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
     [<Test>]
+    let ``uint32 byte`` () = testUInt32From<byte> [0uy; 1uy; 254uy; 255uy;]
+
+    [<Test>]
     let ``uint32 string`` () = testUInt32From<string> ["1"; "4294967296"; "-1"; "str"; null]
 
     let inline testInt64From< ^T when ^T : (static member op_Explicit: ^T -> int64) > data =
@@ -874,6 +968,9 @@ module ConvertFuncTest =
     let ``int64 decimal`` () =
       let max, min = decimal Int64.MaxValue, decimal Int64.MinValue
       testInt64From<decimal> [1.0M; max + 1.0M; min - 1.0M]
+
+    [<Test>]
+    let ``int64 byte`` () = testInt64From<byte> [0uy; 1uy; 254uy; 255uy;]
 
     [<Test>]
     let ``int64 string`` () =
@@ -906,6 +1003,9 @@ module ConvertFuncTest =
       testUInt64From<decimal> [1.0M; max + 1.0M; min - 1.0M]
 
     [<Test>]
+    let ``uint64 byte`` () = testUInt64From<byte> [0uy; 1uy; 254uy; 255uy;]
+    
+    [<Test>]
     let ``uint64 string`` () =
       testUInt64From<string> ["1"; "18446744073709551616"; "-18446744073709551617"; "str"; null]
 
@@ -921,6 +1021,12 @@ module ConvertFuncTest =
     [<Test>]
     let ``nativeint float`` () = testNativeIntFrom<float> [1.0; nan; infinity; -infinity]
 
+    [<TestCase(0uy)>]
+    [<TestCase(1uy)>]
+    [<TestCase(254uy)>]
+    [<TestCase(255uy)>]
+    let ``nativeint byte`` (b:byte) = <@ nativeint b @> |> check (nativeint b)
+
     let inline testUNativeIntFrom< ^T when ^T : (static member op_Explicit: ^T -> unativeint) > data =
       test { Data = data; ExprFun = (fun (x: ^T) -> <@ unativeint x @>); Fun = unativeint }
 
@@ -934,3 +1040,9 @@ module ConvertFuncTest =
 
     [<Test>]
     let ``unativeint float`` () = testUNativeIntFrom<float> [1.0; nan; infinity; -infinity]
+
+    [<TestCase(0uy)>]
+    [<TestCase(1uy)>]
+    [<TestCase(254uy)>]
+    [<TestCase(255uy)>]
+    let ``unativeint byte`` (b:byte) = <@ unativeint b @> |> check (unativeint b)

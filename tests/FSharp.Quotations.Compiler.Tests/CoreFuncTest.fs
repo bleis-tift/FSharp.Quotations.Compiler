@@ -21,6 +21,9 @@ module CoreFuncTest =
   let ``box bool`` () = <@ box true @> |> check (box true)
 
   [<Test>]
+  let ``box byte`` () = <@ box 255uy @> |> check (box 255uy)
+
+  [<Test>]
   let ``box string`` () = <@ box "str" @> |> check (box "str")
 
   [<Test>]
@@ -46,6 +49,16 @@ module CoreFuncTest =
 
   [<Test>]
   let ``compare bool bool`` () = <@ compare true true @> |> check 0
+
+  [<Ignore("compareの結果ではなく、CompareToメソッド呼び出しの結果が返ってきてしまっているので、bge.un.s などを実装する必要があるように見える")>]
+  [<TestCase(0uy, 0uy, 0)>]
+  [<TestCase(1uy, 1uy, 0)>]
+  [<TestCase(255uy, 255uy, 0)>]
+  [<TestCase(0uy, 1uy, -1)>]
+  [<TestCase(1uy, 255uy, -1)>]
+  [<TestCase(1uy, 0uy, 1)>]
+  [<TestCase(255uy, 1uy, 1)>]
+  let ``compare byte byte`` (a:byte, b:byte, expected:int) = <@ compare a b @> |> check expected
 
   [<Test>]
   let ``compare string string`` () = <@ compare "str" "str" @> |> check 0
@@ -86,6 +99,11 @@ module CoreFuncTest =
   [<Test>]
   let ``hash bool`` () = <@ hash true @> |> check 1
 
+  [<TestCase(0uy)>]
+  [<TestCase(1uy)>]
+  [<TestCase(255uy)>]
+  let ``hash byte`` (b:byte) = <@ hash b @> |> check (hash b)
+
   [<Test>]
   let ``hash string`` () = <@ hash "str" @> |> check (hash "str")
 
@@ -109,6 +127,11 @@ module CoreFuncTest =
 
   [<Test>]
   let ``limitedHash int bool`` () = <@ limitedHash 1 true @> |> check 1
+
+  [<TestCase(1, 0uy)>]
+  [<TestCase(1, 1uy)>]
+  [<TestCase(1, 255uy)>]
+  let ``limitedHash int byte`` (i:int, b:byte) = <@ limitedHash i b @> |> check (limitedHash i b)
 
   [<Test>]
   let ``limitedHash int string`` () = <@ limitedHash 1 "str" @> |> check (limitedHash 1 "str")
@@ -134,6 +157,11 @@ module CoreFuncTest =
   [<Test>]
   let ``id bool`` () = <@ id true @> |> check true
 
+  [<TestCase(0uy)>]
+  [<TestCase(1uy)>]
+  [<TestCase(255uy)>]
+  let ``id byte`` (b:byte) = <@ id b @> |> check b
+
   [<Test>]
   let ``id string`` () = <@ id "str" @> |> check "str"
 
@@ -157,6 +185,11 @@ module CoreFuncTest =
 
   [<Test>]
   let ``ignore bool`` () = <@ ignore true @> |> check ()
+
+  [<TestCase(0uy)>]
+  [<TestCase(1uy)>]
+  [<TestCase(255uy)>]
+  let ``ignore byte`` (b:byte) = <@ ignore b @> |> check ()
 
   [<Test>]
   let ``ignore string`` () = <@ ignore "str" @> |> check ()
@@ -190,6 +223,16 @@ module CoreFuncTest =
   [<Test>]
   let ``max bool bool`` () = <@ max false true @> |> check true
 
+  [<TestCase(0uy, 0uy)>]
+  [<TestCase(0uy, 1uy)>]
+  [<TestCase(0uy, 254uy)>]
+  [<TestCase(0uy, 255uy)>]
+  [<TestCase(255uy, 0uy)>]
+  [<TestCase(255uy, 1uy)>]
+  [<TestCase(255uy, 254uy)>]
+  [<TestCase(255uy, 255uy)>]
+  let ``max byte byte`` (a:byte, b:byte) = <@ max a b @> |> check (max a b)
+
   [<Test>]
   let ``max string string`` () = <@ max "aaa" "bbb" @> |> check "bbb"
 
@@ -214,11 +257,39 @@ module CoreFuncTest =
   [<Test>]
   let ``min bool bool`` () = <@ min false true @> |> check false
 
+  [<TestCase(0uy, 0uy)>]
+  [<TestCase(0uy, 1uy)>]
+  [<TestCase(0uy, 254uy)>]
+  [<TestCase(0uy, 255uy)>]
+  [<TestCase(255uy, 0uy)>]
+  [<TestCase(255uy, 1uy)>]
+  [<TestCase(255uy, 254uy)>]
+  [<TestCase(255uy, 255uy)>]
+  let ``min byte byte`` (a:byte, b:byte) = <@ min a b @> |> check (min a b)
+
   [<Test>]
   let ``min string string`` () = <@ min "aaa" "bbb" @> |> check "aaa"
 
   [<Test>]
   let ``min int[] int[]`` () = <@ min [|10|] [|20|] @> |> check [|10|]
+
+  [<Test>]
+  let ``sizeof type`` () =
+    <@ sizeof<byte> @> |> check (sizeof<byte>)
+    <@ sizeof<int> @> |> check (sizeof<int>)
+    <@ sizeof<string> @> |> check (sizeof<string>)
+
+  [<Test>]
+  let ``typeof type`` () =
+    <@ typeof<byte> @> |> check (typeof<byte>)
+    <@ typeof<int> @> |> check (typeof<int>)
+    <@ typeof<string> @> |> check (typeof<string>)
+
+  [<Test>]
+  let ``typedefof type`` () =
+    <@ typedefof<byte> @> |> check (typedefof<byte>)
+    <@ typedefof<int> @> |> check (typedefof<int>)
+    <@ typedefof<string> @> |> check (typedefof<string>)
 
   [<Test>]
   let ``not bool`` () = <@ not true @> |> check false
@@ -267,6 +338,16 @@ module CoreFuncTest =
     [<Test>]
     let ``Unchecked.compare decimal decimal`` () = <@ compare 1.0M 1.0M @> |> check 0
 
+    [<Ignore("compareの結果ではなく、CompareToメソッド呼び出しの結果が返ってきてしまっているので、bge.un.s などを実装する必要があるように見える")>]
+    [<TestCase(0uy, 0uy, 0)>]
+    [<TestCase(1uy, 1uy, 0)>]
+    [<TestCase(255uy, 255uy, 0)>]
+    [<TestCase(0uy, 1uy, -1)>]
+    [<TestCase(1uy, 255uy, -1)>]
+    [<TestCase(1uy, 0uy, 1)>]
+    [<TestCase(255uy, 1uy, 1)>]
+    let ``Unchecked.compare byte byte`` (a:byte, b:byte, expected:int) = <@ compare a b @> |> check expected
+
     [<Test>]
     let ``Unchecked.hash int`` () = <@ hash 1 @> |> check 1
 
@@ -283,6 +364,9 @@ module CoreFuncTest =
     let ``Unchecked.hash decimal`` () = <@ hash 1.0M @> |> check (hash 1.0M)
 
     [<Test>]
+    let ``Unchecked.hash byte`` () = <@ hash 1uy @> |> check (hash 1uy)
+
+    [<Test>]
     let ``Unchecked.equals int int`` () = <@ equals 1 1 @> |> check true
 
     [<Test>]
@@ -296,6 +380,9 @@ module CoreFuncTest =
 
     [<Test>]
     let ``Unchecked.equals decimal decimal`` () = <@ equals 1.0M 1.0M @> |> check true
+
+    [<Test>]
+    let ``Unchecked.equals byte byte`` () = <@ equals 1uy 1uy @> |> check true
 
     [<Test>]
     let ``Unchecked.defaultof char`` () = <@ defaultof<char> @> |> check defaultof<char>

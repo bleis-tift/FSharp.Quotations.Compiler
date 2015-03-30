@@ -284,3 +284,51 @@ module CmpOpTest =
     <@ [|1|] >= [|2|] @> |> check false
     <@ [|1|] >= [|1; 1|] @> |> check false
     <@ [|2|] >= [|1; 1|] @> |> check false
+
+  [<Test>]
+  let ``byte = byte`` () =
+    <@ 0uy = 0uy @> |> check true
+    <@ 255uy = 255uy @> |> check true
+    <@ 0uy = 255uy @> |> check false
+    <@ 255uy = 0uy @> |> check false
+
+  [<Test>]
+  let ``byte <> byte`` () =
+    <@ 0uy <> 0uy @> |> check false
+    <@ 255uy <> 255uy @> |> check false
+    <@ 0uy <> 255uy @> |> check true
+    <@ 255uy <> 0uy @> |> check true
+
+  [<Test>]
+  let ``byte > byte`` () =
+    <@ 1uy > 0uy @> |> check true
+    <@ 255uy > 1uy @> |> check true
+    <@ 255uy > 254uy @> |> check true
+    <@ 0uy > 255uy @> |> check false
+    <@ 255uy > 255uy @> |> check false
+
+  [<Test>]
+  let ``byte >= byte`` () =
+    <@ 1uy >= 0uy @> |> check true
+    <@ 255uy >= 1uy @> |> check true
+    <@ 255uy >= 254uy @> |> check true
+    <@ 255uy >= 255uy @> |> check true
+    <@ 0uy >= 255uy @> |> check false
+    <@ 254uy >= 255uy @> |> check false
+
+  [<Test>]
+  let ``byte < byte`` () =
+    <@ 0uy < 1uy @> |> check true
+    <@ 1uy < 255uy @> |> check true
+    <@ 254uy < 255uy @> |> check true
+    <@ 255uy < 0uy @> |> check false
+    <@ 255uy < 255uy @> |> check false
+
+  [<Test>]
+  let ``byte <= byte`` () =
+    <@ 0uy <= 1uy @> |> check true
+    <@ 1uy <= 255uy @> |> check true
+    <@ 254uy <= 255uy @> |> check true
+    <@ 255uy <= 255uy @> |> check true
+    <@ 255uy <= 0uy @> |> check false
+    <@ 255uy <= 254uy @> |> check false
