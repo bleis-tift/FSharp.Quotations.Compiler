@@ -140,6 +140,40 @@ module CmpOpTest =
     <@ 0.0 >= 1.0 @> |> check false
 
   [<Test>]
+  let ``decimal = decimal`` () =
+    <@ 1M = 1M @> |> check true
+    <@ 1M = 0M @> |> check false
+
+  [<Test>]
+  let ``decimal <> decimal`` () =
+    <@ 1M = 1M @> |> check true
+    <@ 1M = 0M @> |> check false
+
+  [<Test>]
+  let ``decimal < decimal`` () =
+    <@ 1M < 0M @> |> check false
+    <@ 1M < 1M @> |> check false
+    <@ 0M < 1M @> |> check true
+
+  [<Test>]
+  let ``decimal <= decimal`` () =
+    <@ 1M <= 0M @> |> check false
+    <@ 1M <= 1M @> |> check true
+    <@ 0M <= 1M @> |> check true
+
+  [<Test>]
+  let ``decimal > decimal`` () =
+    <@ 1M > 0M @> |> check true
+    <@ 1M > 1M @> |> check false
+    <@ 0M > 1M @> |> check false
+
+  [<Test>]
+  let ``decimal >= decimal`` () =
+    <@ 1M >= 0M @> |> check true
+    <@ 1M >= 1M @> |> check true
+    <@ 0M >= 1M @> |> check false
+
+  [<Test>]
   let ``bool = bool`` () =
     <@ true = true @> |> check true
     <@ false = true @> |> check false
