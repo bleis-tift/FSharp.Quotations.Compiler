@@ -32,3 +32,15 @@ module ExtraTopLevelOpTest =
     <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintfn w "hoge"; w.Result @> |> check "hoge\r\n"
     <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintfn w "hoge%d" 1; w.Result @> |> check "hoge1\r\n"
     <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintfn w "%s" "hoge"; w.Result @> |> check "hoge\r\n"
+
+  [<Test>]
+  let ``printf`` () =
+    <@ printf "hoge" @> |> checkPrinted Out "hoge"
+    <@ printf "hoge%d" 1 @> |> checkPrinted Out "hoge1"
+    <@ printf "%s" "hoge" @> |> checkPrinted Out "hoge"
+
+  [<Test>]
+  let ``printfn`` () =
+    <@ printfn "hoge" @> |> checkPrinted Out "hoge\r\n"
+    <@ printfn "hoge%d" 1 @> |> checkPrinted Out "hoge1\r\n"
+    <@ printfn "%s" "hoge" @> |> checkPrinted Out "hoge\r\n"
