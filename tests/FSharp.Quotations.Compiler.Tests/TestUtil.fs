@@ -44,6 +44,14 @@ module TestUtil =
       Assert.Fail("exception is not thrown.")
     with :? 'TExn -> ()
 
+  let checkExnMsg<'T, 'TExn when 'TExn :> exn> (expected: string) (expr: Expr<'T>) =
+    try
+      ExprCompiler.compile expr |> ignore
+      Assert.Fail("exception is not thrown.")
+    with
+      :? 'TExn as e ->
+        e.Message |> should equal expected
+
   let checkExnType (expectedType: Type) (expr: Expr<_>) =
     try
       ExprCompiler.compile expr |> ignore
