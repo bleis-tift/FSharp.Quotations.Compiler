@@ -20,4 +20,15 @@ module ExtraTopLevelOpTest =
     <@ eprintfn "hoge" @> |> checkPrinted Error "hoge\r\n"
     <@ eprintfn "hoge%d" 1 @> |> checkPrinted Error "hoge1\r\n"
     <@ eprintfn "%s" "hoge" @> |> checkPrinted Error "hoge\r\n"
-
+    
+  [<Test>]
+  let ``fprintf`` () =
+    <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintf w "hoge"; w.Result @> |> check "hoge"
+    <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintf w "hoge%d" 1; w.Result @> |> check "hoge1"
+    <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintf w "%s" "hoge"; w.Result @> |> check "hoge"
+    
+  [<Test>]
+  let ``fprintfn`` () =
+    <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintfn w "hoge"; w.Result @> |> check "hoge\r\n"
+    <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintfn w "hoge%d" 1; w.Result @> |> check "hoge1\r\n"
+    <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintfn w "%s" "hoge"; w.Result @> |> check "hoge\r\n"
