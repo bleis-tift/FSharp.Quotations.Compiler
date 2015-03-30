@@ -22,7 +22,7 @@ module internal MethodCallEmitter =
 
   let doNothing = []
 
-  let emitOpCode opcode = [ Compiling (fun (gen: ILGeneratorWrapper) -> gen.Emit(opcode)) ]
+  let emitOpCode opcode = [ Compiling (fun gen -> gen.Emit(opcode)) ]
   let emitCall (mi: MethodInfo) (gen: ILGeneratorWrapper) =
     if mi.IsVirtual then
       gen.Emit(Callvirt (Method mi))
@@ -31,7 +31,7 @@ module internal MethodCallEmitter =
 
   let private (|>>) emit1 emit2 =
     match emit1, emit2 with
-    | [Compiling e1], [Compiling e2] -> [ Compiling (fun (gen: ILGeneratorWrapper) -> e1 gen; e2 gen) ]
+    | [Compiling e1], [Compiling e2] -> [ Compiling (fun gen -> e1 gen; e2 gen) ]
     | [Compiling e1], [Assumed e2] -> [ Assumed e2; Compiling e1 ]
     | _ -> failwith "oops!"
 
@@ -58,7 +58,7 @@ module internal MethodCallEmitter =
 
   let declareLocal<'T> loader =
     [
-      Compiling (fun (gen: ILGeneratorWrapper) -> let loc = gen.DeclareLocal(typeof<'T>) in gen.Emit(Stloc (loc, None)); gen.Emit(loader (loc, None)))
+      Compiling (fun gen -> let loc = gen.DeclareLocal(typeof<'T>) in gen.Emit(Stloc (loc, None)); gen.Emit(loader (loc, None)))
     ]
 
   let private altEmitterTableUnchecked =
@@ -395,7 +395,7 @@ module internal MethodCallEmitter =
       | Local (local, name) -> (local, name)
       | _ -> failwith "variable is not found in varEnv"
     [
-      Compiling (fun (gen: ILGeneratorWrapper) -> gen.Emit(ILOpCode.ldloca local name))
+      Compiling (fun gen -> gen.Emit(ILOpCode.ldloca local name))
     ]
 
   let private tryGetGenericEmitter (mi: MethodInfo) =
