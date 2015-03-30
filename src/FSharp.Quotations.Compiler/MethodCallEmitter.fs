@@ -103,6 +103,12 @@ module internal MethodCallEmitter =
     dict.Add(Expr.getMethodInfo <@ 1I >>> 1 @>, emitCallMethod (Expr.getMethodInfo <@ Numerics.BigInteger.op_RightShift(1I, 1) @>))
     dict.Add(Expr.getMethodInfo <@ 1I <<< 1 @>, emitCallMethod (Expr.getMethodInfo <@ Numerics.BigInteger.op_LeftShift(1I, 1) @>))
 
+    dict.Add(Expr.getMethodInfo <@ 1M + 1M @>, emitCallMethod (Expr.getMethodInfo <@ System.Decimal.op_Addition(1M, 1M) @>))
+    dict.Add(Expr.getMethodInfo <@ 1M - 1M @>, emitCallMethod (Expr.getMethodInfo <@ System.Decimal.op_Subtraction(1M, 1M) @>))
+    dict.Add(Expr.getMethodInfo <@ 1M * 1M @>, emitCallMethod (Expr.getMethodInfo <@ System.Decimal.op_Multiply(1M, 1M) @>))
+    dict.Add(Expr.getMethodInfo <@ 1M / 1M @>, emitCallMethod (Expr.getMethodInfo <@ System.Decimal.op_Division(1M, 1M) @>))
+    dict.Add(Expr.getMethodInfo <@ 1M % 1M @>, emitCallMethod (Expr.getMethodInfo <@ System.Decimal.op_Modulus(1M, 1M) @>))
+
     dict.Add(Expr.getMethodInfo <@ byte 1 @>, doNothing)
     dict.Add(Expr.getMethodInfo <@ sbyte 1 @>, doNothing)
     dict.Add(Expr.getMethodInfo <@ char 1 @>, doNothing)
@@ -226,6 +232,9 @@ module internal MethodCallEmitter =
     dict.Add(Expr.getMethodInfo <@ 1uL * 1uL @>, emitOpCode Mul_Ovf_Un)
     dict.Add(Expr.getMethodInfo <@ 1.0 * 1.0 @>, emitOpCode Mul)
     dict.Add(Expr.getMethodInfo <@ 1.0f * 1.0f @>, emitOpCode Mul)
+
+    dict.Add(Expr.getMethodInfo <@ 1M - 1M @>, emitCallMethod (Expr.getMethodInfo <@ System.Decimal.op_Subtraction(1M, 1M) @>))
+    dict.Add(Expr.getMethodInfo <@ 1M * 1M @>, emitCallMethod (Expr.getMethodInfo <@ System.Decimal.op_Multiply(1M, 1M) @>))
 
     dict.Add(Expr.getMethodInfo <@ byte 1uy @>, doNothing)
     dict.Add(Expr.getMethodInfo <@ byte 1us @>, emitOpCode Conv_Ovf_U1_Un)

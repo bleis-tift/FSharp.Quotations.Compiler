@@ -106,6 +106,34 @@ module ArithmeticOpTest =
     <@ 0.0 / 0.0 @> |> check nan
 
   [<Test>]
+  let ``+ decimal`` () =
+    <@ +(1.0) @> |> check (+(1.0))
+
+  [<Test>]
+  let ``- decimal`` () =
+    <@ -(1.0) @> |> check (-(1.0))
+
+  [<Test>]
+  let ``decimal + decimal`` () =
+    <@ 1.0m + 1.0m @> |> check (1.0m + 1.0m)
+
+  [<Test>]
+  let ``decimal - decimal`` () =
+    <@ 1.0m - 1.0m @> |> check (1.0m - 1.0m)
+
+  [<Test>]
+  let ``decimal * decimal`` () =
+    <@ 1.0m * 1.0m @> |> check (1.0m * 1.0m)
+
+  [<Test>]
+  let ``decimal / decimal`` () =
+    <@ 1.0m / 1.0m @> |> check (1.0m / 1.0m)
+
+  [<Test>]
+  let ``decimal % decimal`` () =
+    <@ 1.0m % 1.0m @> |> check (1.0m % 1.0m)
+
+  [<Test>]
   let ``string + string`` () =
     <@ "aaa" + "bbb" @> |> check "aaabbb"
 
@@ -184,6 +212,34 @@ module ArithmeticOpTest =
     let ``float * float`` () =
       <@ 2.0 * 3.0 @> |> check 6.0
       <@ Double.MinValue * -1.0 @> |> check Double.MaxValue
+      
+    [<Test>]
+    let ``+ decimal`` () =
+      <@ +(1.0) @> |> check (+(1.0))
+
+    [<Test>]
+    let ``- decimal`` () =
+      <@ -(1.0) @> |> check (-(1.0))
+
+    [<Test>]
+    let ``decimal + decimal`` () =
+      <@ 1.0m + 1.0m @> |> check (1.0m + 1.0m)
+
+    [<Test>]
+    let ``decimal - decimal`` () =
+      <@ 1.0m - 1.0m @> |> check (1.0m - 1.0m)
+
+    [<Test>]
+    let ``decimal * decimal`` () =
+      <@ 1.0m * 1.0m @> |> check (1.0m * 1.0m)
+
+    [<Test>]
+    let ``decimal / decimal`` () =
+      <@ 1.0m / 1.0m @> |> check (1.0m / 1.0m)
+
+    [<Test>]
+    let ``decimal % decimal`` () =
+      <@ 1.0m % 1.0m @> |> check (1.0m % 1.0m)
 
     [<Test>]
     let ``string + string`` () =
