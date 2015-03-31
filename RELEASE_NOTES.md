@@ -1,2 +1,2 @@
-### 1.0 - Unreleased
-* More awesome stuff coming
+### 0.1 - Unreleased
+* internal release version
