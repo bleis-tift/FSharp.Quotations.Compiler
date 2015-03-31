@@ -37,6 +37,11 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Quotations.Compiler.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.Quotations.Compiler.Tests.CSharp", "tests\FSharp.Quotations.Compiler.Tests.CSharp\FSharp.Quotations.Compiler.Tests.CSharp.csproj", "{B69BD2F7-BD0B-4DEC-AF95-6069212101A8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ja", "ja", "{E8FC761A-5863-4AAB-9313-7CF0B0C71FEB}"
+	ProjectSection(SolutionItems) = preProject
+		docs\content\ja\index.fsx = docs\content\ja\index.fsx
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,5 +76,6 @@ Global
 		{8E6D5255-776D-4B61-85F9-73C37AA1FB9A} = {A6A6AF7D-D6E3-442D-9B1E-58CC91879BE1}
 		{6B9E5F15-6DA0-4D39-AAB7-B28986D9447C} = {ED8079DD-2B06-4030-9F0F-DC548F98E1C4}
 		{B69BD2F7-BD0B-4DEC-AF95-6069212101A8} = {ED8079DD-2B06-4030-9F0F-DC548F98E1C4}
+		{E8FC761A-5863-4AAB-9313-7CF0B0C71FEB} = {8E6D5255-776D-4B61-85F9-73C37AA1FB9A}
 	EndGlobalSection
 EndGlobal
