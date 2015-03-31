@@ -497,13 +497,13 @@ module internal MethodCallEmitter =
 
   let loadReceiverAddress (r: Expr) (varEnv: VariableEnv ref) =
     let v = match r with | Patterns.Var v -> v | _ -> failwith "argument is not variable"
-    let (local, name) =
-      match List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv with
-      | Local (local, name) -> (local, name)
-      | _ -> failwith "variable is not found in varEnv"
-    [
-      Compiling (fun gen -> gen.Emit(ILOpCode.ldloca local name))
-    ]
+    match List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv with
+    | Local (local, name) ->
+        [ Compiling (fun gen -> gen.Emit(ILOpCode.ldloca local name)) ]
+    | Arg idx ->
+        [ Compiling (fun gen -> gen.Emit(Ldarga idx)) ]
+    | Field fi ->
+        [ Compiling (fun gen -> gen.Emit(Ldarg_0); gen.Emit(Ldflda fi)) ]
 
   let private tryGetGenericEmitter (mi: MethodInfo) =
     if mi.IsGenericMethod then

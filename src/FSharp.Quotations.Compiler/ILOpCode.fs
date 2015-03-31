@@ -80,10 +80,12 @@ type ILOpCode =
   | Ldarg_2
   | Ldarg_3
   | Ldarg of int
+  | Ldarga of int
   | Stsfld of FieldInfo
   | Ldsfld of FieldInfo
   | Stfld of FieldInfo
   | Ldfld of FieldInfo
+  | Ldflda of FieldInfo
   | Ldnull
   | Ldstr of string
   | Ldc_I4_M1
@@ -203,10 +205,12 @@ module ILOpCode =
   | Ldarg_2 -> OpCodes.Ldarg_2
   | Ldarg_3 -> OpCodes.Ldarg_3
   | Ldarg _ -> OpCodes.Ldarg
+  | Ldarga _ -> OpCodes.Ldarga
   | Stsfld _ -> OpCodes.Stsfld
   | Ldsfld _ -> OpCodes.Ldsfld
   | Stfld _ -> OpCodes.Stfld
   | Ldfld _ -> OpCodes.Ldfld
+  | Ldflda _ -> OpCodes.Ldflda
   | Ldnull -> OpCodes.Ldnull
   | Ldstr _ -> OpCodes.Ldstr
   | Ldc_I4_M1 -> OpCodes.Ldc_I4_M1

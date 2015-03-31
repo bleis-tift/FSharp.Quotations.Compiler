@@ -120,6 +120,14 @@ module ObjTest =
     <@ Struct(1).ToString() @> |> check (Struct(1).ToString())
 
   [<Test>]
+  let ``value type stringify in lambda`` () =
+    <@ (fun (x: int) -> x.ToString()) 42 @> |> check "42"
+
+  [<Test>]
+  let ``value type stringify in lambda2`` () =
+    <@ let x = 42 in (fun () -> x.ToString()) () @> |> check "42"
+
+  [<Test>]
   let ``value type get type`` () =
     <@ (1).GetType() @> |> check ((1).GetType())
     <@ (true).GetType() @> |> check ((true).GetType())
