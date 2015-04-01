@@ -12,7 +12,8 @@ module Expr =
   | PropertyGet (_, pi, _) -> pi
   | expr -> failwithf "expr is not property get: %A" expr
 
-  let getGenericMethodInfo = function
+  let rec getGenericMethodInfo = function
   | Call (_, mi, _) -> mi.GetGenericMethodDefinition()
   | TryWith (_, _, _, _, Sequential (_, Call (_, mi, _))) -> mi.GetGenericMethodDefinition()
+  | Lambda (_, body) -> getGenericMethodInfo body
   | expr -> failwithf "expr is not Method call: %A" expr

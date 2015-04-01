@@ -436,6 +436,7 @@ module internal MethodCallEmitter =
   let private altGenericEmitterTable =
     let dict = Dictionary<MethodInfo, CompileStackInfo list>(identityEqualityComparer)
     let x = 42
+
     dict.Add(Expr.getGenericMethodInfo <@ +(x) @>, doNothing)
     dict.Add(Expr.getGenericMethodInfo <@ -(x) @>, emitOpCode Neg)
     dict.Add(Expr.getGenericMethodInfo <@ x - x @>, emitOpCode Sub)
@@ -508,6 +509,74 @@ module internal MethodCallEmitter =
     | Field fi ->
         [ Compiling (fun gen -> gen.Emit(Ldarg_0); gen.Emit(Ldflda fi)) ]
 
+  let private tryGetOpMethod name paramTypes (typ: Type) =
+    let paramTypes = Array.ofList paramTypes
+    typ.GetMethods(BindingFlags.Static ||| BindingFlags.Public)
+    |> Array.tryFind (fun mi -> mi.Name = name && (mi.GetParameters() |> Array.map (fun p -> p.ParameterType)) = paramTypes)
+
+  let (|OpMethod|_|) expr (mi: MethodInfo) =
+    let genMethod = Expr.getGenericMethodInfo expr
+    if genMethod = mi.GetGenericMethodDefinition() then
+      let opName = genMethod.Name
+      match mi.GetParameters() |> Array.map (fun p -> p.ParameterType) with
+      | [|typ|] -> typ |> tryGetOpMethod opName [typ]
+      | [|typ1; typ2|] ->
+          match typ1 |> tryGetOpMethod opName [typ1; typ2] with
+          | Some mi -> Some mi
+          | None -> typ2 |> tryGetOpMethod opName [typ1; typ2]
+      | _ -> None
+    else
+      None
+
+  let (|OpExplicit|_|) expr (mi: MethodInfo) =
+    let genMethod = Expr.getGenericMethodInfo expr
+    if genMethod = mi.GetGenericMethodDefinition() then
+      let typ = mi.GetParameters().[0].ParameterType
+      typ.GetMethods(BindingFlags.Static ||| BindingFlags.Public)
+      |> Array.tryFind (fun m -> m.Name = "op_Explicit" && m.ReturnType = mi.ReturnType)
+    else
+      None
+
+  let private tryGetOverloadedOpEmitter (mi: MethodInfo) =
+    if mi.IsGenericMethod then
+      match mi with
+      | OpMethod <@ (~+) @> op
+      | OpMethod <@ (~-) @> op
+      | OpMethod <@ (+) @> op
+      | OpMethod <@ (-) @> op
+      | OpMethod <@ (*) @> op
+      | OpMethod <@ (/) @> op
+      | OpMethod <@ (%) @> op
+      | OpMethod <@ (<<<) @> op
+      | OpMethod <@ (>>>) @> op
+      | OpMethod <@ (&&&) @> op
+      | OpMethod <@ (|||) @> op
+      | OpMethod <@ (^^^) @> op
+      | OpMethod <@ (~~~) @> op
+      | OpExplicit <@ byte @> op
+      | OpExplicit <@ char @> op
+      | OpExplicit <@ decimal @> op
+      | OpExplicit <@ double @> op
+      | OpExplicit <@ float @> op
+      | OpExplicit <@ float32 @> op
+      | OpExplicit <@ int @> op
+      | OpExplicit <@ int16 @> op
+      | OpExplicit <@ int32 @> op
+      | OpExplicit <@ int64 @> op
+      | OpExplicit <@ int8 @> op
+      | OpExplicit <@ nativeint @> op
+      | OpExplicit <@ sbyte @> op
+      | OpExplicit <@ single @> op
+      | OpExplicit <@ uint16 @> op
+      | OpExplicit <@ uint32 @> op
+      | OpExplicit <@ uint64 @> op
+      | OpExplicit <@ uint8 @> op
+      | OpExplicit <@ unativeint @> op
+          -> Some (emitCallMethod op)
+      | _ -> None
+    else
+      None
+
   let private tryGetGenericEmitter (mi: MethodInfo) =
     if mi.IsGenericMethod then
       match altGenericEmitterTable.TryGetValue(mi.GetGenericMethodDefinition()) with
@@ -527,29 +596,32 @@ module internal MethodCallEmitter =
             match altEmitterTableReceiver(recv, mi).TryGetValue(mi) with
             | true, emitter -> (emitter, Some loadReceiverAddress)
             | _ ->
-                match tryGetGenericEmitter mi with
+                match tryGetOverloadedOpEmitter mi with
                 | Some emitter -> (emitter, None)
                 | _ ->
-                    let emitCall (gen: ILGeneratorWrapper) =
-                      if mi.IsVirtual then gen.Emit(Callvirt (Method mi))
-                      else gen.Emit(Call (Method mi))
+                    match tryGetGenericEmitter mi with
+                    | Some emitter -> (emitter, None)
+                    | _ ->
+                        let emitCall (gen: ILGeneratorWrapper) =
+                          if mi.IsVirtual then gen.Emit(Callvirt (Method mi))
+                          else gen.Emit(Call (Method mi))
 
-                    let isReturnVoid = mi.ReturnType = typeof<Void>
-                    let assumed = 
-                      if isReturnVoid then
-                        [ Assumed (function
-                                   | IfSequential, gen -> emitCall gen
-                                   | _, gen -> emitCall gen; gen.Emit(Ldnull)) ]
-                      elif mi.ReturnType = typeof<unit> then
-                        [ Assumed (function
-                                   | IfSequential, gen -> emitCall gen; gen.Emit(Pop)
-                                   | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
-                                   | _, gen -> emitCall gen; gen.Emit(Ldnull)) ]
-                      else
-                        [ Assumed (function
-                                   | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
-                                   | _, gen -> emitCall gen) ]
-                    (assumed, None)
+                        let isReturnVoid = mi.ReturnType = typeof<Void>
+                        let assumed = 
+                          if isReturnVoid then
+                            [ Assumed (function
+                                       | IfSequential, gen -> emitCall gen
+                                       | _, gen -> emitCall gen; gen.Emit(Ldnull)) ]
+                          elif mi.ReturnType = typeof<unit> then
+                            [ Assumed (function
+                                       | IfSequential, gen -> emitCall gen; gen.Emit(Pop)
+                                       | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
+                                       | _, gen -> emitCall gen; gen.Emit(Ldnull)) ]
+                          else
+                            [ Assumed (function
+                                       | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
+                                       | _, gen -> emitCall gen) ]
+                        (assumed, None)
 
   let emit (recv: Expr option, mi: MethodInfo, argsExprs: Expr list) (stack: CompileStack) (varEnv: VariableEnv ref) =
     let (emitter, recvEmitter) = getPushingCompileStackInfos recv mi
