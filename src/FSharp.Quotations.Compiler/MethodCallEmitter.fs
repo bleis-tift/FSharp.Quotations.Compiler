@@ -480,6 +480,9 @@ module internal MethodCallEmitter =
     dict.Add(Expr.getGenericMethodInfo <@ Checked.uint64 x @>, emitOpCode Conv_Ovf_U8)
     dict.Add(Expr.getGenericMethodInfo <@ Checked.nativeint x @>, emitOpCode Conv_Ovf_I)
     dict.Add(Expr.getGenericMethodInfo <@ Checked.unativeint x @>, emitOpCode Conv_Ovf_U)
+
+    dict.Add(Expr.getGenericMethodInfo <@ try () with _ -> reraise () @>, emitOpCode Rethrow)
+
     dict :> IReadOnlyDictionary<_, _>
 
   let private altEmitterTableReceiver (recv: Expr option, mi: MethodInfo) =

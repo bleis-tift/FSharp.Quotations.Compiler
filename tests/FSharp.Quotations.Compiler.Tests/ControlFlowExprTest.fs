@@ -73,6 +73,14 @@ module ControlFlowExprTest =
     <@ try 10 finally () @> |> check 10
 
   [<Test>]
+  let ``rethrow`` () =
+    <@ try
+         try failwith "oops!"
+         with _ -> reraise ()
+       with e -> e.Message @>
+    |> check "oops!"
+
+  [<Test>]
   let ``match type test`` () =
     <@
       let x =

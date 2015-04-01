@@ -14,4 +14,5 @@ module Expr =
 
   let getGenericMethodInfo = function
   | Call (_, mi, _) -> mi.GetGenericMethodDefinition()
+  | TryWith (_, _, _, _, Sequential (_, Call (_, mi, _))) -> mi.GetGenericMethodDefinition()
   | expr -> failwithf "expr is not Method call: %A" expr

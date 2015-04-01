@@ -159,7 +159,7 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string,
     | Conv_Ovf_U1_Un | Conv_Ovf_U2_Un | Conv_Ovf_U4_Un | Conv_Ovf_U8_Un
     | Ldarg_0 | Ldarg_1 | Ldarg_2 | Ldarg_3
     | Ldnull | Ldc_I4_M1 | Ldc_I4_0 | Ldc_I4_1 | Ldc_I4_2 | Ldc_I4_3 | Ldc_I4_4 | Ldc_I4_5 | Ldc_I4_6 | Ldc_I4_7 | Ldc_I4_8
-    | Tailcall | Dup | Pop | Ret | Endfinally ->
+    | Tailcall | Dup | Pop | Rethrow | Ret | Endfinally ->
         this.WriteLineAndMark(raw.Name)
         gen.Emit(raw)
 

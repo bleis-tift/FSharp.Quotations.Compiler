@@ -114,6 +114,7 @@ type ILOpCode =
   | Initobj of Type
   | Dup
   | Pop
+  | Rethrow
   | Ret
 
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
@@ -239,4 +240,5 @@ module ILOpCode =
   | Initobj _ -> OpCodes.Initobj
   | Dup -> OpCodes.Dup
   | Pop -> OpCodes.Pop
+  | Rethrow -> OpCodes.Rethrow
   | Ret -> OpCodes.Ret
