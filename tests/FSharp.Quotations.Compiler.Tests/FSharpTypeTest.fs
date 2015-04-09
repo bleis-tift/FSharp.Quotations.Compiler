@@ -71,3 +71,11 @@ module FSharpTypeTest =
 
   [<Test>]
   let ``decr ref`` () = <@ let x = ref 0 in decr x; !x @> |> check -1
+
+  [<TestCase(true, true)>]
+  [<TestCase(true, false)>]
+  [<TestCase(false, true)>]
+  [<TestCase(false, false)>]
+  let ``partial apply`` (a, b) =
+    <@ let f x = (||) x in f a b @> |> check (a || b)
+    <@ let f x = (&&) x in f a b @> |> check (a && b)
