@@ -70,7 +70,10 @@ module ControlFlowExprTest =
 
   [<Test>]
   let ``try-finally`` () =
-    <@ try 10 finally () @> |> check 10
+    <@ let x = ref 0
+       try () finally x := 10
+       !x @>
+    |> check 10
 
   [<Test>]
   let ``rethrow`` () =
