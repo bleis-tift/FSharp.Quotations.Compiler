@@ -3,8 +3,10 @@
 open Microsoft.FSharp.Quotations.Patterns
 
 module Expr =
-  let getMethodInfo = function
+  let rec getMethodInfo = function
   | Call (_, mi, _) -> mi
+  | Let (_, _, body) -> getMethodInfo body
+  | Lambda (_, body) -> getMethodInfo body
   | expr -> failwithf "expr is not Method call: %A" expr
 
   let getPropertyInfo = function
