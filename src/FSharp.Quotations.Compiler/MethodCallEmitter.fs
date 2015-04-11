@@ -128,17 +128,15 @@ module internal MethodCallEmitter =
     dict.Add(Expr.getMethodInfo <@ 1 >>> 1 @>, emitOpCode (Ldc_I4_S 31) |>> emitOpCode And |>> emitOpCode Shr)
     dict.Add(Expr.getMethodInfo <@ 1s >>> 1 @>, emitOpCode (Ldc_I4_S 15) |>> emitOpCode And |>> emitOpCode Shr |>> convInt16)
     dict.Add(Expr.getMethodInfo <@ 1y >>> 1 @>, emitOpCode (Ldc_I4_7) |>> emitOpCode And |>> emitOpCode Shr |>> convInt8)
-
-    dict.Add(Expr.getMethodInfo <@ 1L <<< 1 @>, emitOpCode (Ldc_I4_S 63) |>> emitOpCode And |>> emitOpCode Shl)
-    dict.Add(Expr.getMethodInfo <@ 1 <<< 1 @>, emitOpCode (Ldc_I4_S 31) |>> emitOpCode And |>> emitOpCode Shl)
-    dict.Add(Expr.getMethodInfo <@ 1s <<< 1 @>, emitOpCode (Ldc_I4_S 15) |>> emitOpCode And |>> emitOpCode Shl |>> convInt16)
-    dict.Add(Expr.getMethodInfo <@ 1y <<< 1 @>, emitOpCode (Ldc_I4_7) |>> emitOpCode And |>> emitOpCode Shl |>> convInt8)
-
     dict.Add(Expr.getMethodInfo <@ 1uL >>> 1 @>, emitOpCode (Ldc_I4_S 63) |>> emitOpCode And |>> emitOpCode Shr_Un)
     dict.Add(Expr.getMethodInfo <@ 1u >>> 1 @>, emitOpCode (Ldc_I4_S 31) |>> emitOpCode And |>> emitOpCode Shr_Un)
     dict.Add(Expr.getMethodInfo <@ 1us >>> 1 @>, emitOpCode (Ldc_I4_S 15) |>> emitOpCode And |>> emitOpCode Shr_Un |>> convUInt16)
     dict.Add(Expr.getMethodInfo <@ 1uy >>> 1 @>, emitOpCode (Ldc_I4_7) |>> emitOpCode And |>> emitOpCode Shr_Un |>> convUInt8)
 
+    dict.Add(Expr.getMethodInfo <@ 1L <<< 1 @>, emitOpCode (Ldc_I4_S 63) |>> emitOpCode And |>> emitOpCode Shl)
+    dict.Add(Expr.getMethodInfo <@ 1 <<< 1 @>, emitOpCode (Ldc_I4_S 31) |>> emitOpCode And |>> emitOpCode Shl)
+    dict.Add(Expr.getMethodInfo <@ 1s <<< 1 @>, emitOpCode (Ldc_I4_S 15) |>> emitOpCode And |>> emitOpCode Shl |>> convInt16)
+    dict.Add(Expr.getMethodInfo <@ 1y <<< 1 @>, emitOpCode (Ldc_I4_7) |>> emitOpCode And |>> emitOpCode Shl |>> convInt8)
     dict.Add(Expr.getMethodInfo <@ 1uL <<< 1 @>, emitOpCode (Ldc_I4_S 63) |>> emitOpCode And |>> emitOpCode Shl)
     dict.Add(Expr.getMethodInfo <@ 1u <<< 1 @>, emitOpCode (Ldc_I4_S 31) |>> emitOpCode And |>> emitOpCode Shl)
     dict.Add(Expr.getMethodInfo <@ 1us <<< 1 @>, emitOpCode (Ldc_I4_S 15) |>> emitOpCode And |>> emitOpCode Shl |>> convUInt16)
