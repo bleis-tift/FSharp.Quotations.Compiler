@@ -99,6 +99,7 @@
     <Compile Include="ArrayFuncTest.fs" />
     <Compile Include="ListTest.fs" />
     <Compile Include="SeqTest.fs" />
+    <Compile Include="NullableTest.fs" />
     <Compile Include="ControlFlowExprTest.fs" />
     <Compile Include="LetTest.fs" />
     <Compile Include="FSharpTypeTest.fs" />

@@ -187,7 +187,8 @@ module ExprCompiler =
             | Application (fExpr, argExpr) ->
                 MethodCallEmitter.emit (None, fExpr.Type.GetMethod("Invoke"), [fExpr; argExpr]) stack varEnv
             | Call (recv, mi, argsExprs) ->
-                MethodCallEmitter.emit (recv, mi, argsExprs) stack varEnv
+                if NullableOpTranslator.transIfNeed mi argsExprs stack then ()
+                else MethodCallEmitter.emit (recv, mi, argsExprs) stack varEnv
             | PropertyGet (recv, pi, argsExprs) ->
                 MethodCallEmitter.emit (recv, pi.GetMethod, argsExprs) stack varEnv
             | PropertySet (recv, pi, argsExprs, expr) ->

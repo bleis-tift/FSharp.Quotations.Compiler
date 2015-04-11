@@ -83,6 +83,7 @@
     <Compile Include="LambdaEmitter.fs" />
     <Compile Include="MethodCallEmitter.fs" />
     <Compile Include="TupleEmitter.fs" />
+    <Compile Include="NullableOpTranslator.fs" />
     <Compile Include="ExprCompiler.fs" />
   </ItemGroup>
   <ItemGroup>
