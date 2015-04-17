@@ -16,7 +16,7 @@ open System.Reflection
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Linq.NullableOperators
 
-module NullableOpTranslator =
+module internal NullableOpTranslator =
 
   let (|Op|_|) expr altOpExpr (mi: MethodInfo) =
     let genMethod = Expr.getGenericMethodInfo expr

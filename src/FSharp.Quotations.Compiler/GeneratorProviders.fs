@@ -16,10 +16,10 @@ open System
 open System.Reflection
 open System.Reflection.Emit
 
-type IGeneratorProvider =
+type internal IGeneratorProvider =
   abstract GetGenerator: unit -> ILGenerator
 
-type MethodBuilderWrapper private (moduleBuilder: ModuleBuilderWrapper, typeBuilder: TypeBuilderWrapper, builder: MethodBuilder, name: string) =
+type internal MethodBuilderWrapper private (moduleBuilder: ModuleBuilderWrapper, typeBuilder: TypeBuilderWrapper, builder: MethodBuilder, name: string) =
   static member Create(moduleBuilder, typeBuilder, builder, name) =
     MethodBuilderWrapper(moduleBuilder, typeBuilder, builder, name)
 
@@ -32,7 +32,7 @@ type MethodBuilderWrapper private (moduleBuilder: ModuleBuilderWrapper, typeBuil
   interface IGeneratorProvider with
     member this.GetGenerator() = this.GetGenerator()
 
-type CtorBuilderWrapper private (moduleBuilder: ModuleBuilderWrapper, typeBuilder: TypeBuilderWrapper, builder: ConstructorBuilder) =
+type internal CtorBuilderWrapper private (moduleBuilder: ModuleBuilderWrapper, typeBuilder: TypeBuilderWrapper, builder: ConstructorBuilder) =
   static member Create(moduleBuilder, typeBuilder, builder) =
     CtorBuilderWrapper(moduleBuilder, typeBuilder, builder)
 
@@ -45,7 +45,7 @@ type CtorBuilderWrapper private (moduleBuilder: ModuleBuilderWrapper, typeBuilde
     member this.GetGenerator() = this.GetGenerator()
 
 [<AutoOpen>]
-module TypeBuilderWrapperExtension =
+module internal TypeBuilderWrapperExtension =
   open Microsoft.FSharp.Quotations
 
   type TypeBuilderWrapper with

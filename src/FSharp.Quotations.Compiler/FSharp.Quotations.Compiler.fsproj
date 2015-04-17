@@ -85,6 +85,7 @@
     <Compile Include="TupleEmitter.fs" />
     <Compile Include="NullableOpTranslator.fs" />
     <Compile Include="ExprCompiler.fs" />
+    <Compile Include="Expr.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

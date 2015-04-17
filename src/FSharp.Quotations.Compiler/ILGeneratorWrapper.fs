@@ -17,7 +17,7 @@ open System.Reflection.Emit
 open System.Diagnostics.SymbolStore
 open System.IO
 
-type ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string, gen: ILGenerator, name: string, doc: ISymbolDocumentWriter option) =
+type internal ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string, gen: ILGenerator, name: string, doc: ISymbolDocumentWriter option) =
   let mutable lineNumber = 2
   let mutable indentCount = 0
   let mutable localVariableNumber = 0
@@ -176,7 +176,7 @@ type ILGeneratorWrapper private (builder: IGeneratorProvider, signature: string,
         gen.Emit(raw)
 
 [<AutoOpen>]
-module GeneratorProvidersExtension =
+module internal GeneratorProvidersExtension =
   open Microsoft.FSharp.Quotations
 
   let private defineDoc (_name: string) (_builder: ModuleBuilderWrapper) =

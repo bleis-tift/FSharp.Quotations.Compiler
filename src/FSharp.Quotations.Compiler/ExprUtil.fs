@@ -14,7 +14,7 @@ namespace FSharp.Quotations.Compiler
 
 open Microsoft.FSharp.Quotations.Patterns
 
-module Expr =
+module internal Expr =
   let rec getMethodInfo = function
   | Call (_, mi, _) -> mi
   | Let (_, _, body) -> getMethodInfo body

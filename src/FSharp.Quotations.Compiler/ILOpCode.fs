@@ -16,17 +16,17 @@ open System
 open System.Reflection
 open System.Reflection.Emit
 
-type CallTarget =
+type internal CallTarget =
   | Method of MethodInfo
   | Ctor of ConstructorInfo
   | PropGet of PropertyInfo
 
-type Token =
+type internal Token =
   | TokType of Type
   | TokMethod of MethodInfo
   | TokField of FieldInfo
 
-type ILOpCode =
+type internal ILOpCode =
   | And
   | Or
   | Xor
@@ -133,7 +133,7 @@ type ILOpCode =
   | Ret
 
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
-module ILOpCode =
+module internal ILOpCode =
   let stloc local _nameOpt =
     #if DEVELOPMENT
     Stloc (local, Some _nameOpt)

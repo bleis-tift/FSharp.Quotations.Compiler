@@ -16,11 +16,28 @@ open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 open System
 open System.Reflection
-open System.Reflection.Emit
 
+/// <summary>
+/// The result of compiling the expression tree.
+/// </summary>
+/// <remarks>
+/// In order to get an instance of this interface,
+/// you need to use <see cref="FSharp.Quotations.Compiler.ExprCompiler.compile"/> method.
+/// </remarks>
+type ICompiledCode<'T> =
+
+  /// <summary>
+  /// Execute the compiled code.
+  /// </summary>
+  /// <returns>
+  /// The result of executing the compiled <see cref="Microsoft.FSharp.Quotations.Expr{'T}"/>.
+  /// </returns>
+  abstract member ExecuteCompiledCode: unit -> 'T
+
+/// Contains functions to compile F# expression tree.
 module ExprCompiler =
 
-  let inline emitLoadInteger< ^TInteger when ^TInteger : (static member op_Explicit: ^TInteger -> int) > (value: obj) (gen: ILGeneratorWrapper) =
+  let inline private emitLoadInteger< ^TInteger when ^TInteger : (static member op_Explicit: ^TInteger -> int) > (value: obj) (gen: ILGeneratorWrapper) =
     match int (unbox< ^TInteger > value) with
     | -1 -> gen.Emit(Ldc_I4_M1)
     | 0 -> gen.Emit(Ldc_I4_0)
@@ -37,7 +54,7 @@ module ExprCompiler =
     | i ->
         gen.Emit(Ldc_I4 i)
 
-  let emitLoadBigInteger (value: obj) (gen: ILGeneratorWrapper) =
+  let private emitLoadBigInteger (value: obj) (gen: ILGeneratorWrapper) =
     let v = unbox<bigint> value
     if v = Numerics.BigInteger.MinusOne then
       gen.Emit(Call (PropGet (Expr.getPropertyInfo <@ Numerics.BigInteger.MinusOne @> )))
@@ -53,7 +70,7 @@ module ExprCompiler =
       gen.Emit(Ldstr (string v))
       gen.Emit(Call (Method (Expr.getMethodInfo <@ NumericLiterals.NumericLiteralI.FromString("1") : bigint @>)))
 
-  let emitLoadDecimal (value: decimal) (gen: ILGeneratorWrapper) =
+  let private emitLoadDecimal (value: decimal) (gen: ILGeneratorWrapper) =
     match Decimal.GetBits(value) with
     | [|lo; mid; hi; flags|] ->
         let scale = flags >>> 16
@@ -62,9 +79,6 @@ module ExprCompiler =
         let ctor = typeof<decimal>.GetConstructor([|typeof<int>; typeof<int>; typeof<int>; typeof<bool>; typeof<byte>|])
         gen.Emit(Newobj ctor)
     | _ -> failwith "oops!"
-
-  type ICompiledType<'T> =
-    abstract member ExecuteCompiledCode: unit -> 'T
 
   let private tryPopAssumption (stack: CompileStack) =
     if stack.Count <> 0 then
@@ -82,15 +96,22 @@ module ExprCompiler =
     | None ->
         stack.Push(Compiling (f False))
 
-  let compile (expr: Expr<'T>) : 'T =
+  /// <summary>
+  /// Compile the typed expression tree.
+  /// </summary>
+  /// <param name="expr">compiling target</param>
+  /// <returns>
+  /// The compilation result.
+  /// </returns>
+  let compile (expr: Expr<'T>) : ICompiledCode<'T> =
     let asm =
       AppDomain.CurrentDomain.DefineDynamicAssembly(
         AssemblyName("CompiledAssembly"),
         DebugUtil.assemblyBuilderAccess
       )
     let parentMod = ModuleBuilderWrapper.Create(asm, "CompiledModule")
-    let typ = parentMod.DefineType("CompiledType", TypeAttributes.Public, typeof<obj>, [typeof<ICompiledType<'T>>])
-    let m = typ.DefineOverrideMethod(typeof<ICompiledType<'T>>, "ExecuteCompiledCode", MethodAttributes.Public, typeof<'T>, [])
+    let typ = parentMod.DefineType("CompiledType", TypeAttributes.Public, typeof<obj>, [typeof<ICompiledCode<'T>>])
+    let m = typ.DefineOverrideMethod(typeof<ICompiledCode<'T>>, "ExecuteCompiledCode", MethodAttributes.Public, typeof<'T>, [])
 
     let mutable gen = m.GetILGenerator(expr.Type)
 
@@ -390,6 +411,6 @@ module ExprCompiler =
         | _ -> ()
       gen.Close()
 
-    let x = Activator.CreateInstance(typ.CreateType()) :?> ICompiledType<'T>
+    let x = Activator.CreateInstance(typ.CreateType()) :?> ICompiledCode<'T>
     DebugUtil.save asm
-    x.ExecuteCompiledCode()
+    x

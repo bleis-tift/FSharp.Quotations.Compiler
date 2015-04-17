@@ -16,7 +16,7 @@ open System
 open System.Reflection
 
 [<AutoOpen>]
-module Stringizer =
+module internal Stringizer =
 
   let rec private toSimpleName (typ: Type) =
     if typ = typeof<obj> then "obj"

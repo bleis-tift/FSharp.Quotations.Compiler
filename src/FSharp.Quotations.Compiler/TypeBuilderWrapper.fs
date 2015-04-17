@@ -16,7 +16,7 @@ open System
 open System.Reflection
 open System.Reflection.Emit
 
-type TypeBuilderWrapper private (moduleBuilder: ModuleBuilderWrapper, builder: TypeBuilder, name: string) =
+type internal TypeBuilderWrapper private (moduleBuilder: ModuleBuilderWrapper, builder: TypeBuilder, name: string) =
   static member Create(moduleBuilder, builder, name) =
     TypeBuilderWrapper(moduleBuilder, builder, name)
 
@@ -28,7 +28,7 @@ type TypeBuilderWrapper private (moduleBuilder: ModuleBuilderWrapper, builder: T
   member __.CreateType() = builder.CreateType()
 
 [<AutoOpen>]
-module ModuleBuilderWrapperExtension =
+module internal ModuleBuilderWrapperExtension =
   let private genericFSharpFuncType = typedefof<_ -> _>
   let private fsharpFuncType argType retType = genericFSharpFuncType.MakeGenericType([|argType; retType|])
 

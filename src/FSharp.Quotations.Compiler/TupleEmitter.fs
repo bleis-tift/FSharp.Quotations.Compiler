@@ -17,7 +17,7 @@ open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 open Microsoft.FSharp.Reflection
 
-module TupleEmitter =
+module internal TupleEmitter =
   let private getMethod = function
   | Call (_, mi, _) -> mi
   | expr -> failwithf "expr is not Method call: %A" expr

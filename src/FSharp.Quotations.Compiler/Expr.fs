@@ -13,18 +13,25 @@
 namespace FSharp.Quotations.Compiler
 
 open Microsoft.FSharp.Quotations
-open System.Collections.Generic
 
-type internal Assumption =
-  | IfSequential
-  | IfRet
-  | False
+/// Contains the type extension for <see cref="Microsoft.FSharp.Quotations.Expr{'T}"/>.
+[<AutoOpen>]
+module Extension =
 
-type internal CompileStackInfo =
-  | CompileTarget of Expr
-  | Assumed of (Assumption * ILGeneratorWrapper -> unit)
-  | Assumption of Assumption
-  | Compiling of (ILGeneratorWrapper -> unit)
-  | RestoreGen of ILGeneratorWrapper
+  /// The type extension for the typed expression tree.
+  type Expr<'T> with
+    /// <summary>
+    /// Compile the typed expression tree.
+    /// </summary>
+    /// <returns>
+    /// The compilation result.
+    /// </returns>
+    member this.Compile() = ExprCompiler.compile this
 
-type internal CompileStack = Stack<CompileStackInfo>
+    /// <summary>
+    /// Compie and execute the typed expression tree.
+    /// </summary>
+    /// <returns>
+    /// The execution result.
+    /// </returns>
+    member this.Execute() = this.Compile().ExecuteCompiledCode()

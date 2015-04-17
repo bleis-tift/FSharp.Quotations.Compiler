@@ -12,10 +12,9 @@
  *)
 namespace FSharp.Quotations.Compiler
 
-open System.Reflection
 open System.Reflection.Emit
 
-module DebugUtil =
+module internal DebugUtil =
 
   let assemblyBuilderAccess =
     #if DEBUG
@@ -31,9 +30,9 @@ module DebugUtil =
     None
     #endif
 
-  let label (gen: ILGenerator) =
+  let label (_gen: ILGenerator) =
     #if DEBUG
-    "IL_" + gen.ILOffset.ToString("X").PadLeft(4, '0') + ": "
+    "IL_" + _gen.ILOffset.ToString("X").PadLeft(4, '0') + ": "
     #else
     ""
     #endif

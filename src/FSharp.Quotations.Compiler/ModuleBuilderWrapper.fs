@@ -17,7 +17,7 @@ open System.Diagnostics
 open System.Collections.Generic
 
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
-module ModuleBuilder =
+module internal ModuleBuilder =
 
   let private setDebuggingAttr (asm: AssemblyBuilder) =
     let attr = typeof<DebuggableAttribute>
@@ -35,7 +35,7 @@ module ModuleBuilder =
     asm.DefineDynamicModule(name)
     #endif
 
-type ModuleBuilderWrapper private (builder: ModuleBuilder, name: string) =
+type internal ModuleBuilderWrapper private (builder: ModuleBuilder, name: string) =
   let countDict = Dictionary<string, int>()
   static member Create(asm: AssemblyBuilder, name: string) =
     ModuleBuilderWrapper(ModuleBuilder.defineDynamicModule name asm, name)

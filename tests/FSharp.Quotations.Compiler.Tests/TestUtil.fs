@@ -50,18 +50,18 @@ module TestUtil =
     new (from, ``to``) = CharRange(from, ``to``)
 
   let check (expected: 'T) (expr: Expr<'T>) =
-    expr |> ExprCompiler.compile
+    expr.Execute()
     |> should equal expected
 
   let checkExn<'T, 'TExn when 'TExn :> exn> (expr: Expr<'T>) =
     try
-      ExprCompiler.compile expr |> ignore
+      expr.Execute() |> ignore
       Assert.Fail("exception is not thrown.")
     with :? 'TExn -> ()
 
   let checkExnMsg<'T, 'TExn when 'TExn :> exn> (expected: string) (expr: Expr<'T>) =
     try
-      ExprCompiler.compile expr |> ignore
+      expr.Execute() |> ignore
       Assert.Fail("exception is not thrown.")
     with
       :? 'TExn as e ->
@@ -69,7 +69,7 @@ module TestUtil =
 
   let checkExnType (expectedType: Type) (expr: Expr<_>) =
     try
-      ExprCompiler.compile expr |> ignore
+      expr.Execute() |> ignore
       Assert.Fail("exception is not thrown.")
     with e ->
       e.GetType() |> should equal expectedType
@@ -82,7 +82,7 @@ module TestUtil =
     member __.Result = result
 
     override __.Encoding = encoding
-    override this.Write(c: char) =
+    override __.Write(c: char) =
       result <- result + c.ToString()
 
   type PrintType = Error | Out
@@ -96,6 +96,6 @@ module TestUtil =
     let (defaultPrinter, setter) = getDefaultPrinter printType
     use writer = new RobWriter(defaultPrinter.Encoding)
     setter writer
-    expr |> ExprCompiler.compile
+    expr.Execute()
     setter defaultPrinter
     writer.Result |> should equal expected
