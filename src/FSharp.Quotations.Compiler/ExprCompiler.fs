@@ -144,6 +144,8 @@ module ExprCompiler =
                   let res = gen.DeclareLocal("$res", body.Type)
                   let label = gen.BeginExceptionBlock()
                   stack.Push(Compiling (fun gen ->
+                    if body.Type = typeof<unit> then
+                      gen.Emit(Ldnull)
                     gen.Emit(ILOpCode.stloc res "$res")
                     gen.Emit(Leave label)
                     gen.EndExceptionBlock()
@@ -157,7 +159,13 @@ module ExprCompiler =
                   stack.Push(Compiling (fun _ ->
                     varEnv := (e.Name, e.Type, Local (local, e.Name)) :: (!varEnv)
                   ))
-                  stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.Emit(Leave label); gen.BeginCatchBlock(e.Type)))
+                  stack.Push(Compiling (fun gen ->
+                    if body.Type = typeof<unit> then
+                      gen.Emit(Ldnull)
+                    gen.Emit(ILOpCode.stloc res "$res")
+                    gen.Emit(Leave label)
+                    gen.BeginCatchBlock(e.Type)
+                  ))
                   stack.Push(CompileTarget body)
                 )) stack
             | TryWith _ as tryWithExpr ->
@@ -168,7 +176,13 @@ module ExprCompiler =
                   let label = gen.BeginExceptionBlock()
                   stack.Push(Compiling (fun gen -> gen.Emit(Endfinally); gen.EndExceptionBlock(); gen.Emit(ILOpCode.ldloc res "$res")))
                   stack.Push(CompileTarget handler)
-                  stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc res "$res"); gen.Emit(Leave label); gen.BeginFinallyBlock()))
+                  stack.Push(Compiling (fun gen ->
+                    if body.Type = typeof<unit> then
+                      gen.Emit(Ldnull)
+                    gen.Emit(ILOpCode.stloc res "$res")
+                    gen.Emit(Leave label)
+                    gen.BeginFinallyBlock()
+                  ))
                   stack.Push(CompileTarget body)
                 )) stack
             | TryFinally _ as tryFinallyExpr ->
@@ -333,13 +347,18 @@ module ExprCompiler =
                 | Local (local, name) -> gen.Emit(ILOpCode.ldloc local name)
                 | Field fi -> gen.Emit(Ldarg_0); gen.Emit(Ldfld fi)
             | VarSet (v, expr) ->
+                let var =
+                  List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv
                 stack.Push(Compiling (fun gen ->
-                  match List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv with
+                  match var with
                   | Arg idx -> gen.Emit(Starg idx)
                   | Local (local, name) -> gen.Emit(ILOpCode.stloc local name)
-                  | Field fi -> gen.Emit(Ldarg_0); gen.Emit(Stfld fi)
+                  | Field fi -> gen.Emit(Stfld fi)
                 ))
                 stack.Push(CompileTarget expr)
+                match var with
+                | Field _ -> stack.Push(Compiling (fun gen -> gen.Emit(Ldarg_0)))
+                | _ -> ()
             | UnionCaseTest (expr, case) ->
                 let typ = case.DeclaringType
                 let prop = typ.GetProperty("Is" + case.Name)

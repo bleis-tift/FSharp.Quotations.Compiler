@@ -105,6 +105,7 @@
     <Compile Include="FSharpTypeTest.fs" />
     <Compile Include="ExtraTopLevelOpTest.fs" />
     <Compile Include="CustomClassTest.fs" />
+    <Compile Include="Limitations.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Quotations.Compiler.Tests.CSharp\FSharp.Quotations.Compiler.Tests.CSharp.csproj">
