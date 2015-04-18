@@ -25,7 +25,7 @@ module Limitations =
   [<Test>]
   let ``inline function`` () =
     <@ f1 20 10 @> |> check 30 // It's OK but...
-    <@ f2 20 10 @> |> checkExnType (typeof<NotSupportedException>) // (-) has NoDynamicInvokationAttribute. So it throws NotSupportedException.
+    <@ f2 20 10 @> |> checkExnType (typeof<NotSupportedException>) // (-) has NoDynamicInvocationAttribute. So it throws NotSupportedException.
 
   [<Test>]
   let ``mutable and try finally`` () =

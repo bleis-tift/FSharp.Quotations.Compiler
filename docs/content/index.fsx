@@ -49,7 +49,7 @@ printfn "%d" (res.ExecuteCompiledCode()) // 30
 Samples & documentation
 -----------------------
  * [Tutorial](tutorial.html) contains a further explanation of this library.
-
+ * [Limitations](limitations.html) contains an explanation of limitations of this library.
  * [API Reference](reference/index.html) contains automatically generated documentation for all types, modules
    and functions in the library. 
 
