@@ -41,6 +41,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ja", "ja", "{E8FC761A-5863-4AAB-9313-7CF0B0C71FEB}"
 	ProjectSection(SolutionItems) = preProject
 		docs\content\ja\index.fsx = docs\content\ja\index.fsx
+		docs\content\ja\limitations.fsx = docs\content\ja\limitations.fsx
+		docs\content\ja\tutorial.fsx = docs\content\ja\tutorial.fsx
 	EndProjectSection
 EndProject
 Global
