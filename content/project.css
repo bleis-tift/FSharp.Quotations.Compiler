@@ -1,0 +1,8 @@
+.nav-list > li > a.nflag {
+  float:right;
+  padding: 0px;
+}
+
+.nav-list > li > a.nflag2 {
+  margin-right: 18px;
+}
