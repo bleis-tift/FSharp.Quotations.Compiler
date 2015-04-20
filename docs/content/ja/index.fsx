@@ -25,9 +25,9 @@ FSharp.Quotations.Compilerは、F#の式木をILにコンパイルして実行�
 
 同じようなライブラリには、以下のようなものがあります。
 
-* FSharp.Quotations.Evaluator
-* QuotationCompiler
-* Unquote
+* [FSharp.Quotations.Evaluator](http://fsprojects.github.io/FSharp.Quotations.Evaluator/)
+* [QuotationCompiler](https://github.com/eiriktsarpalis/QuotationCompiler)
+* [Unquote](https://code.google.com/p/unquote/)
 
 これらのライブラリとFSharp.Quotations.Compilerの大きな違いは、
 式木の解析に(再帰ではなく)ループを使っていることです。
@@ -40,9 +40,15 @@ FSharp.Quotations.Compilerは、F#の式木をILにコンパイルして実行�
 #r "FSharp.Quotations.Compiler.dll"
 open FSharp.Quotations.Compiler
 
+(*** define-output: result ***)
 let expr = <@ 10 + 20 @>
 let res = expr.Compile()
-printfn "%d" (res.ExecuteCompiledCode()) // 30
+printfn "%d" (res.ExecuteCompiledCode())
+
+(**
+このコードを実行すると以下のように出力されます：
+*)
+(*** include-output: result ***)
 
 (**
 

@@ -109,12 +109,14 @@ let buildReference () =
 
 // Build documentation from `fsx` and `md` files in `docs/content`
 let buildDocumentation () =
+  let fsi = FsiEvaluator()
   Literate.ProcessDirectory
     ( content, docTemplate, output, replacements = ("root", root)::info,
       layoutRoots = layoutRootsAll.["en"],
       ?assemblyReferences = references,
       generateAnchors = true,
-      processRecursive = false )
+      processRecursive = false,
+      fsiEvaluator = fsi )
 
   let subdirs = Directory.EnumerateDirectories(content, "*", SearchOption.TopDirectoryOnly)
   for dir in subdirs do
@@ -128,7 +130,8 @@ let buildDocumentation () =
       ( dir, docTemplate, output @@ dirname, replacements = ("root", root)::info,
         layoutRoots = layoutRoots,
         ?assemblyReferences = references,
-        generateAnchors = true )
+        generateAnchors = true,
+        fsiEvaluator = fsi )
 
 // Generate
 copyFiles()

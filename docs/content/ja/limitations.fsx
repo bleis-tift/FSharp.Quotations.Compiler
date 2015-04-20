@@ -130,18 +130,23 @@ let valueExpr: Expr<System.DateTime> =
   Expr.Value(System.DateTime.UtcNow)
   |> Expr.Cast
 
+(*** define-output: result1 ***)
 try
   valueExpr.Execute() |> ignore
 with
-  e -> printfn "%A" e
+  e -> printfn "%s" e.Message
+
+(*** include-output: result1 ***)
 
 (**
 `Expr.Value`の代わりに、引用式を使ってください。
 *)
 
 let codeQuote = <@ System.DateTime.UtcNow @>
+(*** define-output: result2 ***)
 printfn "%A" (codeQuote.Execute())
 
 (**
-上の引用式は`Expr.Value`にならず、`Expr.PropertyGet`になります。
+上の引用式は`Expr.Value`にならず、`Expr.PropertyGet`になるため、正しく実行できます。
 *)
+(*** include-output: result2 ***)

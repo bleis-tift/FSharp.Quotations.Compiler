@@ -131,19 +131,25 @@ let valueExpr: Expr<System.DateTime> =
   Expr.Value(System.DateTime.UtcNow)
   |> Expr.Cast
 
+(*** define-output: result1 ***)
 try
   valueExpr.Execute() |> ignore
 with
-  e -> printfn "%A" e
+  e -> printfn "%A" e.Message
+
+(*** include-output: result1 ***)
 
 (**
 You should use the quoted expression instead of using the `Expr.Value`.
 *)
 
 let codeQuote = <@ System.DateTime.UtcNow @>
+(*** define-output: result2 ***)
 printfn "%A" (codeQuote.Execute())
 
 (**
-The above quoted expression does not become the `Expr.Value`.
-It becomes the `Expr.PropertyGet`.
+The above quoted expression can execute as expected
+because it is evaluated as `Expr.PropertyGet`
+rather than `Expr.Value`.
 *)
+(*** include-output: result2 ***)
