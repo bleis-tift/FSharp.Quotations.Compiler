@@ -109,19 +109,23 @@ let buildReference () =
 
 // Build documentation from `fsx` and `md` files in `docs/content`
 let buildDocumentation () =
-  let subdirs = Directory.EnumerateDirectories(content, "*", SearchOption.AllDirectories)
-  for dir in Seq.append [content] subdirs do
-    let sub = if dir.Length > content.Length then dir.Substring(content.Length + 1) else "."
-    let langSpecificPath(lang, path:string) =
-        path.Split([|'/'; '\\'|], System.StringSplitOptions.RemoveEmptyEntries)
-        |> Array.exists(fun i -> i = lang)
+  Literate.ProcessDirectory
+    ( content, docTemplate, output, replacements = ("root", root)::info,
+      layoutRoots = layoutRootsAll.["en"],
+      ?assemblyReferences = references,
+      generateAnchors = true,
+      processRecursive = false )
+
+  let subdirs = Directory.EnumerateDirectories(content, "*", SearchOption.TopDirectoryOnly)
+  for dir in subdirs do
+    let dirname = (new DirectoryInfo(dir)).Name
     let layoutRoots =
-        let key = layoutRootsAll.Keys |> Seq.tryFind (fun i -> langSpecificPath(i, dir))
+        let key = layoutRootsAll.Keys |> Seq.tryFind (fun i -> i = dirname)
         match key with
         | Some lang -> layoutRootsAll.[lang]
         | None -> layoutRootsAll.["en"] // "en" is the default language
     Literate.ProcessDirectory
-      ( dir, docTemplate, output @@ sub, replacements = ("root", root)::info,
+      ( dir, docTemplate, output @@ dirname, replacements = ("root", root)::info,
         layoutRoots = layoutRoots,
         ?assemblyReferences = references,
         generateAnchors = true )
