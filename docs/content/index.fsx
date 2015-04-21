@@ -25,9 +25,9 @@ FSharp.Quotations.Compiler is a library for compiling F# expression tree to IL.
 
 There are similar libraries:
 
- * FSharp.Quotations.Evaluator
- * QuotationCompiler
- * Unquote
+* [FSharp.Quotations.Evaluator](http://fsprojects.github.io/FSharp.Quotations.Evaluator/)
+* [QuotationCompiler](https://github.com/eiriktsarpalis/QuotationCompiler)
+* [Unquote](https://code.google.com/p/unquote/)
 
 The biggest difference between FSharp.Quotations.Compiler and these is analysis policy of expression tree.
 FSharp.Quotations.Compiler uses while loop rather than recursive function.
@@ -40,9 +40,13 @@ Example
 #r "FSharp.Quotations.Compiler.dll"
 open FSharp.Quotations.Compiler
 
+(*** define-output: result ***)
 let expr = <@ 10 + 20 @>
 let res = expr.Compile()
-printfn "%d" (res.ExecuteCompiledCode()) // 30
+printfn "%d" (res.ExecuteCompiledCode())
+
+(** The output is: *)
+(*** include-output: result ***)
 
 (**
 

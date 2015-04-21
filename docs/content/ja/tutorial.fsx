@@ -29,11 +29,15 @@ let expr = <@ x + y @>
 `Execute`メソッドを使うだけでできます。
 *)
 
+(*** define-output: result1 ***)
 printfn "%d + %d = %d" x y (expr.Execute())
 
 (**
-このコードは`10 + 20 = 30`と表示します。
+このコードを実行すると以下のように出力されます：
+*)
+(*** include-output: result1 ***)
 
+(**
 もし式木をコンパイルして、あとで実行したい場合は、`Compile`メソッドを使います。
 *)
 
