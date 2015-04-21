@@ -252,43 +252,63 @@
 <span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
-<span class="l">4: </span>
-<span class="l">5: </span>
-<span class="l">6: </span>
-<span class="l">7: </span>
-<span class="l">8: </span>
 </pre>
 </td>
 <td class="snippet"><pre class="fssnip">
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs47', 88)" onmouseover="showTip(event, 'fs47', 88)" class="i">valueExpr</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs48', 89)" onmouseover="showTip(event, 'fs48', 89)" class="t">Expr</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs13', 90)" onmouseover="showTip(event, 'fs13', 90)" class="i">System</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 91)" onmouseover="showTip(event, 'fs49', 91)" class="t">DateTime</span><span class="o">&gt;</span> <span class="o">=</span>
   <span onmouseout="hideTip(event, 'fs48', 92)" onmouseover="showTip(event, 'fs48', 92)" class="t">Expr</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs50', 93)" onmouseover="showTip(event, 'fs50', 93)" class="f">Value</span>(<span onmouseout="hideTip(event, 'fs13', 94)" onmouseover="showTip(event, 'fs13', 94)" class="i">System</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 95)" onmouseover="showTip(event, 'fs49', 95)" class="t">DateTime</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs51', 96)" onmouseover="showTip(event, 'fs51', 96)" class="i">UtcNow</span>)
   <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs48', 97)" onmouseover="showTip(event, 'fs48', 97)" class="t">Expr</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs52', 98)" onmouseover="showTip(event, 'fs52', 98)" class="f">Cast</span>
-
-<span class="k">try</span>
-  <span onmouseout="hideTip(event, 'fs47', 99)" onmouseover="showTip(event, 'fs47', 99)" class="i">valueExpr</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 100)" onmouseover="showTip(event, 'fs11', 100)" class="f">Execute</span>() <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs12', 101)" onmouseover="showTip(event, 'fs12', 101)" class="f">ignore</span>
-<span class="k">with</span>
-  <span onmouseout="hideTip(event, 'fs53', 102)" onmouseover="showTip(event, 'fs53', 102)" class="i">e</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs15', 103)" onmouseover="showTip(event, 'fs15', 103)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%A</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs53', 104)" onmouseover="showTip(event, 'fs53', 104)" class="i">e</span>
 </pre>
 </td>
 </tr>
 </table>
+
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="k">try</span>
+  <span onmouseout="hideTip(event, 'fs47', 99)" onmouseover="showTip(event, 'fs47', 99)" class="i">valueExpr</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 100)" onmouseover="showTip(event, 'fs11', 100)" class="f">Execute</span>() <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs12', 101)" onmouseover="showTip(event, 'fs12', 101)" class="f">ignore</span>
+<span class="k">with</span>
+  <span onmouseout="hideTip(event, 'fs53', 102)" onmouseover="showTip(event, 'fs53', 102)" class="i">e</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs15', 103)" onmouseover="showTip(event, 'fs15', 103)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%s</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs53', 104)" onmouseover="showTip(event, 'fs53', 104)" class="i">e</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs54', 105)" onmouseover="showTip(event, 'fs54', 105)" class="i">Message</span>
+</pre>
+</td>
+</tr>
+</table>
+
+<table class="pre"><tr><td><pre><code>unsupported value type: System.DateTime</code></pre></td></tr></table>
 
 <p><code>Expr.Value</code>の代わりに、引用式を使ってください。</p>
 
 <table class="pre"><tr><td class="lines"><pre class="fssnip">
 <span class="l">1: </span>
-<span class="l">2: </span>
 </pre>
 </td>
 <td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs54', 105)" onmouseover="showTip(event, 'fs54', 105)" class="i">codeQuote</span> <span class="o">=</span> &lt;@ <span onmouseout="hideTip(event, 'fs13', 106)" onmouseover="showTip(event, 'fs13', 106)" class="i">System</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 107)" onmouseover="showTip(event, 'fs49', 107)" class="t">DateTime</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs51', 108)" onmouseover="showTip(event, 'fs51', 108)" class="i">UtcNow</span> @&gt;
-<span onmouseout="hideTip(event, 'fs15', 109)" onmouseover="showTip(event, 'fs15', 109)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%A</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs54', 110)" onmouseover="showTip(event, 'fs54', 110)" class="i">codeQuote</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 111)" onmouseover="showTip(event, 'fs11', 111)" class="f">Execute</span>())
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs55', 106)" onmouseover="showTip(event, 'fs55', 106)" class="i">codeQuote</span> <span class="o">=</span> &lt;@ <span onmouseout="hideTip(event, 'fs13', 107)" onmouseover="showTip(event, 'fs13', 107)" class="i">System</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 108)" onmouseover="showTip(event, 'fs49', 108)" class="t">DateTime</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs51', 109)" onmouseover="showTip(event, 'fs51', 109)" class="i">UtcNow</span> @&gt;
 </pre>
 </td>
 </tr>
 </table>
 
-<p>上の引用式は<code>Expr.Value</code>にならず、<code>Expr.PropertyGet</code>になります。</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l">1: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span onmouseout="hideTip(event, 'fs15', 110)" onmouseover="showTip(event, 'fs15', 110)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%A</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs55', 111)" onmouseover="showTip(event, 'fs55', 111)" class="i">codeQuote</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 112)" onmouseover="showTip(event, 'fs11', 112)" class="f">Execute</span>())
+</pre>
+</td>
+</tr>
+</table>
+
+<p>上の引用式は<code>Expr.Value</code>にならず、<code>Expr.PropertyGet</code>になるため、正しく実行できます。</p>
+
+<table class="pre"><tr><td><pre><code>2015/04/21 1:44:03</code></pre></td></tr></table>
 
 <div class="tip" id="fs1">namespace Microsoft</div>
 <div class="tip" id="fs2">namespace Microsoft.FSharp</div>
@@ -343,7 +363,8 @@
 <div class="tip" id="fs51">property System.DateTime.UtcNow: System.DateTime</div>
 <div class="tip" id="fs52">static member Expr.Cast : source:Expr -&gt; Expr&lt;&#39;T&gt;</div>
 <div class="tip" id="fs53">val e : exn</div>
-<div class="tip" id="fs54">val codeQuote : Expr&lt;System.DateTime&gt;<br /><br />Full name: Limitations.codeQuote</div>
+<div class="tip" id="fs54">property System.Exception.Message: string</div>
+<div class="tip" id="fs55">val codeQuote : Expr&lt;System.DateTime&gt;<br /><br />Full name: Limitations.codeQuote</div>
 
         </div>
         <div class="span3">

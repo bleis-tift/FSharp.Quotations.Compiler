@@ -54,9 +54,9 @@
 <p>同じようなライブラリには、以下のようなものがあります。</p>
 
 <ul>
-<li>FSharp.Quotations.Evaluator</li>
-<li>QuotationCompiler</li>
-<li>Unquote</li>
+<li><a href="http://fsprojects.github.io/FSharp.Quotations.Evaluator/">FSharp.Quotations.Evaluator</a></li>
+<li><a href="https://github.com/eiriktsarpalis/QuotationCompiler">QuotationCompiler</a></li>
+<li><a href="https://code.google.com/p/unquote/">Unquote</a></li>
 </ul>
 
 <p>これらのライブラリとFSharp.Quotations.Compilerの大きな違いは、
@@ -68,23 +68,34 @@
 <table class="pre"><tr><td class="lines"><pre class="fssnip">
 <span class="l">1: </span>
 <span class="l">2: </span>
-<span class="l">3: </span>
-<span class="l">4: </span>
-<span class="l">5: </span>
-<span class="l">6: </span>
 </pre>
 </td>
 <td class="snippet"><pre class="fssnip">
 <span class="prep">#r</span> <span class="s">&quot;FSharp.Quotations.Compiler.dll&quot;</span>
 <span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="i">FSharp</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">Quotations</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="i">Compiler</span>
-
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="i">expr</span> <span class="o">=</span> &lt;@ <span class="n">10</span> <span class="o">+</span> <span class="n">20</span> @&gt;
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs5', 5)" onmouseover="showTip(event, 'fs5', 5)" class="i">res</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs4', 6)" onmouseover="showTip(event, 'fs4', 6)" class="i">expr</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 7)" onmouseover="showTip(event, 'fs6', 7)" class="f">Compile</span>()
-<span onmouseout="hideTip(event, 'fs7', 8)" onmouseover="showTip(event, 'fs7', 8)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%d</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs5', 9)" onmouseover="showTip(event, 'fs5', 9)" class="i">res</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs8', 10)" onmouseover="showTip(event, 'fs8', 10)" class="f">ExecuteCompiledCode</span>()) <span class="c">// 30</span>
 </pre>
 </td>
 </tr>
 </table>
+
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="i">expr</span> <span class="o">=</span> &lt;@ <span class="n">10</span> <span class="o">+</span> <span class="n">20</span> @&gt;
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs5', 5)" onmouseover="showTip(event, 'fs5', 5)" class="i">res</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs4', 6)" onmouseover="showTip(event, 'fs4', 6)" class="i">expr</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 7)" onmouseover="showTip(event, 'fs6', 7)" class="f">Compile</span>()
+<span onmouseout="hideTip(event, 'fs7', 8)" onmouseover="showTip(event, 'fs7', 8)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%d</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs5', 9)" onmouseover="showTip(event, 'fs5', 9)" class="i">res</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs8', 10)" onmouseover="showTip(event, 'fs8', 10)" class="f">ExecuteCompiledCode</span>())
+</pre>
+</td>
+</tr>
+</table>
+
+<p>このコードを実行すると以下のように出力されます：</p>
+
+<table class="pre"><tr><td><pre><code>30</code></pre></td></tr></table>
 
 <h2><a name="サンプルとドキュメント" class="anchor" href="#サンプルとドキュメント">サンプルとドキュメント</a></h2>
 
