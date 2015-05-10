@@ -1,5 +1,5 @@
 (*** hide ***)
-// This block of code is omitted in the generated HTML documentation. Use 
+// This block of code is omitted in the generated HTML documentation. Use
 // it to define helpers that you do not want to show in the documentation.
 #I "../../bin"
 #I "../../bin/FSharp.Quotations.Compiler"
@@ -55,20 +55,20 @@ Samples & documentation
  * [Tutorial](tutorial.html) contains a further explanation of this library.
  * [Limitations](limitations.html) contains an explanation of limitations of this library.
  * [API Reference](reference/index.html) contains automatically generated documentation for all types, modules
-   and functions in the library. 
+   and functions in the library.
 
 Contributing and copyright
 --------------------------
 
-The project is hosted on [GitHub][gh] where you can [report issues][issues], fork 
+The project is hosted on [GitHub][gh] where you can [report issues][issues], fork
 the project and submit pull requests.
 
-The library is available under Public Domain license, which allows modification and 
-redistribution for both commercial and non-commercial purposes. For more information see the 
-[License file][license] in the GitHub repository. 
+The library is available under Public Domain license, which allows modification and
+redistribution for both commercial and non-commercial purposes. For more information see the
+[License file][license] in the GitHub repository.
 
-  [content]: https://github.com/fsprojects/FSharp.Quotations.Compiler/tree/master/docs/content
-  [gh]: https://github.com/fsprojects/FSharp.Quotations.Compiler
-  [issues]: https://github.com/fsprojects/FSharp.Quotations.Compiler/issues
-  [license]: https://github.com/fsprojects/FSharp.Quotations.Compiler/blob/master/LICENSE.txt
+  [content]: https://github.com/bleis-tift/FSharp.Quotations.Compiler/tree/master/docs/content
+  [gh]: https://github.com/bleis-tift/FSharp.Quotations.Compiler
+  [issues]: https://github.com/bleis-tift/FSharp.Quotations.Compiler/issues
+  [license]: https://github.com/bleis-tift/FSharp.Quotations.Compiler/blob/master/LICENSE.txt
 *)
