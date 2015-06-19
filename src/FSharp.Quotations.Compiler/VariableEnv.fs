@@ -15,10 +15,11 @@ namespace FSharp.Quotations.Compiler
 open System
 open System.Reflection
 open System.Reflection.Emit
+open Microsoft.FSharp.Quotations
 
 type internal VariableInfo =
   | Arg of int
   | Local of LocalBuilder * string
   | Field of FieldInfo
 
-type internal VariableEnv = (string * Type * VariableInfo) list
+type internal VariableEnv = (Var * VariableInfo) list

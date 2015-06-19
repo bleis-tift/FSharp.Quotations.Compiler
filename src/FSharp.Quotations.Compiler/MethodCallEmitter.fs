@@ -568,7 +568,7 @@ module internal MethodCallEmitter =
 
   let loadReceiverAddress (r: Expr) (varEnv: VariableEnv ref) =
     let v = match r with | Patterns.Var v -> v | _ -> failwith "argument is not variable"
-    match List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv with
+    match List.pick (fun (var, info) -> if v = var then Some info else None) !varEnv with
     | Local (local, name) ->
         [ Compiling (fun gen -> gen.Emit(ILOpCode.ldloca local name)) ]
     | Arg idx ->

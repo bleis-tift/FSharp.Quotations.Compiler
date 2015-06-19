@@ -19,7 +19,7 @@ open Microsoft.FSharp.Quotations
 
 module internal LambdaEmitter =
   let private emitCtor (baseType: Type) (lambda: TypeBuilderWrapper) (fields: FieldBuilder list) (varEnv: VariableEnv) =
-    let varNamesAndTypes = varEnv |> List.map (fun (n, t, _) -> (n, t))
+    let varNamesAndTypes = varEnv |> List.map (fun (v, _) -> (v.Name, v.Type))
     let baseCtor = baseType.GetConstructor(BindingFlags.NonPublic ||| BindingFlags.Instance, null, [||], null)
     let ctor = lambda.DefineConstructor(MethodAttributes.Public, varNamesAndTypes)
     let ctorGen = ctor.GetILGenerator(varNamesAndTypes)
@@ -49,7 +49,7 @@ module internal LambdaEmitter =
       varEnvRef := varEnv
     ))
     stack.Push(Compiling (fun gen ->
-      for _, _, info in needVarInfos do
+      for _, info in needVarInfos do
         match info with
         | Arg i -> gen.Emit(Ldarg i)
         | Local (local, name) -> gen.Emit(ILOpCode.ldloc local name)
@@ -64,9 +64,9 @@ module internal LambdaEmitter =
     ))
     stack.Push(Assumption IfRet)
     stack.Push(bodyCompileInfo)
-    let newVarEnv = List.zip needVarInfos fields |> List.map (fun ((name, typ, _), fi) -> (name, typ, Field fi))
+    let newVarEnv = List.zip needVarInfos fields |> List.map (fun ((var, _), fi) -> (var, Field fi))
     stack.Push(Compiling (fun _ ->
-      varEnvRef := (argVar.Name, argVar.Type, Arg 1)::newVarEnv
+      varEnvRef := (argVar, Arg 1)::newVarEnv
     ))
     
     invokeGen
@@ -79,9 +79,9 @@ module internal LambdaEmitter =
 
     let needVarInfos =
       varEnv
-      |> List.fold (fun acc (n, t, info) -> if List.forall (fun (n2, _, _) -> n <> n2) acc then (n, t, info)::acc else acc) []
+      |> List.fold (fun acc (v, info) -> if List.forall (fun (v2, _) -> v <> v2) acc then (v, info)::acc else acc) []
       |> List.rev
 
-    let fields = needVarInfos |> List.map (fun (name, typ, _) -> lambda.DefineField(name, typ, FieldAttributes.Private))
+    let fields = needVarInfos |> List.map (fun (var, _) -> lambda.DefineField(var.Name, var.Type, FieldAttributes.Private))
     let ctor = emitCtor baseType lambda fields needVarInfos
     emitInvoke baseType (lambda, fields, ctor) (gen, varEnvRef, needVarInfos, argVar, bodyType) bodyCompileInfo stack

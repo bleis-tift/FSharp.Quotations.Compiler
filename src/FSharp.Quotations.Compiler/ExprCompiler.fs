@@ -178,7 +178,7 @@ module ExprCompiler =
                   let local = gen.DeclareLocal(e.Name, e.Type)
                   stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc local e.Name)))
                   stack.Push(Compiling (fun _ ->
-                    varEnv := (e.Name, e.Type, Local (local, e.Name)) :: (!varEnv)
+                    varEnv := (e, Local (local, e.Name)) :: (!varEnv)
                   ))
                   stack.Push(Compiling (fun gen ->
                     if body.Type = typeof<unit> then
@@ -215,7 +215,7 @@ module ExprCompiler =
                 let local = gen.DeclareLocal(var.Name, var.Type)
                 stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc local var.Name)))
                 stack.Push(Compiling (fun _ ->
-                  varEnv := (var.Name, var.Type, Local (local, var.Name))::(!varEnv)
+                  varEnv := (var, Local (local, var.Name))::(!varEnv)
                 ))
                 stack.Push(CompileTarget expr)
             | LetRecursive (varAndExprList, body) ->
@@ -226,7 +226,7 @@ module ExprCompiler =
                   let local = gen.DeclareLocal(var.Name, var.Type)
                   stack.Push(Compiling (fun gen -> gen.Emit(ILOpCode.stloc local var.Name)))
                   stack.Push(Compiling (fun _ ->
-                    varEnv := (var.Name, var.Type, Local (local, var.Name))::(!varEnv)
+                    varEnv := (var, Local (local, var.Name))::(!varEnv)
                   ))
                   stack.Push(CompileTarget expr)
             | Lambda (var, body) ->
@@ -359,7 +359,7 @@ module ExprCompiler =
                 gen.Emit(Initobj typ)
                 gen.Emit(ILOpCode.ldloc local "$defaultValue")
             | Var v ->
-                match List.pick (fun (n, typ, info) -> if n = v.Name && typ = v.Type then Some info else None) !varEnv with
+                match List.pick (fun (var, info) -> if var = v then Some info else None) !varEnv with
                 | Arg 0 -> gen.Emit(Ldarg_0)
                 | Arg 1 -> gen.Emit(Ldarg_1)
                 | Arg 2 -> gen.Emit(Ldarg_2)
@@ -369,7 +369,7 @@ module ExprCompiler =
                 | Field fi -> gen.Emit(Ldarg_0); gen.Emit(Ldfld fi)
             | VarSet (v, expr) ->
                 let var =
-                  List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv
+                  List.pick (fun (var, info) -> if var = v then Some info else None) !varEnv
                 stack.Push(Compiling (fun gen ->
                   match var with
                   | Arg idx -> gen.Emit(Starg idx)
