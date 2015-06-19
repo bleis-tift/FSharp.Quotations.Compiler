@@ -359,7 +359,7 @@ module ExprCompiler =
                 gen.Emit(Initobj typ)
                 gen.Emit(ILOpCode.ldloc local "$defaultValue")
             | Var v ->
-                match List.pick (fun (n, _, info) -> if n = v.Name then Some info else None) !varEnv with
+                match List.pick (fun (n, typ, info) -> if n = v.Name && typ = v.Type then Some info else None) !varEnv with
                 | Arg 0 -> gen.Emit(Ldarg_0)
                 | Arg 1 -> gen.Emit(Ldarg_1)
                 | Arg 2 -> gen.Emit(Ldarg_2)
