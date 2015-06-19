@@ -87,6 +87,19 @@ module ControlFlowExprTest =
        !x @>
     |> check 10
 
+  let run f = try f () with e -> e.GetType().Name
+
+  [<Test>]
+  let ``try with in let body`` () =
+    <@
+      let v = 10
+      try
+        run (fun () -> "1")
+      with
+        _ -> ""
+    @>
+    |> check "1"
+
   [<Test>]
   let ``rethrow`` () =
     <@ try
@@ -173,15 +186,22 @@ module ControlFlowExprTest =
     @>
     |> check "empty1:2"
 
-  let run f = try f () with e -> e.GetType().Name
+  let (|Number|_|) (str: string) =
+    match Int32.TryParse(str) with
+    | true, res -> Some res
+    | _ -> None
+
+  let (|EndsWith|_|) (suffix: string) (str: string) =
+    if str.EndsWith(suffix) then Some suffix
+    else None
 
   [<Test>]
-  let ``try with in let body`` () =
+  let ``match with and pattern`` () =
     <@
-      let v = 10
-      try
-        run (fun () -> "1")
-      with
-        _ -> ""
+       let f x =
+         match x with
+         | Number num & EndsWith("0") suffix -> (num, suffix)
+         | _ -> (0, "")
+       (f "100")
     @>
-    |> check "1"
+    |> check (100, "0")
