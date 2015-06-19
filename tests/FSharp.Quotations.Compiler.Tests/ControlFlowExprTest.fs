@@ -205,3 +205,15 @@ module ControlFlowExprTest =
        (f "100")
     @>
     |> check (100, "0")
+
+  [<Test>]
+  let ``match with and pattern2`` () =
+    <@
+       let f x =
+         match x with
+         | EndsWith("00") suffix1 & EndsWith("0") suffix2 ->
+             suffix1 + ", " + suffix2
+         | _ -> ""
+       (f "100")
+    @>
+    |> check "00, 0"
