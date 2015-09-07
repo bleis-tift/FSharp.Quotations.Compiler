@@ -696,7 +696,7 @@ module internal MethodCallEmitter =
                         [ Assumed (function
                                    | IfSequential, gen -> emitCall gen; gen.Emit(Pop)
                                    | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
-                                   | _, gen -> emitCall gen; gen.Emit(Ldnull)) ]
+                                   | _, gen -> emitCall gen) ]
                       else
                         [ Assumed (function
                                    | IfRet, gen -> gen.Emit(Tailcall); emitCall gen

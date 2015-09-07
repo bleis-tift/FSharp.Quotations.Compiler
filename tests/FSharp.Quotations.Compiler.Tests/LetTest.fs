@@ -94,3 +94,8 @@ module LetTest =
   let ``application try-finally`` () =
     let expr = <@ let const10 = fun (_: int) -> 10 in const10 (try 1 finally ()) @>
     expr |> check 10
+
+  [<Test>]
+  let ``nested unit property binding`` () =
+    <@ let x = let y = Some () in y.Value in x @> |> check ()
+
