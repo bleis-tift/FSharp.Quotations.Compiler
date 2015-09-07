@@ -46,6 +46,9 @@ module LetTest =
   let ``simple let rec`` () = <@ let rec n = 42 in n @> |> check 42
 
   [<Test>]
+  let ``let _`` () = <@ let _ = 10 in true @> |> check true
+
+  [<Test>]
   let ``let rec list`` () =
     <@
        let rec a = 10

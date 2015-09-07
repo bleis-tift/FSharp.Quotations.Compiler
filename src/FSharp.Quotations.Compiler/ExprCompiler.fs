@@ -142,6 +142,8 @@ module ExprCompiler =
             | Sequential (e1, e2) ->
                 stack.Push(CompileTarget e2)
                 stack.Push(Assumption IfSequential)
+                if e1.Type <> typeof<unit> then
+                  stack.Push(Compiling (fun gen -> gen.Emit Pop))
                 stack.Push(CompileTarget e1)
             | IfThenElse (cond, truePart, falsePart) ->
                 let falseLabel = gen.DefineLabel()
