@@ -142,6 +142,8 @@ module ExprCompiler =
             | Sequential (e1, e2) ->
                 stack.Push(CompileTarget e2)
                 stack.Push(Assumption IfSequential)
+                // The void method call expression returns unit as value of Type property.
+                // So the below condition contains the case of typeof<Void>.
                 if e1.Type <> typeof<unit> then
                   stack.Push(Compiling (fun gen -> gen.Emit Pop))
                 stack.Push(CompileTarget e1)

@@ -691,6 +691,7 @@ module internal MethodCallEmitter =
                       if isReturnVoid then
                         [ Assumed (function
                                    | IfSequential, gen -> emitCall gen
+                                   //| IfRet, gen -> gen.Emit(Tailcall); emitCall gen // can not apply the tailcall prefix to the void method
                                    | _, gen ->
                                        emitCall gen
                                        // F# requires unit type as the return type of method.
@@ -700,7 +701,12 @@ module internal MethodCallEmitter =
                                        gen.Emit(Ldnull)) ]
                       elif mi.ReturnType = typeof<unit> then
                         [ Assumed (function
-                                   | IfSequential, gen -> emitCall gen; gen.Emit(Pop)
+                                   | IfSequential, gen ->
+                                       emitCall gen
+                                       // The method call that returns unit type pushes null value to the evaluation stack.
+                                       // But sequential expression doesn't consume it.
+                                       // Pop it in order to avoid that the null remains in the evaluation stack.
+                                       gen.Emit(Pop)
                                    | IfRet, gen -> gen.Emit(Tailcall); emitCall gen
                                    | _, gen -> emitCall gen) ]
                       else
