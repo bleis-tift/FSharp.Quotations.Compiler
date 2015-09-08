@@ -691,7 +691,13 @@ module internal MethodCallEmitter =
                       if isReturnVoid then
                         [ Assumed (function
                                    | IfSequential, gen -> emitCall gen
-                                   | _, gen -> emitCall gen; gen.Emit(Ldnull)) ]
+                                   | _, gen ->
+                                       emitCall gen
+                                       // F# requires unit type as the return type of method.
+                                       // That means evaluator needs to push null value to the evaluation stack.
+                                       // But the method that returns void doesn't do it.
+                                       // So the method returns void needs to push null value to the evaluation stack after calling it.
+                                       gen.Emit(Ldnull)) ]
                       elif mi.ReturnType = typeof<unit> then
                         [ Assumed (function
                                    | IfSequential, gen -> emitCall gen; gen.Emit(Pop)
