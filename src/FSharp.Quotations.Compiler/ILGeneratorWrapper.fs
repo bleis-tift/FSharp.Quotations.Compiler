@@ -93,6 +93,18 @@ type internal ILGeneratorWrapper private (builder: IGeneratorProvider, signature
     popIndent ()
     this.WriteLine("}")
     gen.EndExceptionBlock()
+  member this.BeginWhileBlock() =
+    this.WriteLine("// while start")
+    pushIndent ()
+    let loopStart = gen.DefineLabel()
+    let loopEnd = gen.DefineLabel()
+    this.MarkLabel(loopStart)
+    (loopStart, loopEnd)
+  member this.EndWhileBlock(loopStart, loopEnd) =
+    this.Emit(Br loopStart)
+    popIndent ()
+    this.WriteLine("// while end")
+    this.MarkLabel(loopEnd)
 
   member __.DefineLabel() = gen.DefineLabel()
   member this.MarkLabel(label) =

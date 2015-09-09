@@ -164,6 +164,17 @@ module ExprCompiler =
                   gen.Emit(Brfalse falseLabel)
                 ))
                 stack.Push(CompileTarget cond)
+            | WhileLoop (cond, body) ->
+                let loopStart, loopEnd = gen.BeginWhileBlock()
+                stack.Push(Compiling (fun gen ->
+                  gen.EndWhileBlock(loopStart, loopEnd)
+                ))
+                stack.Push(CompileTarget body)
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Brfalse loopEnd)
+                  gen.WriteLine("")
+                ))
+                stack.Push(CompileTarget cond)
             | Lambda (var, TryWith (body, _, _, e, exnHandler)) when var.Type = typeof<unit> ->
                 gen <- LambdaEmitter.emit parentMod (gen, varEnv, var, body.Type) (Compiling (fun gen ->
                   let res = gen.DeclareLocal("$res", body.Type)

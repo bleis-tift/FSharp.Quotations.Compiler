@@ -80,16 +80,6 @@ module Limitations =
        res.ToArray() @>
     |> checkExnType (typeof<exn>)
 
-  [<Test>]
-  let ``while loop`` () =
-    // while loop is not implemented yet.
-    <@ let res = ResizeArray<_>()
-       let mutable i = 0
-       while i <> 10 do
-         res.Add(i)
-       res.ToArray() @>
-    |> checkExnType (typeof<exn>)
-
   let cast<'T> (expr: Expr) : Expr<'T> = expr |> Expr.Cast
 
   [<Test>]

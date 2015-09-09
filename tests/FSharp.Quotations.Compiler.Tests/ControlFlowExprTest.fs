@@ -217,3 +217,13 @@ module ControlFlowExprTest =
        (f "100")
     @>
     |> check "00, 0"
+
+  [<Test>]
+  let ``while loop`` () =
+    <@ let res = ResizeArray<_>()
+       let mutable i = 0
+       while i <> 10 do
+         res.Add(i)
+         i <- i + 1
+       res.ToArray() @>
+    |> check [|0..9|]
