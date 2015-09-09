@@ -4,9 +4,9 @@ open System.Reflection
 [<assembly: AssemblyTitleAttribute("FSharp.Quotations.Compiler")>]
 [<assembly: AssemblyProductAttribute("FSharp.Quotations.Compiler")>]
 [<assembly: AssemblyDescriptionAttribute("A compiler for F# expression tree")>]
-[<assembly: AssemblyVersionAttribute("0.3")>]
-[<assembly: AssemblyFileVersionAttribute("0.3")>]
+[<assembly: AssemblyVersionAttribute("0.4")>]
+[<assembly: AssemblyFileVersionAttribute("0.4")>]
 do ()
 
 module internal AssemblyVersionInformation =
-    let [<Literal>] Version = "0.3"
+    let [<Literal>] Version = "0.4"
