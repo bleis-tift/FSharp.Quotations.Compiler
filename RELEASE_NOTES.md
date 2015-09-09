@@ -1,3 +1,6 @@
+### 0.4 - September 9 2015
+* bug fix
+
 ### 0.3 - June 19 2015
 * bug fix
 
