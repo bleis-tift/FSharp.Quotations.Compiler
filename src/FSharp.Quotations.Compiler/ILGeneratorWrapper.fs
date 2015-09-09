@@ -105,6 +105,18 @@ type internal ILGeneratorWrapper private (builder: IGeneratorProvider, signature
     popIndent ()
     this.WriteLine("// while end")
     this.MarkLabel(loopEnd)
+  member this.BeginForBlock() =
+    this.WriteLine("// for start")
+    pushIndent ()
+    let loopStart = gen.DefineLabel()
+    let loopEnd = gen.DefineLabel()
+    this.MarkLabel(loopStart)
+    (loopStart, loopEnd)
+  member this.EndForBlock(loopStart, loopEnd) =
+    this.Emit(Br loopStart)
+    popIndent ()
+    this.WriteLine("// for end")
+    this.MarkLabel(loopEnd)
 
   member __.DefineLabel() = gen.DefineLabel()
   member this.MarkLabel(label) =
@@ -117,7 +129,7 @@ type internal ILGeneratorWrapper private (builder: IGeneratorProvider, signature
     emittedOpCodes.Add(opcode)
     let raw = ILOpCode.toRawOpCode opcode
     match opcode with
-    | Brfalse label | Br label ->
+    | Bgt label | Brfalse label | Br label ->
         this.WriteLineAndMark(raw.Name + " " + string (label.GetHashCode()))
         gen.Emit(raw, label)
     | Leave label ->

@@ -175,6 +175,40 @@ module ExprCompiler =
                   gen.WriteLine("")
                 ))
                 stack.Push(CompileTarget cond)
+            | ForIntegerRangeLoop (var, fromX, toX, body) ->
+                let local = gen.DeclareLocal(var.Name, var.Type)
+                let tmp = gen.DeclareTemp(var.Type)
+                stack.Push(Compiling (fun gen ->
+                  let loopStart, loopEnd = gen.BeginForBlock()
+                  stack.Push(Compiling (fun gen ->
+                    gen.EndForBlock(loopStart, loopEnd)
+                    varEnv := (!varEnv).Tail
+                  ))
+                  stack.Push(Compiling (fun gen ->
+                    gen.Emit(Pop)
+                    gen.WriteLine("")
+                    gen.Emit(ILOpCode.ldloc local var.Name)
+                    gen.Emit(Ldc_I4_1)
+                    gen.Emit(Add)
+                    gen.Emit(ILOpCode.stloc local var.Name)
+                  ))
+                  stack.Push(CompileTarget body)
+                  stack.Push(Compiling (fun gen ->
+                    gen.Emit(ILOpCode.ldloc local var.Name)
+                    gen.Emit(Ldloc (tmp, None))
+                    gen.Emit(Bgt loopEnd)
+                    gen.WriteLine("")
+                  ))
+                ))
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(Stloc (tmp, None))
+                ))
+                stack.Push(CompileTarget toX)
+                stack.Push(Compiling (fun gen ->
+                  gen.Emit(ILOpCode.stloc local var.Name)
+                ))
+                stack.Push(CompileTarget fromX)
+                varEnv := (var, Local (local, var.Name)) :: (!varEnv)
             | Lambda (var, TryWith (body, _, _, e, exnHandler)) when var.Type = typeof<unit> ->
                 gen <- LambdaEmitter.emit parentMod (gen, varEnv, var, body.Type) (Compiling (fun gen ->
                   let res = gen.DeclareLocal("$res", body.Type)

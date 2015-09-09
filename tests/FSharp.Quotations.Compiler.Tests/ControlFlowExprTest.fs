@@ -227,3 +227,11 @@ module ControlFlowExprTest =
          i <- i + 1
        res.ToArray() @>
     |> check [|0..9|]
+
+  [<Test>]
+  let ``for loop`` () =
+    <@ let res = ResizeArray<_>()
+       for x in 5..10 do 
+         res.Add(x)
+       res.ToArray() @>
+    |> check [|5..10|]

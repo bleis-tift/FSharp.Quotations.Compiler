@@ -71,15 +71,6 @@ module Limitations =
        factInnerQuotation 5 @>
     |> checkExnType (typeof<KeyNotFoundException>) // So it throws KeyNotFoundException.
 
-  [<Test>]
-  let ``for loop`` () =
-    // for loop is not implemented yet.
-    <@ let res = ResizeArray<_>()
-       for x in 0..10 do 
-         res.Add(x)
-       res.ToArray() @>
-    |> checkExnType (typeof<exn>)
-
   let cast<'T> (expr: Expr) : Expr<'T> = expr |> Expr.Cast
 
   [<Test>]

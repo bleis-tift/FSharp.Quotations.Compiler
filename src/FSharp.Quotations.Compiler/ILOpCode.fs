@@ -46,6 +46,7 @@ type internal ILOpCode =
   | Sub
   | Sub_Ovf
   | Sub_Ovf_Un
+  | Bgt of Label
   | Brfalse of Label
   | Br of Label
   | Leave of Label
@@ -175,6 +176,7 @@ module internal ILOpCode =
   | Sub -> OpCodes.Sub
   | Sub_Ovf -> OpCodes.Sub_Ovf
   | Sub_Ovf_Un -> OpCodes.Sub_Ovf_Un
+  | Bgt _ -> OpCodes.Bgt
   | Brfalse _ -> OpCodes.Brfalse
   | Br _ -> OpCodes.Br
   | Leave _ -> OpCodes.Leave
