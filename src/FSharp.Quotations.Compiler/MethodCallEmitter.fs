@@ -690,7 +690,7 @@ module internal MethodCallEmitter =
                     let assumed = 
                       if isReturnVoid then
                         [ Assumed (function
-                                   | IfSequential, gen -> emitCall gen
+                                   | (IfSequential | IfLoop), gen -> emitCall gen
                                    //| IfRet, gen -> gen.Emit(Tailcall); emitCall gen // can not apply the tailcall prefix to the void method
                                    | _, gen ->
                                        emitCall gen
@@ -701,7 +701,7 @@ module internal MethodCallEmitter =
                                        gen.Emit(Ldnull)) ]
                       elif mi.ReturnType = typeof<unit> then
                         [ Assumed (function
-                                   | IfSequential, gen ->
+                                   | (IfSequential | IfLoop), gen ->
                                        emitCall gen
                                        // The method call that returns unit type pushes null value to the evaluation stack.
                                        // But sequential expression doesn't consume it.

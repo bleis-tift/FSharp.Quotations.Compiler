@@ -18,6 +18,7 @@ open System.Collections.Generic
 type internal Assumption =
   | IfSequential
   | IfRet
+  | IfLoop
   | False
 
 type internal CompileStackInfo =

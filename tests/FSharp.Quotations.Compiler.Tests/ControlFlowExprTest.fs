@@ -235,3 +235,11 @@ module ControlFlowExprTest =
          res.Add(x)
        res.ToArray() @>
     |> check [|5..10|]
+
+  [<Test>]
+  let ``for loop that is compiled into while loop`` () =
+    <@ let res = ResizeArray<_>()
+       for x in [5..10] do
+         res.Add(x)
+       res.ToArray() @>
+    |> check [|5..10|]

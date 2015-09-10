@@ -169,6 +169,7 @@ module ExprCompiler =
                 stack.Push(Compiling (fun gen ->
                   gen.EndWhileBlock(loopStart, loopEnd)
                 ))
+                stack.Push(Assumption IfLoop)
                 stack.Push(CompileTarget body)
                 stack.Push(Compiling (fun gen ->
                   gen.Emit(Brfalse loopEnd)
