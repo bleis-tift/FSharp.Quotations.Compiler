@@ -27,11 +27,13 @@ module ExtraTopLevelOpTest =
     <@ eprintf "hoge%d" 1 @> |> checkPrinted Error "hoge1"
     <@ eprintf "%s" "hoge" @> |> checkPrinted Error "hoge"
 
+  let appendNewLine str = str + System.Environment.NewLine
+
   [<Test>]
   let ``eprintfn`` () =
-    <@ eprintfn "hoge" @> |> checkPrinted Error "hoge\r\n"
-    <@ eprintfn "hoge%d" 1 @> |> checkPrinted Error "hoge1\r\n"
-    <@ eprintfn "%s" "hoge" @> |> checkPrinted Error "hoge\r\n"
+    <@ eprintfn "hoge" @> |> checkPrinted Error (appendNewLine "hoge")
+    <@ eprintfn "hoge%d" 1 @> |> checkPrinted Error (appendNewLine "hoge1")
+    <@ eprintfn "%s" "hoge" @> |> checkPrinted Error (appendNewLine "hoge")
     
   [<Test>]
   let ``fprintf`` () =
@@ -41,9 +43,9 @@ module ExtraTopLevelOpTest =
     
   [<Test>]
   let ``fprintfn`` () =
-    <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintfn w "hoge"; w.Result @> |> check "hoge\r\n"
-    <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintfn w "hoge%d" 1; w.Result @> |> check "hoge1\r\n"
-    <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintfn w "%s" "hoge"; w.Result @> |> check "hoge\r\n"
+    <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintfn w "hoge"; w.Result @> |> check (appendNewLine "hoge")
+    <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintfn w "hoge%d" 1; w.Result @> |> check (appendNewLine "hoge1")
+    <@ let w = new RobWriter(System.Text.UTF8Encoding()) in fprintfn w "%s" "hoge"; w.Result @> |> check (appendNewLine "hoge")
 
   [<Test>]
   let ``printf`` () =
@@ -53,9 +55,9 @@ module ExtraTopLevelOpTest =
 
   [<Test>]
   let ``printfn`` () =
-    <@ printfn "hoge" @> |> checkPrinted Out "hoge\r\n"
-    <@ printfn "hoge%d" 1 @> |> checkPrinted Out "hoge1\r\n"
-    <@ printfn "%s" "hoge" @> |> checkPrinted Out "hoge\r\n"
+    <@ printfn "hoge" @> |> checkPrinted Out (appendNewLine "hoge")
+    <@ printfn "hoge%d" 1 @> |> checkPrinted Out (appendNewLine "hoge1")
+    <@ printfn "%s" "hoge" @> |> checkPrinted Out (appendNewLine "hoge")
 
   [<Test>]
   let ``failwith`` () = <@ failwith "hoge" @> |> checkExnMsg "hoge"
