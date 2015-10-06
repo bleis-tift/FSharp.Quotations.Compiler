@@ -1,5 +1,5 @@
 (*** hide ***)
-// This block of code is omitted in the generated HTML documentation. Use 
+// This block of code is omitted in the generated HTML documentation. Use
 // it to define helpers that you do not want to show in the documentation.
 #I "../../../bin"
 #I "../../../bin/FSharp.Quotations.Compiler"
@@ -67,8 +67,8 @@ printfn "%d" (res.ExecuteCompiledCode())
 このライブラリは、CC0で公開されており、商用、非商用問わず、変更や再頒布可能です。
 より詳しい情報は、Githubリポジトリの[ライセンスファイル][license]をご覧ください。
 
-  [content]: https://github.com/fsprojects/FSharp.Quotations.Compiler/tree/master/docs/content
-  [gh]: https://github.com/fsprojects/FSharp.Quotations.Compiler
-  [issues]: https://github.com/fsprojects/FSharp.Quotations.Compiler/issues
-  [license]: https://github.com/fsprojects/FSharp.Quotations.Compiler/blob/master/LICENSE.txt
+  [content]: https://github.com/bleis-tift/FSharp.Quotations.Compiler/tree/master/docs/content
+  [gh]: https://github.com/bleis-tift/FSharp.Quotations.Compiler
+  [issues]: https://github.com/bleis-tift/FSharp.Quotations.Compiler/issues
+  [license]: https://github.com/bleis-tift/FSharp.Quotations.Compiler/blob/master/LICENSE.txt
 *)
